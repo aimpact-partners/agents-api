@@ -1,0 +1,6 @@
+{
+	"name": "realtime/interfaces/agent-events",
+	"platforms": ["web", "node"],
+	"bundle": "ts",
+	"files": "*"
+}

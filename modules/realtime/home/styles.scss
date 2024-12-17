@@ -1,0 +1,180 @@
+/* General Page Layout */
+[data-component='ConsolePage'] {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	font-family: Arial, sans-serif;
+}
+
+/* Header Section */
+.content-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+	background-color: #f8f9fa;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.content-title {
+	display: flex;
+	align-items: center;
+}
+
+.content-title img {
+	height: 40px;
+	margin-right: 10px;
+}
+
+.content-api-key button {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.content-api-key button:hover {
+	background-color: #0056b3;
+}
+
+/* Main Content Area */
+.content-main {
+	display: flex;
+	flex: 1;
+	padding: 20px;
+	background-color: #f1f3f5;
+}
+
+/* Logs Section */
+.content-logs {
+	flex: 2;
+	margin-right: 20px;
+}
+
+/* Event Log Styles */
+.content-block.events {
+	background-color: #ffffff;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+	padding: 15px;
+}
+
+.content-block-title {
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.content-block-body {
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.event {
+	padding: 10px;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.event:last-child {
+	border-bottom: none;
+}
+
+.event-summary {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+}
+
+.event-details {
+	margin-top: 10px;
+	background-color: #f8f9fa;
+	padding: 10px;
+	border-radius: 4px;
+}
+
+/* Conversation Log Styles */
+.content-block.conversation {
+	background-color: #ffffff;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+	padding: 15px;
+}
+
+.conversation-item {
+	margin-bottom: 10px;
+}
+
+.speaker {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.speaker-content {
+	padding-left: 20px;
+}
+
+.close {
+	cursor: pointer;
+	margin-left: auto;
+	color: #dc3545;
+}
+
+/* Actions Panel */
+.content-actions {
+	display: flex;
+	align-items: center;
+	margin-top: 20px;
+}
+
+.content-actions button {
+	background-color: #28a745;
+	color: white;
+	border: none;
+	padding: 10px 15px;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-right: 10px;
+}
+
+.content-actions button.alert {
+	background-color: #dc3545;
+}
+
+.content-actions button.action {
+	background-color: #007bff;
+}
+
+.content-actions button:hover {
+	opacity: 0.9;
+}
+
+/* Right Sidebar */
+.content-right {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.content-block {
+	background-color: #ffffff;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+	padding: 15px;
+}
+
+/* Weather Panel */
+.content-block.map p {
+	margin: 5px 0;
+}
+
+/* Memory Panel */
+.content-block.kv {
+	white-space: pre-wrap;
+	background-color: #f8f9fa;
+	padding: 10px;
+	border-radius: 4px;
+}

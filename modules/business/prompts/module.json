@@ -1,0 +1,6 @@
+{
+	"name": "business/prompts",
+	"platforms": ["node"],
+	"bundle": "ts",
+	"files": "*"
+}

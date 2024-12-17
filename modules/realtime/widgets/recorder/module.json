@@ -1,0 +1,15 @@
+{
+	"name": "realtime/recorder",
+	"widget": {
+		"route": "/recorder",
+		"is": "page",
+		"scss": {
+			"path": "scss",
+			"files": "*"
+		},
+		"ts": "*",
+		"element": {
+			"name": "beyondjs-agents-realtime-recorder"
+		}
+	}
+}

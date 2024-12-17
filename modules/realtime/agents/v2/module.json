@@ -1,0 +1,6 @@
+{
+	"name": "realtime/agents/v2",
+	"platforms": ["web", "node"],
+	"bundle": "ts",
+	"files": "*"
+}

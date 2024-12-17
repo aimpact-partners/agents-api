@@ -1,0 +1,6 @@
+{
+	"name": "models/open-ai/key",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}

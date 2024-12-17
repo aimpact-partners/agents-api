@@ -1,0 +1,4 @@
+{
+	"name": "realtime/audio/recorder",
+	"ts": { "files": "*" }
+}

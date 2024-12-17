@@ -1,0 +1,8 @@
+{
+	"name": "provider",
+	"bridge": {
+		"path": "./",
+		"files": ["*"]
+	},
+	"platforms": ["*"]
+}

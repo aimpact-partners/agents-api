@@ -1,0 +1,6 @@
+{
+	"name": "business/chats",
+	"bundle": "ts",
+	"platforms": ["node", "backend"],
+	"files": "*"
+}

@@ -1,0 +1,10 @@
+{
+	"name": "cloud-functions",
+	"platforms": ["node"],
+	"start": {
+		"ts": {
+			"path": "/start/ts",
+			"files": ["*"]
+		}
+	}
+}

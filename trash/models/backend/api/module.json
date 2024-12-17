@@ -1,0 +1,7 @@
+{
+	"name": "backend/api",
+	"platforms": ["node", "backend"],
+	"ts": {
+		"files": ["*"]
+	}
+}

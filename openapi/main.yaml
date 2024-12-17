@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+    title: Agents
+    description: Agents Specification
+    version: 0.4.0
+servers:
+    - url: https://dev.agents.api.aimpact.partners
+paths:
+    /:
+        $ref: 'home.yaml'
+    /chats:
+        $ref: 'chats/index.yaml'
+
+components:
+    securitySchemes:
+        firebaseId:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Firebase ID token for authentication

@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+    title: Agents-API
+    version: 1.0.0
+paths:
+    /chats/{id}:
+        get:
+            summary: Get a specific chat
+            tags:
+                - Chat
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                  description: Unique identifier for the chat
+            responses:
+                '200':
+                    description: Details of the specified chat
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: boolean
+                                        example: true
+                                    data:
+                                        $ref: '#/components/schemas/IChatBase'
+                '404':
+                    description: Not Found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: boolean
+                                        example: false
+                                    error:
+                                        $ref: '#/components/schemas/Error'
+        delete:
+            summary: Delete a specific chat
+            tags:
+                - Chat
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                  description: Unique identifier for the chat
+            responses:
+                '200':
+                    description: Chat deleted successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: boolean
+                                        example: true
+                                    data:
+                                        type: object
+                                        properties:
+                                            deleted:
+                                                type: boolean
+                                                example: true
+                '404':
+                    description: Not Found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: boolean
+                                        example: false
+                                    error:
+                                        $ref: '#/components/schemas/Error'
+components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+    schemas:
+        Error:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    example: 404
+                text:
+                    type: string
+                    example: 'Not Found'
+        IUserBase:
+            type: object
+            properties:
+                uid:
+                    type: string
+                    example: 'uid123'
+                id:
+                    type: string
+                    example: 'id123'
+                name:
+                    type: string
+                    example: 'John Doe'
+                displayName:
+                    type: string
+                    example: 'John'
+                email:
+                    type: string
+                    example: 'john.doe@example.com'
+                photoURL:
+                    type: string
+                    example: 'http://example.com/photo.jpg'
+                phoneNumber:
+                    type: integer
+                    example: 1234567890
+        ILastIterationsData:
+            type: object
+            properties:
+                role:
+                    type: string
+                    example: 'user'
+                content:
+                    type: string
+                    example: 'Hello'
+                synthesis:
+                    type: string
+                    example: 'Summary'
+        IChatBase:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: '12345'
+                name:
+                    type: string
+                    example: 'General Chat'
+                metadata:
+                    type: object
+                    example: {}
+                parent:
+                    type: string
+                    example: 'parent123'
+                children:
+                    type: string
+                    example: 'children123'
+                language:
+                    type: object
+                    properties:
+                        default:
+                            type: string
+                            example: 'en'
+                user:
+                    $ref: '#/components/schemas/IUserBase'
+                messages:
+                    type: object
+                    properties:
+                        count:
+                            type: integer
+                            example: 2
+                        lastTwo:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/ILastIterationsData'
+        IChatData:
+            allOf:
+                - $ref: '#/components/schemas/IChatBase'
+                - type: object
+                  properties:
+                      synthesis:
+                          type: string
+                          example: 'summary text'
+                      project:
+                          type: object
+                          properties:
+                              id:
+                                  type: string
+                                  example: '02d991dd-8d57-42f3-b155-8e7133482c19'
+                              name:
+                                  type: string
+                                  example: 'Project Name'
+                              identifier:
+                                  type: string
+                                  example: 'project-identifier'
+                              agent:
+                                  type: object
+                                  properties:
+                                      url:
+                                          type: string
+                                          example: 'http://agent.example.com'

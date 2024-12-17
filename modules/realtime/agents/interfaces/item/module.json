@@ -1,0 +1,6 @@
+{
+	"name": "realtime/interfaces/item",
+	"platforms": ["web", "node"],
+	"bundle": "ts",
+	"files": "*"
+}

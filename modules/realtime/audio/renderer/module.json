@@ -1,0 +1,5 @@
+{
+	"name": "realtime/audio/renderer",
+	"bundle": "ts",
+	"files": "*"
+}

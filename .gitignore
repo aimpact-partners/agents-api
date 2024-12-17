@@ -1,0 +1,12 @@
+# Ignore node_modules at the root
+node_modules
+
+# Do not ignore node_modules inside 'modules'
+!/modules/node_modules
+
+.beyond
+.vscode
+.idea
+.env
+credentials
+uploads

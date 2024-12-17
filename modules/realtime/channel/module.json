@@ -1,0 +1,6 @@
+{
+	"name": "realtime/channel",
+	"platforms": ["web", "node"],
+	"bundle": "ts",
+	"files": "*"
+}

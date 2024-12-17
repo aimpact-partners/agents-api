@@ -1,0 +1,4 @@
+{
+	"name": "realtime/audio/player/worklet/processor",
+	"static": { "includes": ["./index.js", "./index.js.map"] }
+}

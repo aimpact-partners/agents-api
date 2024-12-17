@@ -1,0 +1,6 @@
+{
+	"name": "models/open-ai/caller",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}

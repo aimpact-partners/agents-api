@@ -1,0 +1,201 @@
+openapi: 3.0.0
+info:
+    title: Agents-API Projects
+    version: 1.0.0
+    description: API endpoint for prompts in the Chat-API platform.
+    contact:
+        email: hello@aimpact.partners
+
+paths:
+    /projects:
+        get:
+            summary: Get a projects list.
+            tags:
+                - /projects
+            responses:
+                200:
+                    description: Projects list geted successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponseList'
+                400:
+                    description: Bad request. Possible errors regarding missing or incorrect data.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponseBadRequest'
+        post:
+            summary: Publish a new project.
+            tags:
+                - /projects
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - name
+                            properties:
+                                id:
+                                    type: string
+                                name:
+                                    type: string
+                                description:
+                                    type: string
+
+            responses:
+                200:
+                    description: Project published successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponse'
+                400:
+                    description: Bad request. Possible errors regarding missing or incorrect data.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponseBadRequest'
+
+    /projects/{id}:
+        get:
+            summary: Get a Project.
+            tags:
+                - /projects
+            responses:
+                200:
+                    description: Project Geted successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponse'
+                400:
+                    description: Bad request. Possible errors regarding missing or incorrect data.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponseBadRequest'
+
+        put:
+            summary: Put a Project.
+            tags:
+                - /projects
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                description:
+                                    type: string
+            responses:
+                200:
+                    description: Project updated successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponse'
+                400:
+                    description: Bad request. Possible errors regarding missing or incorrect data.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponseBadRequest'
+
+        delete:
+            summary: Delete a Project.
+            tags:
+                - /projects
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - id
+                            properties:
+                                id:
+                                    type: string
+
+            responses:
+                200:
+                    description: Project published successfully.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponse'
+                400:
+                    description: Bad request. Possible errors regarding missing or incorrect data.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                $ref: '#/components/schemas/IResponseBadRequest'
+
+components:
+    schemas:
+        IResponse:
+            type: object
+            required:
+                - status
+            properties:
+                status:
+                    type: boolean
+                    description: Response status.
+                data:
+                    type: object
+                    $ref: '#/components/schemas/IProjectData'
+                    description: Response Data.
+
+        IResponseBadRequest:
+            type: object
+            properties:
+                status:
+                    type: boolean
+                    description: Response status.
+                error:
+                    type: string
+                    description: Error text.
+
+        IResponseList:
+            type: object
+            required:
+                - status
+            properties:
+                status:
+                    type: boolean
+                    description: Response status.
+                data:
+                    type: object
+                    properties:
+                        entries:
+                            description: Response Data.
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/IProjectData'
+
+        IProjectData:
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                identifier:
+                    type: string
+                description:
+                    type: string

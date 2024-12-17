@@ -1,0 +1,6 @@
+{
+	"name": "realtime/interfaces/open-ai-events",
+	"platforms": ["web", "node"],
+	"bundle": "ts",
+	"files": "*"
+}

@@ -1,0 +1,6 @@
+{
+	"name": "backend-openai",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": ["*"]
+}

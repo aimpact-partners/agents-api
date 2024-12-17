@@ -1,0 +1,15 @@
+{
+	"name": "realtime/conversation",
+	"widget": {
+		"route": "/conversation",
+		"is": "page",
+		"scss": {
+			"path": "scss",
+			"files": "*"
+		},
+		"ts": "*",
+		"element": {
+			"name": "beyondjs-agents-realtime-conversation"
+		}
+	}
+}

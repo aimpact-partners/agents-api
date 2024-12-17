@@ -1,0 +1,6 @@
+{
+	"name": "beyond-js/backend",
+	"platforms": ["node"],
+	"bundle": "ts",
+	"files": "*"
+}

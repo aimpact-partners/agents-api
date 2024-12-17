@@ -1,0 +1,239 @@
+get:
+    summary: Get all user chats
+    tags:
+        - Chats
+    security:
+        - BearerAuth: []
+    responses:
+        '200':
+            description: A list of chats
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: array
+                                items:
+                                    $ref: '#/schemas/IChatBase'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/schemas/Error'
+post:
+    summary: Create a new chat
+    tags:
+        - Chats
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        id:
+                            type: string
+                            example: '00000-dd1c-4e5d-8e40-208981d9bd7b'
+                        name:
+                            type: string
+                            example: 'My chat'
+                        projectId:
+                            type: string
+                            example: 'ffdfjhjh-er-b155-8e71334-82c19'
+                        uid:
+                            type: string
+                            example: '123456789'
+                        metadata:
+                            type: object
+                            properties:
+                                prompt:
+                                    type: string
+                                    example: 'topic-q&a'
+                        language:
+                            type: object
+                            properties:
+                                default:
+                                    type: string
+                                    example: 'es'
+    responses:
+        '200':
+            description: Chat created successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/schemas/IChatData'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/schemas/Error'
+delete:
+    summary: Delete all user chats
+    tags:
+        - Chats
+    security:
+        - BearerAuth: []
+    responses:
+        '200':
+            description: All chats deleted successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: object
+                                properties:
+                                    deleted:
+                                        type: array
+                                        items:
+                                            type: string
+                                            example: '12345'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/schemas/Error'
+
+schemas:
+    Error:
+        type: object
+        properties:
+            code:
+                type: integer
+                example: 404
+            text:
+                type: string
+                example: 'Not Found'
+    IUserBase:
+        type: object
+        properties:
+            uid:
+                type: string
+                example: 'uid123'
+            id:
+                type: string
+                example: 'id123'
+            name:
+                type: string
+                example: 'John Doe'
+            displayName:
+                type: string
+                example: 'John'
+            email:
+                type: string
+                example: 'john.doe@example.com'
+            photoURL:
+                type: string
+                example: 'http://example.com/photo.jpg'
+            phoneNumber:
+                type: integer
+                example: 1234567890
+    ILastIterationsData:
+        type: object
+        properties:
+            role:
+                type: string
+                example: 'user'
+            content:
+                type: string
+                example: 'Hello'
+            synthesis:
+                type: string
+                example: 'Summary'
+    IChatBase:
+        type: object
+        properties:
+            id:
+                type: string
+                example: '12345'
+            name:
+                type: string
+                example: 'General Chat'
+            metadata:
+                type: object
+                example: {}
+            parent:
+                type: string
+                example: 'parent123'
+            children:
+                type: string
+                example: 'children123'
+            language:
+                type: object
+                properties:
+                    default:
+                        type: string
+                        example: 'en'
+            user:
+                $ref: '#/schemas/IUserBase'
+            messages:
+                type: object
+                properties:
+                    count:
+                        type: integer
+                        example: 2
+                    lastTwo:
+                        type: array
+                        items:
+                            $ref: '#/schemas/ILastIterationsData'
+    IChatData:
+        allOf:
+            - $ref: '#/schemas/IChatBase'
+            - type: object
+              properties:
+                  synthesis:
+                      type: string
+                      example: 'summary text'
+                  project:
+                      type: object
+                      properties:
+                          id:
+                              type: string
+                              example: '02d991dd-8d57-42f3-b155-8e7133482c19'
+                          name:
+                              type: string
+                              example: 'Project Name'
+                          identifier:
+                              type: string
+                              example: 'project-identifier'
+                          agent:
+                              type: object
+                              properties:
+                                  url:
+                                      type: string
+                                      example: 'http://agent.example.com'

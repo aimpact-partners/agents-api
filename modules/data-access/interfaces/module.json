@@ -1,0 +1,6 @@
+{
+	"name": "data/interfaces",
+	"platforms": ["node"],
+	"bundle": "ts",
+	"files": "*"
+}

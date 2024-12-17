@@ -1,0 +1,8 @@
+{
+	"name": "agents-client/endpoint",
+	"bundle": "start",
+	"platforms": ["*"],
+	"ts": {
+		"files": "*"
+	}
+}

@@ -1,0 +1,6 @@
+{
+	"name": "backend-store",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}

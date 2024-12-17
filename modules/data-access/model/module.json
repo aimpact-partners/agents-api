@@ -1,0 +1,6 @@
+{
+	"name": "data/model",
+	"platforms": ["node"],
+	"bundle": "ts",
+	"files": "*"
+}

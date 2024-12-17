@@ -1,0 +1,7 @@
+{
+	"name": "trigger-agent",
+	"platforms": ["node", "backend"],
+	"ts": {
+		"files": ["*"]
+	}
+}

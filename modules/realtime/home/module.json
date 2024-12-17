@@ -1,0 +1,12 @@
+{
+	"name": "realtime/home",
+	"widget": {
+		"route": "/",
+		"is": "page",
+		"scss": "*",
+		"ts": "*",
+		"element": {
+			"name": "home-page"
+		}
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"name": "utils/timestamp",
+	"platforms": ["node", "backend"],
+	"ts": {
+		"files": ["*"]
+	}
+}

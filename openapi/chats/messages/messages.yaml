@@ -1,0 +1,138 @@
+openapi: 3.0.0
+info:
+    title: Agents-API
+    version: 1.0.0
+paths:
+    /chats/{id}/messages:
+        post:
+            summary: Send a message in a chat
+            tags:
+                - Chats Messages
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                  description: Unique identifier for the chat in the URL
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                id:
+                                    type: string
+                                    description: Unique identifier for the chat in the request body
+                                    example: '12345'
+                                content:
+                                    type: string
+                                    description: Content of the message
+                                    example: 'Hello, this is a message'
+                                systemId:
+                                    type: string
+                                    description: System identifier
+                                    example: 'system123'
+                            required:
+                                - id
+                                - content
+                                - systemId
+            responses:
+                '200':
+                    description: Message sent successfully
+                    content:
+                        application/octet-stream:
+                            schema:
+                                type: string
+                                format: binary
+                '400':
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                '401':
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+            security:
+                - firebaseId: []
+    /chats/{id}/messages/audio:
+        post:
+            summary: Send an audio message in a chat
+            tags:
+                - Chats Messages
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: string
+                  description: Unique identifier for the chat in the URL
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                id:
+                                    type: string
+                                    description: Unique identifier for the chat in the request body
+                                    example: '12345'
+                                systemId:
+                                    type: string
+                                    description: System identifier
+                                    example: 'system123'
+                                file:
+                                    type: string
+                                    format: binary
+                                    description: Audio file containing the message
+                            required:
+                                - id
+                                - systemId
+                                - file
+            responses:
+                '200':
+                    description: Audio message sent successfully
+                    content:
+                        application/octet-stream:
+                            schema:
+                                type: string
+                                format: binary
+                '400':
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                '401':
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+            security:
+                - firebaseId: []
+components:
+    securitySchemes:
+        firebaseId:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Firebase ID token for authentication

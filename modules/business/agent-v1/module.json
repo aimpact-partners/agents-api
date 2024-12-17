@@ -1,0 +1,7 @@
+{
+	"name": "business/agent",
+	"platforms": ["node", "backend"],
+	"ts": {
+		"files": ["*"]
+	}
+}

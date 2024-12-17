@@ -1,0 +1,6 @@
+{
+	"name": "realtime/utils",
+	"platforms": ["web", "node"],
+	"bundle": "ts",
+	"files": "*"
+}

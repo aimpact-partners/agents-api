@@ -1,0 +1,8 @@
+{
+	"name": "fire",
+	"platforms": ["node", "backend"],
+	"ts": {
+		"path": "ts",
+		"files": ["*"]
+	}
+}

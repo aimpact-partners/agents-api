@@ -1,0 +1,5 @@
+{
+	"name": "realtime/audio/recorder/worklet/bridge",
+	"bundle": "ts",
+	"files": "*"
+}

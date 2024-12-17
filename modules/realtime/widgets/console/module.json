@@ -1,0 +1,12 @@
+{
+	"name": "realtime/console",
+	"widget": {
+		"route": "/console",
+		"is": "page",
+		"scss": "*",
+		"ts": "*",
+		"element": {
+			"name": "beyondjs-agents-realtime-console"
+		}
+	}
+}

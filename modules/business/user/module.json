@@ -1,0 +1,6 @@
+{
+	"name": "business/user",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}

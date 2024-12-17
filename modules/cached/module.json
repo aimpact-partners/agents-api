@@ -1,0 +1,6 @@
+{
+	"name": "cached",
+	"bundle": "ts",
+	"platforms": ["node", "backend"],
+	"files": "*"
+}

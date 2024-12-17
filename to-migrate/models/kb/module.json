@@ -1,0 +1,7 @@
+{
+	"name": "models/kb",
+	"platforms": ["node"],
+	"ts": {
+		"files": ["*"]
+	}
+}

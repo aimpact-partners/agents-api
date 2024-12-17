@@ -1,0 +1,48 @@
+openapi: 3.0.0
+info:
+    title: Agents-API Audios
+    version: 1.0.0
+paths:
+    /audios/transcribe:
+        post:
+            summary: Transcribe an audio file
+            tags:
+                - Audio
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: string
+                                    format: binary
+                                    description: Audio file to be transcribed
+                            required:
+                                - file
+            responses:
+                '200':
+                    description: Transcription successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: boolean
+                                        example: true
+                                    data:
+                                        type: object
+                                        properties:
+                                            text:
+                                                type: string
+                                                example: 'This is an example text.'
+
+components:
+    securitySchemes:
+        firebaseId:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Firebase ID token for authentication
