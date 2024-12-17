@@ -1,6 +1,8 @@
 import { Chat as ChatData } from '@aimpact/agents-api/business/chats';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
+import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
+import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
+import { prepare } from './prepare';
 
 export /*bundle*/ class Chat {
 	#id: string;
@@ -10,13 +12,17 @@ export /*bundle*/ class Chat {
 
 	#data;
 
-	#user;
 	get user() {
-		return this.#user;
+		return this.#data?.user;
 	}
 
 	get synthesis() {
 		return this.#data?.synthesis;
+	}
+
+	#system;
+	get system() {
+		return this.#system;
 	}
 
 	get messages() {
@@ -27,8 +33,6 @@ export /*bundle*/ class Chat {
 			count: msgs && msgs.count ? msgs.count : 0,
 			user: msgs && msgs.user ? msgs.user : 0
 		};
-		++messages.user; // add the user recent message
-		++messages.count; // add the recent message
 
 		return messages;
 	}
@@ -38,9 +42,9 @@ export /*bundle*/ class Chat {
 		return this.#error;
 	}
 
-	constructor(id: string, user: User) {
+	constructor(id: string) {
 		this.#id = id;
-		this.#user = user;
+		// this.#user = user; // TODO validate user
 	}
 
 	async fetch() {
@@ -52,21 +56,28 @@ export /*bundle*/ class Chat {
 		const chat = response.data;
 
 		if (!chat) return { error: ErrorGenerator.chatNotValid(this.#id) };
-		const id = chat.user.uid ?? chat.user.id;
-		if (id !== this.user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
+		// const id = chat.user.uid ?? chat.user.id;
+		// if (id !== this.user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
 
 		if (!chat.language) return { error: ErrorGenerator.chatWithoutLanguages(this.#id) };
 		const language = chat.language.default;
 		if (!language) return { error: ErrorGenerator.chatWithoutDefaultLanguage(this.#id) };
 		if (!chat.project) return { error: ErrorGenerator.chatWithoutDefaultLanguage(this.#id) };
 
-		return { chat };
-
 		if (this.#error) return { status: false };
 
 		this.#data = chat;
 
-		return { chat };
+		const specs: IPromptExecutionParams = prepare(chat);
+		specs.messages = chat.messages ?? [];
+
+		specs.model = 'gpt-4o-mini';
+		specs.temperature = 1;
+
+		const templateProcessor = new PromptTemplateProcessor(specs);
+		await templateProcessor.process();
+
+		this.#system = templateProcessor.value;
 	}
 
 	async store(params) {

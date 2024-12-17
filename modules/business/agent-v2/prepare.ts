@@ -1,6 +1,4 @@
-import { User } from '@aimpact/agents-api/business/user';
-
-export const prepare = (chat, user: User) => {
+export const prepare = chat => {
 	const { module, activity } = chat.metadata;
 
 	const lastMessage = chat.messages?.lastTwo.find(messages => messages.role === 'assistant');
@@ -17,7 +15,7 @@ export const prepare = (chat, user: User) => {
 		.join(`\n`);
 
 	const literals = {
-		user: user.displayName,
+		user: chat.user.displayName,
 		age: module.audience ?? '',
 		role: role,
 		subject: subject,

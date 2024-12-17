@@ -1,6 +1,9 @@
 import type { BaseRealtimeAgent } from '.';
-import type { IChannelSettings, ChannelStatusType } from '@aimpact/agents-api/realtime/channel';
-import type { ISessionCreatedServerEvent } from '@aimpact/agents-api/realtime/interfaces/open-ai-events';
+import type { ChannelStatusType } from '@aimpact/agents-api/realtime/channel';
+import type {
+	ISessionCreatedServerEvent,
+	ISessionUpdateClientEvent
+} from '@aimpact/agents-api/realtime/interfaces/open-ai-events';
 import { Data as MessageDataType } from 'ws';
 import { Channel } from '@aimpact/agents-api/realtime/channel';
 import { Events } from '@beyond-js/events/events';
@@ -81,6 +84,7 @@ export class AgentSession extends Events {
 
 				this.#created = true;
 				this.#created = true;
+				this.#model = event.session.model;
 				this.off('session.created', oncreated);
 
 				this.#agent.trigger('session.created');
@@ -135,7 +139,9 @@ export class AgentSession extends Events {
 
 		data = data || {};
 		if (typeof data !== 'object') throw new Error(`data must be an object`);
-		data = Object.assign({ event_id: RealtimeUtils.generateId('evt_'), type: event }, data);
+
+		const id = data.event_id ? data.event_id : RealtimeUtils.generateId('evt_');
+		data = Object.assign({ event_id: id, type: event }, data);
 
 		this.#channel.send(JSON.stringify(data));
 		return true;
@@ -146,6 +152,21 @@ export class AgentSession extends Events {
 		this.#channel.off('close', this.#onclose);
 		this.#channel.off('message', this.#onmessage);
 		if (['open', 'connecting'].includes(this.#channel.status)) this.#channel.close();
+	}
+
+	update() {
+		const session: ISessionUpdateClientEvent = {
+			type: 'session.update',
+			event_id: RealtimeUtils.generateId('evt_'),
+			session: {
+				input_audio_format: 'pcm16',
+				input_audio_transcription: {
+					enabled: false
+				},
+				turn_detection: 2
+			}
+		};
+		this.send('session.update', session);
 	}
 
 	async close() {
