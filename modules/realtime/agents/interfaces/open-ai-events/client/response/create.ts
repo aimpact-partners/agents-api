@@ -1,4 +1,4 @@
-import type { IResponse } from '../../session';
+import type { ISessionConfig } from '../../session';
 
 /**
  * Send this event to trigger a response generation.
@@ -10,6 +10,6 @@ export /*bundle*/ interface IResponseCreateClientEvent {
 	// The event type, must be "response.create".
 	type: 'response.create';
 
-	// Configuration for the response.
-	response: IResponse;
+	// Create a new Realtime response with these parameters.
+	response: ISessionConfig;
 }

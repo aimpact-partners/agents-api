@@ -4,7 +4,7 @@ import type { VoicesType } from './voices';
 import type { IInputAudioTranscription } from './audio-transcription';
 import type { ITurnDetectionServer } from './turn-detection';
 
-export /*bundle*/ interface IResponse {
+export /*bundle*/ interface ISessionConfig {
 	// The set of modalities the model can respond with. To disable audio, set this to ["text"].
 	modalities: 'text' | 'audio'[];
 
@@ -32,7 +32,7 @@ export /*bundle*/ interface IResponse {
 	max_output_tokens?: number | 'inf';
 }
 
-export /*bundle*/ interface ISession extends IResponse {
+export /*bundle*/ interface ISession extends ISessionConfig {
 	// The format of input audio. Options are "pcm16", "g711_ulaw", or "g711_alaw".
 	input_audio_format: AudioFormatType;
 

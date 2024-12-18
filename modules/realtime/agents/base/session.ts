@@ -2,7 +2,8 @@ import type { BaseRealtimeAgent } from '.';
 import type { ChannelStatusType } from '@aimpact/agents-api/realtime/channel';
 import type {
 	ISessionCreatedServerEvent,
-	ISessionUpdateClientEvent
+	ISessionUpdateClientEvent,
+	ISessionConfig
 } from '@aimpact/agents-api/realtime/interfaces/open-ai-events';
 import { Data as MessageDataType } from 'ws';
 import { Channel } from '@aimpact/agents-api/realtime/channel';
@@ -29,7 +30,7 @@ export class AgentSession extends Events {
 	}
 
 	#id: string;
-	#model: string;
+	#config: ISessionConfig;
 
 	get error() {
 		return this.#channel.error;
@@ -83,8 +84,7 @@ export class AgentSession extends Events {
 				clearTimeout(timer);
 
 				this.#created = true;
-				this.#created = true;
-				this.#model = event.session.model;
+				this.#config = event.session;
 				this.off('session.created', oncreated);
 
 				this.#agent.trigger('session.created');
@@ -154,19 +154,17 @@ export class AgentSession extends Events {
 		if (['open', 'connecting'].includes(this.#channel.status)) this.#channel.close();
 	}
 
-	update() {
-		const session: ISessionUpdateClientEvent = {
+	update(value: Partial<ISessionConfig.session>) {
+		this.#config = Object.assign({}, this.#config, value);
+		const event: ISessionUpdateClientEvent = {
 			type: 'session.update',
 			event_id: RealtimeUtils.generateId('evt_'),
-			session: {
-				input_audio_format: 'pcm16',
-				input_audio_transcription: {
-					enabled: false
-				},
-				turn_detection: 2
-			}
+			session: this.#config
 		};
-		this.send('session.update', session);
+
+		// Be sure that the session is created before updating it
+		const update = () => this.send('session.update', event);
+		this.status === 'created' ? update() : this.#agent.on('session.created', update);
 	}
 
 	async close() {
