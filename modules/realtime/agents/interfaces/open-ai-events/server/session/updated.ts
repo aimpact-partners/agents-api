@@ -7,8 +7,8 @@ export /*bundle*/ interface ISessionUpdatedServerEvent {
 	// The unique ID of the server event.
 	event_id: string;
 
-	// The event type, must be "session.created".
-	type: 'session.created';
+	// The event type, must be "session.updated".
+	type: 'session.updated';
 
 	// The session resource.
 	session: ISession & {

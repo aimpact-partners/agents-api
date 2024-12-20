@@ -1,8 +1,14 @@
+import { Chat } from '@aimpact/agents-api/business/agent-v2';
+import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
 import type { ISessionSettings } from '@aimpact/agents-api/realtime/agents/base';
 import { BaseRealtimeAgent } from '@aimpact/agents-api/realtime/agents/base';
-import { Chat } from '@aimpact/agents-api/business/agent-v2';
 
 export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
+	#error: BusinessErrorManager;
+	get error() {
+		return this.#error;
+	}
+
 	constructor(settings: ISessionSettings) {
 		super(settings);
 	}
@@ -17,11 +23,14 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 		const chatId = `a380e14a-5faf-459f-9a71-87fedd801162`;
 		const chat = new Chat(chatId);
 		await chat.fetch();
-		if (chat.error) return new BusinessResponse({ error: chat.error });
+		if (chat.error) {
+			this.#error = chat.error;
+			return false;
+		}
 
-		console.log(`\n`, chat.messages.last, `\n`, chat.system);
-
-		// this.session.update();
+		// console.log(`\n`, chat.messages.last, chat.system);
+		const specs = { instructions: chat.system };
+		this.session.update(specs);
 
 		return true;
 	}

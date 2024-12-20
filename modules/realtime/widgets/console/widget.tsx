@@ -32,11 +32,13 @@ export default function Widget() {
 
 		client.on('session.open', invalidate);
 		client.on('session.created', invalidate);
+		client.on('session.ready', invalidate);
 		client.on('session.close', invalidate);
 
 		return () => {
 			client.off('session.open', invalidate);
 			client.off('session.created', invalidate);
+			client.off('session.ready', invalidate);
 			client.off('session.close', invalidate);
 		};
 	}, []);
@@ -44,6 +46,10 @@ export default function Widget() {
 	useEffect(() => {
 		let interval: ReturnType<typeof setInterval>;
 
+		const ready = () => {
+			console.warn('ready');
+			interval = setInterval(() => values.duration++, 1000);
+		};
 		const initiate = () => (interval = setInterval(() => values.duration++, 1000));
 		const end = () => {
 			clearInterval(interval);
@@ -51,11 +57,13 @@ export default function Widget() {
 		};
 
 		client.on('session.created', initiate);
+		client.on('session.ready', ready);
 		client.on('session.close', end);
 
 		return () => {
 			end();
 			client.off('session.created', initiate);
+			client.off('session.ready', ready);
 			client.off('session.close', end);
 		};
 	}, []);

@@ -77,7 +77,7 @@ export /*bundle*/ class Chat {
 		const templateProcessor = new PromptTemplateProcessor(specs);
 		await templateProcessor.process();
 
-		this.#system = templateProcessor.value;
+		this.#system = templateProcessor.processedValue;
 	}
 
 	async store(params) {

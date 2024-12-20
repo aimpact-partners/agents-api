@@ -38,6 +38,7 @@ export class Router {
 	#events: Map<AgentEventName | 'open' | 'close', IEventRoute> = new Map([
 		['open', { source: EventSource.SESSION, name: 'session.open' }],
 		['close', { source: EventSource.SESSION, name: 'session.close' }],
+		['session.ready', { source: EventSource.AGENT, destination: EventDestination.CLIENT }],
 		['session.created', { source: EventSource.AGENT, destination: EventDestination.CLIENT }],
 		['conversation.item.created', { source: EventSource.AGENT }],
 		['conversation.item.audio.delta', { source: EventSource.AGENT }],

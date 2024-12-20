@@ -1,14 +1,15 @@
-import type { BaseRealtimeAgent } from '.';
 import type { ChannelStatusType } from '@aimpact/agents-api/realtime/channel';
-import type {
-	ISessionCreatedServerEvent,
-	ISessionUpdateClientEvent,
-	ISessionConfig
-} from '@aimpact/agents-api/realtime/interfaces/open-ai-events';
-import { Data as MessageDataType } from 'ws';
 import { Channel } from '@aimpact/agents-api/realtime/channel';
-import { Events } from '@beyond-js/events/events';
+import type {
+	ISession,
+	ISessionConfig,
+	ISessionCreatedServerEvent,
+	ISessionUpdateClientEvent
+} from '@aimpact/agents-api/realtime/interfaces/open-ai-events';
 import { RealtimeUtils } from '@aimpact/agents-api/realtime/utils';
+import { Events } from '@beyond-js/events/events';
+import { Data as MessageDataType } from 'ws';
+import type { BaseRealtimeAgent } from '.';
 
 export /*bundle*/ interface ISessionSettings {
 	key: string; // The Open AI API key
@@ -30,7 +31,21 @@ export class AgentSession extends Events {
 	}
 
 	#id: string;
-	#config: ISessionConfig;
+
+	#config: ISession;
+	#sessionProps = [
+		'modalities',
+		'instructions',
+		'voice',
+		'output_audio_format',
+		'tools',
+		'tool_choice',
+		'temperature',
+		'max_output_tokens',
+		'input_audio_format',
+		'input_audio_transcription',
+		'turn_detection'
+	] as (keyof ISession)[];
 
 	get error() {
 		return this.#channel.error;
@@ -84,9 +99,11 @@ export class AgentSession extends Events {
 				clearTimeout(timer);
 
 				this.#created = true;
-				this.#config = event.session;
+				this.#config = this.#sessionConfig(event.session, this.#sessionProps);
+
 				this.off('session.created', oncreated);
 
+				console.log('agent trigger: session.created');
 				this.#agent.trigger('session.created');
 
 				// @TODO: Session created. @TODO: handle session data (id, settings)
@@ -123,6 +140,7 @@ export class AgentSession extends Events {
 		} catch (exc) {
 			// @TODO: Log error messages
 			console.warn(`Open AI message cannot be parsed: ${exc.message}`, exc);
+			return;
 		}
 
 		if (!message.type) {
@@ -130,8 +148,18 @@ export class AgentSession extends Events {
 			console.warn('Open AI message type is not defined:', message);
 			return;
 		}
+		if (message.error) {
+			console.error('message', message);
+		}
 
+		console.log('server trigger', message.type);
 		this.trigger(message.type, message);
+
+		if (message.type === 'session.updated') {
+			console.log('server trigger session.ready');
+			this.trigger('session.ready', message);
+			this.#agent.trigger('session.ready');
+		}
 	};
 
 	send(event: string, data?: Record<string, any>) {
@@ -154,7 +182,7 @@ export class AgentSession extends Events {
 		if (['open', 'connecting'].includes(this.#channel.status)) this.#channel.close();
 	}
 
-	update(value: Partial<ISessionConfig.session>) {
+	update(value: Partial<ISessionConfig>) {
 		this.#config = Object.assign({}, this.#config, value);
 		const event: ISessionUpdateClientEvent = {
 			type: 'session.update',
@@ -169,5 +197,11 @@ export class AgentSession extends Events {
 
 	async close() {
 		return await this.#channel.close();
+	}
+
+	#sessionConfig<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+		const props = {} as Pick<T, K>;
+		keys.forEach(key => (props[key] = obj[key]));
+		return props;
 	}
 }

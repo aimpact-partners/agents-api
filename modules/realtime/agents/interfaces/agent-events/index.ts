@@ -1,4 +1,5 @@
 export /*bundle*/ type AgentEventName =
+	| 'session.ready'
 	| 'session.created'
 	| 'conversation.item.created'
 	| 'conversation.item.audio.delta'
