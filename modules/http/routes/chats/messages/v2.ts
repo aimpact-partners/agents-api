@@ -32,7 +32,7 @@ export const v2 = async (req: IAuthenticatedRequest, res: IResponse) => {
 	const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
 	let metadata: IMetadata;
 	try {
-		const { iterator, error } = await Agent.sendMessage(id, specs, user);
+		const { iterator, error } = await Agent.processInteraction(id, specs, user);
 		if (error) return done({ status: false, error });
 
 		for await (const part of iterator) {

@@ -1,7 +1,15 @@
-export const prepare = chat => {
+import * as dotenv from 'dotenv';
+import { Chat } from './chat';
+
+dotenv.config();
+const { GPT_MODEL } = process.env;
+
+export const prepare = (chat: Chat, content: string) => {
 	const { module, activity } = chat.metadata;
 
-	const lastMessage = chat.messages?.lastTwo.find(messages => messages.role === 'assistant');
+	const lastTwo = chat.messages?.lastTwo ?? [];
+
+	const lastMessage = lastTwo.find(messages => messages.role === 'assistant');
 	const synthesis = lastMessage?.metadata.synthesis ?? '';
 	const progress = lastMessage?.metadata.progress ?? '';
 
@@ -9,11 +17,10 @@ export const prepare = chat => {
 		? JSON.stringify([{ ...synthesis, ...progress }])
 		: `The conversation hasn't started yet.`;
 
-	const { subject, role, instructions } = activity.resources.specs;
-	const activityObjectives = activity.resources.specs?.objectives
-		.map(objective => `* ${objective.name}: ${objective.objective}`)
-		.join(`\n`);
+	const { specs } = activity.resources;
+	const objectives = specs?.objectives.map(objective => `* ${objective.name}: ${objective.objective}`).join(`\n`);
 
+	const { subject, role, instructions } = specs;
 	const literals = {
 		user: chat.user.displayName,
 		age: module.audience ?? '',
@@ -21,14 +28,22 @@ export const prepare = chat => {
 		subject: subject,
 		instructions: instructions ?? '',
 		objective: activity.objective ?? '',
-		'activity-objectives': activityObjectives,
+		'activity-objectives': objectives,
 		'activity-objectives-progress': objectiveProgress
 	};
+
+	const messages: MessagesType = lastTwo.map((message: ILastMessages) => {
+		return { role: message.role, content: message.content };
+	});
+	messages.push({ role: 'user', content });
 
 	return {
 		category: 'agents',
 		name: `ailearn.activity-${activity.type}-v2`,
 		language: activity.language,
-		literals
+		literals,
+		messages: messages ?? [],
+		model: GPT_MODEL,
+		temperature: 1
 	};
 };

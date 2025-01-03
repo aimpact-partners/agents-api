@@ -1,9 +1,7 @@
-import { Chat } from '@aimpact/agents-api/business/chats';
-import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { User } from '@aimpact/agents-api/business/user';
+import { Chat } from './chat';
 import { prepare } from './prepare';
 
 interface IParams {
@@ -20,31 +18,12 @@ interface IMetadata {
 }
 
 export /*bundle*/ class Agent {
-	static async sendMessage(chatId: string, params: IParams, user: User) {
-		let chat, error;
-		({ chat, error } = await (async () => {
-			const response = await Chat.get(chatId);
-			if (response.error) return { error: response.error };
-			chat = response.data;
+	static async processInteraction(chatId: string, params: IParams, user: User) {
+		const chat = new Chat(chatId, user);
+		await chat.fetch();
+		if (chat.error) return chat.error;
 
-			// Chat validations
-			const id = chat.user.uid ?? chat.user.id;
-			if (id !== user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
-			if (!chat.language) return { error: ErrorGenerator.chatWithoutLanguages(chatId) };
-			return { chat };
-		})());
-		if (error) return { error: new BusinessResponse({ error }) };
-
-		const specs: IPromptExecutionParams = prepare(chat, user);
-		specs.messages = chat.messages ?? [];
-
-		// add the user's message
-		const { content } = params;
-		specs.messages.push({ role: 'user', content });
-
-		specs.model = 'gpt-4o-mini';
-		specs.temperature = 1;
-
+		const specs: IPromptExecutionParams = prepare(chat, params.content);
 		const promptTemplate = new PromptTemplateExecutor(specs);
 		const execution = await promptTemplate.incremental();
 

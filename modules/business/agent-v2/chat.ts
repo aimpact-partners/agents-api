@@ -2,6 +2,8 @@ import { Chat as ChatData } from '@aimpact/agents-api/business/chats';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
+import { User } from '@aimpact/agents-api/business/user';
+import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 import { prepare } from './prepare';
 
 export /*bundle*/ class Chat {
@@ -10,8 +12,13 @@ export /*bundle*/ class Chat {
 		return this.#id;
 	}
 
-	#data;
+	#data: IChatData;
 
+	get metadata() {
+		return this.#data?.metadata;
+	}
+
+	#user: User;
 	get user() {
 		return this.#data?.user;
 	}
@@ -20,9 +27,9 @@ export /*bundle*/ class Chat {
 		return this.#data?.synthesis;
 	}
 
-	#system;
-	get system() {
-		return this.#system;
+	#promptTemplate: PromptTemplateProcessor;
+	get promptTemplate() {
+		return this.#promptTemplate?.processedValue;
 	}
 
 	get messages() {
@@ -42,9 +49,9 @@ export /*bundle*/ class Chat {
 		return this.#error;
 	}
 
-	constructor(id: string) {
+	constructor(id: string, user: User) {
 		this.#id = id;
-		// this.#user = user; // TODO validate user
+		this.#user = user;
 	}
 
 	async fetch() {
@@ -56,8 +63,8 @@ export /*bundle*/ class Chat {
 		const chat = response.data;
 
 		if (!chat) return { error: ErrorGenerator.chatNotValid(this.#id) };
-		// const id = chat.user.uid ?? chat.user.id;
-		// if (id !== this.user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
+		const id = chat.user.uid ?? chat.user.id;
+		if (id !== this.#user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
 
 		if (!chat.language) return { error: ErrorGenerator.chatWithoutLanguages(this.#id) };
 		const language = chat.language.default;
@@ -67,17 +74,13 @@ export /*bundle*/ class Chat {
 		if (this.#error) return { status: false };
 
 		this.#data = chat;
+	}
 
-		const specs: IPromptExecutionParams = prepare(chat);
-		specs.messages = chat.messages ?? [];
+	async processPrompt(content: string) {
+		const specs: IPromptExecutionParams = prepare(this, content);
 
-		specs.model = 'gpt-4o-mini';
-		specs.temperature = 1;
-
-		const templateProcessor = new PromptTemplateProcessor(specs);
-		await templateProcessor.process();
-
-		this.#system = templateProcessor.processedValue;
+		this.#promptTemplate = new PromptTemplateProcessor(specs);
+		await this.#promptTemplate.process();
 	}
 
 	async store(params) {
