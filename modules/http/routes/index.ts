@@ -24,6 +24,6 @@ export /*bundle*/ function setup(app: Application) {
 
 export /*bundle*/ async function specs() {
 	const { findUp } = await import('find-up');
-	const root = await findUp('api', { cwd: __dirname, type: 'directory' });
+	const root = await findUp('app', { cwd: __dirname, type: 'directory' });
 	return join(root, 'openapi/merged.yaml');
 }
