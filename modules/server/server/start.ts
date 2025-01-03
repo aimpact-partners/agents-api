@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5040;
 
 class Server extends ServerBase {
 	#realtime: RealtimeAgentsServer;
