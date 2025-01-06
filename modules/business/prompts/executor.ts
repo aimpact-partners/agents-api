@@ -116,7 +116,11 @@ export /*bundle*/ class PromptTemplateExecutor {
 
 	async *incremental(): IncrementalResponseType {
 		const { error, prompt, messages, model, temperature, format } = await this.#prepare();
-		if (error) return new BusinessResponse({ error });
+
+		if (error) {
+			yield { error };
+			return;
+		}
 
 		// Call Open AI to generate the response of the prompt
 		// The iterator can return a tool call of a chunk

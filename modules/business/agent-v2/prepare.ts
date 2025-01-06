@@ -17,15 +17,22 @@ export const prepare = (chat: Chat, content: string) => {
 		? JSON.stringify([{ ...synthesis, ...progress }])
 		: `The conversation hasn't started yet.`;
 
-	const { specs } = activity.resources;
+	const { specs } = activity;
 	const objectives = specs?.objectives.map(objective => `* ${objective.name}: ${objective.objective}`).join(`\n`);
 
-	const { subject, role, instructions } = specs;
+	const { subject, role, topic, instructions } = specs;
+
+	const audience =
+		typeof module.audience === 'string'
+			? module.audience
+			: `${module.audience.category} level${module.audience.level}`;
+
 	const literals = {
 		user: chat.user.displayName,
-		age: module.audience ?? '',
-		role: role,
-		subject: subject,
+		age: audience,
+		topic: topic ?? '',
+		role: role ?? '',
+		subject: subject ?? '',
 		instructions: instructions ?? '',
 		objective: activity.objective ?? '',
 		'activity-objectives': objectives,

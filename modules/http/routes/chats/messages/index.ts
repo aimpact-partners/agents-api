@@ -22,9 +22,11 @@ export interface IError {
 
 export class ChatMessagesRoutes {
 	static setup(app: Application) {
-		app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.sendMessage);
 		app.post('/chats/:id/messages/audio', UserMiddlewareHandler.validate, audio);
 
+		// v1
+		// app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.sendMessage);
+		app.post('/chats/:id/messages', UserMiddlewareHandler.validate, v2);
 		app.post('/chats/:id/messages/v2', UserMiddlewareHandler.validate, v2);
 	}
 

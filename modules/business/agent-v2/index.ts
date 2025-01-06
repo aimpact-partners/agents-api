@@ -28,8 +28,10 @@ export /*bundle*/ class Agent {
 		const execution = await promptTemplate.incremental();
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {
-			const metadata = { synthesis: '', answer: '', objectives: '' };
+			const metadata: IMetadata = { answer: '', progress: '' };
 			for await (const part of execution) {
+				if (part.error) metadata.error = part.error;
+
 				const chunk = part.chunk?.replace('ÿ', 'y').replace('😸', '😺').replace('🖋️', '✒️');
 
 				// Yield the answer of the response of a function, but only compute the chunks for the answer of the answer
