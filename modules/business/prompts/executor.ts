@@ -83,8 +83,8 @@ export /*bundle*/ class PromptTemplateExecutor {
 		// If there are messages, then the prompt is considered the 'system' or 'assistant mission' in
 		// a conversation with an AI assistant.
 		messages.length
-			? messages.unshift({ role: 'system', content: prompt.value })
-			: messages.push({ role: 'user', content: prompt.value });
+			? messages.unshift({ role: 'system', content: prompt.processedValue })
+			: messages.push({ role: 'user', content: prompt.processedValue });
 
 		// const tools = new Tools(prompt.tools, this.#tools);
 		const format = this.#format;

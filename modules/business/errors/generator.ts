@@ -123,4 +123,10 @@ export /*bundle*/ class ErrorGenerator {
 			`The response processing was canceled because the "${tool.name}" tool did not complete.`
 		);
 	}
+	static parsingIPE(name: string) {
+		return new BusinessErrorManager(ErrorCodes.parsingIPE, `Error parsing IPE: "${name}"`);
+	}
+	static processingIPE(name: string) {
+		return new BusinessErrorManager(ErrorCodes.processingIPE, `Error processing IPE: "${name}"`);
+	}
 }

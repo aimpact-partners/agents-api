@@ -10,7 +10,7 @@ import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 const MESSAGE_ROLE = ['system', 'user', 'assistant', 'function'];
 
 export interface IMessageSpecs {
-	id: string;
+	id?: string;
 	role: 'system' | 'user' | 'assistant' | 'function';
 	content: string;
 	answer?: string;
@@ -48,11 +48,12 @@ export class Message {
 				if (messages.error) return { error: messages.error };
 
 				const count = (chat.messages?.count || 0) + 1;
-				const userCount = params.role == 'user' ? (chat.messages?.user || 0) + 1 : chat.messages?.user;
+				const userCount =
+					params.role == 'user' ? (chat.messages?.interactions || 0) + 1 : chat.messages?.interactions;
 
 				const merge = await chats.merge({
 					id: chatId,
-					data: { messages: { count, user: userCount } },
+					data: { messages: { count, interactions: userCount } },
 					transaction
 				});
 				if (merge.error) return { error: merge.error };

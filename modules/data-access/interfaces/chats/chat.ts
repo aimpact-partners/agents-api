@@ -17,7 +17,7 @@ export /*bundle*/ interface IChatBase {
 	user: IUserBase;
 	messages?: {
 		count: number;
-		user: number;
+		interactions: number;
 		lastTwo?: ILastIterationsData[];
 	};
 }

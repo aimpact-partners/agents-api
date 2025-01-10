@@ -22,5 +22,7 @@ export /*bundle*/ enum ErrorCodes {
 	chatNotHasProjectUrlSet,
 	notLanguagesToUpdate,
 	llmGenerationError,
-	functionExecutionError
+	functionExecutionError,
+	parsingIPE,
+	processingIPE
 }

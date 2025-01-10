@@ -1,10 +1,10 @@
 import { Chat as ChatData } from '@aimpact/agents-api/business/chats';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
 import { User } from '@aimpact/agents-api/business/user';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
-import { prepare } from './prepare';
+// import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
+// import { prepare } from './prepare';
 
 export /*bundle*/ class Chat {
 	#id: string;
@@ -23,6 +23,10 @@ export /*bundle*/ class Chat {
 		return this.#data?.user;
 	}
 
+	get project() {
+		return this.#data?.project;
+	}
+
 	get synthesis() {
 		return this.#data?.synthesis;
 	}
@@ -38,10 +42,14 @@ export /*bundle*/ class Chat {
 		const messages = {
 			last: msgs && msgs.lastTwo ? msgs.lastTwo : [],
 			count: msgs && msgs.count ? msgs.count : 0,
-			user: msgs && msgs.user ? msgs.user : 0
+			interactions: msgs && msgs.interactions ? msgs.interactions : 0
 		};
 
 		return messages;
+	}
+
+	get testing() {
+		return !this.#data.metadata.assignment;
 	}
 
 	#error;
@@ -71,30 +79,56 @@ export /*bundle*/ class Chat {
 		if (!language) return { error: ErrorGenerator.chatWithoutDefaultLanguage(this.#id) };
 		if (!chat.project) return { error: ErrorGenerator.chatWithoutDefaultLanguage(this.#id) };
 
-		if (this.#error) return { status: false };
+		if (this.#error) return;
 
 		this.#data = chat;
 	}
 
-	async processPrompt(content: string) {
-		const specs: IPromptExecutionParams = prepare(this, content);
+	// async processPrompt(content: string) {
+	// 	const specs: IPromptExecutionParams = prepare(this, content);
 
-		this.#promptTemplate = new PromptTemplateProcessor(specs);
-		await this.#promptTemplate.process();
-	}
+	// 	this.#promptTemplate = new PromptTemplateProcessor(specs);
+	// 	await this.#promptTemplate.process();
+	// }
 
-	async store(params) {
+	async storeInteration(params) {
 		try {
-			const { id, content } = params;
-			const userMessage = { id: id ?? uuid(), content, role: <RoleType>'user' };
-			const response = await Chat.saveMessage(chatId, userMessage, user);
-			if (response.error) return { status: false, error: response.error };
+			const promises = [];
+
+			const { prompt, answer, ipe } = params;
+
+			const metadata: Record<string, any> = {};
+			let summary = '';
+			ipe.forEach(item => {
+				metadata[item.key] = item.response;
+				if (item.key === 'summary') {
+					summary = item.response.summary;
+					metadata[item.key] = item.response.summary;
+				}
+			});
+
+			// store user's message
+			const userData = { content: prompt, role: 'user' };
+			promises.push(await ChatData.saveMessage(this.id, userData, this.user));
+
+			// store assistant's message
+			const assistantData = { answer, content: answer, role: 'assistant', metadata, synthesis: summary };
+			promises.push(await ChatData.saveMessage(this.id, assistantData, this.user));
+
+			// set last interaction on chat
+			promises.push(ChatData.setLastInteractions(this.id, 4));
+
+			// update summary on chat
+			promises.push(ChatData.saveSynthesis(this.id, summary));
+
+			const responses = await Promise.all(promises);
+			responses.forEach(response => {
+				if (!response.error) return;
+				this.#error = response.error;
+			});
 		} catch (exc) {
-			console.error(`BAG102:`, exc);
-			return {
-				status: false,
-				error: ErrorGenerator.internalError('BAG102', `Failed to store message`, exc.message)
-			};
+			console.error(`BAG102 storeInteration:`, exc);
+			this.#error = ErrorGenerator.internalError('BAG102', `Failed to store message`, exc.message);
 		}
 	}
 }
