@@ -5,13 +5,15 @@ import { Chat } from './chat';
 
 dotenv.config();
 const { AGENT_API_TOKEN } = process.env;
-const URL = 'http:localhost:5050/agent/hook';
 
 export const hook = async (chat: Chat, user: User, params = {}) => {
 	let response: any;
 	try {
 		const method = 'POST';
 		const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${AGENT_API_TOKEN}` };
+
+		const hookUrl = chat.project.agent.hook ?? `//agent/hook`;
+		const URL = `${chat.project.agent.url}${hookUrl}`;
 
 		// Prepare the parameters
 		const specs = {

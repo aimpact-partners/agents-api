@@ -2,86 +2,79 @@ import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import * as dotenv from 'dotenv';
 import { Chat } from './chat';
+import { BusinessResponse } from '@aimpact/agents-api/business/response';
+import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 
 dotenv.config();
 const { GPT_MODEL } = process.env;
 
 export class IPE {
 	// update for query DB
-	static get(chat, prompt: string) {
-		const { messages, user } = chat;
-		const { module, activity } = chat.metadata;
+	static async get(chat, prompt: string) {
+		const { project } = chat;
+		const response = await ProjectsAgents.get(project.id, project.agent.id);
+		if (response.error) return new BusinessResponse({ error: response.error });
 
-		const lastMessage = messages?.last.find(messages => messages.role === 'assistant');
-		const synthesis = lastMessage?.metadata.synthesis ?? '';
-		const progress = lastMessage?.metadata.progress ?? '';
-
-		const { type } = activity;
-
-		const specs = activity.resources?.specs ?? activity.specs;
-		console.log('activity', activity);
-		console.log('specs____', specs);
-
-		const { subject, role, instructions } = specs;
-
-		const activityObjectives = specs?.objectives
-			.map(objective => `* ${objective.name}: ${objective.objective}`)
-			.join(`\n`);
-
-		const objectiveProgress = progress?.objectives
-			? JSON.stringify([{ ...synthesis, ...progress }])
-			: `The conversation hasn't started yet.`;
-
+		const { metadata } = chat;
+		const agentData = response.data;
+		//
 		const ipe = [];
-		ipe.push({
-			format: 'json',
-			language: activity.language,
-			key: 'summary',
-			prompt: { category: 'agents', name: `ailearn.${type}-summary` },
-			literals: {
-				user: user.displayName,
-				age: module.audience ?? '',
-				role: role ?? '',
-				subject: subject ?? '',
-				prompt,
-				instructions: instructions ?? '',
-				'activity-objectives-progress': objectiveProgress
-			}
-		});
-		ipe.push({
-			format: 'json',
-			language: activity.language,
-			key: 'progress',
-			prompt: { category: 'agents', name: `ailearn.${type}-ipe` },
-			literals: {
-				user: user.displayName,
-				age: module.audience ?? '',
-				role: role ?? '',
-				subject: subject ?? '',
-				prompt,
-				previous: lastMessage?.content ?? '',
-				'activity-objectives': activityObjectives,
-				'activity-objectives-progress': objectiveProgress
-			}
+		agentData.ipe.forEach(item => {
+			const literals = {};
+			item.literals.pure.forEach(literal => {
+				literals[literal] =
+					typeof metadata[literal] === 'object'
+						? Object.entries(metadata[literal])
+								.map((entry, index) => {
+									return `  ${entry[0]}: ${entry[1]}`;
+								})
+								.join(`\n`)
+						: metadata[literal];
+			});
+
+			const reserved = [];
+			item.literals.reserved.forEach(literal => reserved.push(literal));
+
+			ipe.push(Object.assign({}, item, { language: metadata.language, literals, reserved }));
 		});
 
-		return { ipe };
+		return ipe;
 	}
 
-	static async process(chat, prompt: string, answer: string) {
-		const ipe = IPE.get(chat, prompt);
+	static async process(chat, message: string, answer: string) {
+		const ipe = await IPE.get(chat, message);
 
 		const promises: Promise<any>[] = [];
-		ipe.forEach(({ prompt, literals, format, language }) => {
+		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
+			const reservedValues = {};
+			reserved.forEach(literal => {
+				if (literal.toUpperCase() === 'PREVIOUS') {
+					const lastMessage = chat.messages?.last.find(messages => messages.role === 'assistant');
+					reservedValues[literal] = lastMessage?.content ?? '';
+					return;
+				}
+
+				const summary = chat.ipe?.summary;
+				const progress = chat.ipe?.progress?.objectives;
+
+				const objectiveProgress = chat.ipe
+					? JSON.stringify([{ progress, summary }])
+					: `The conversation hasn't started yet.`;
+
+				reservedValues[literal] = objectiveProgress;
+			});
+
 			const specs = {
 				category: prompt.category,
 				name: prompt.name,
 				model: GPT_MODEL,
 				temperature: 1,
-				language,
+				language: chat.language,
 				format: format ?? 'text',
-				literals: { answer, ...literals }
+				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
+
+			// console.log(`IPE specs_________________\n`, specs, `\n_________________`);
 
 			const promptExecutor = new PromptTemplateExecutor(specs);
 			promises.push(promptExecutor.execute());
@@ -94,20 +87,23 @@ export class IPE {
 			const { category, name } = entry.prompt;
 
 			if (error) {
-				responseError = { error: ErrorGenerator.processingIPE(`${category}.${name}`) };
+				console.error('IPE', error);
+				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(`${category}.${name}`) });
 				return;
 			}
 			try {
 				const content = entry.format === 'json' ? JSON.parse(data?.content) : data?.content;
 				ipe[index].response = content;
 			} catch (exc) {
-				responseError = { error: ErrorGenerator.parsingIPE(`${category}.${name}`) };
+				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
 		});
 
 		return { ipe, error: responseError };
 	}
 
+	// TODO
+	// Assistant Mission
 	static prepare(chat: Chat, content: string) {
 		const { module, activity } = chat.metadata;
 

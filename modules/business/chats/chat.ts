@@ -192,6 +192,23 @@ export /*bundle*/ class Chat {
 		});
 	}
 
+	static async saveIPE(id: string, ipe: string) {
+		return await db.runTransaction(async (transaction: Transaction) => {
+			try {
+				const response = await chats.data({ id, transaction });
+				if (response.error) return new BusinessResponse({ error: response.error });
+				if (!response.data.exists) return new BusinessResponse({ error: response.data.error });
+
+				const { error } = await chats.merge({ id, data: { ipe }, transaction });
+				if (error) return new BusinessResponse({ error });
+
+				return new BusinessResponse({ data: ipe });
+			} catch (exc) {
+				return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+			}
+		});
+	}
+
 	/**
 	 * Functions migradas del objeto Chat inicial
 	 * @TODO validar funcionamiento

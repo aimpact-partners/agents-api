@@ -1,10 +1,7 @@
-import type { Application, Request, Response as IResponse } from 'express';
-import { Projects } from '@aimpact/agents-api/business/projects';
+import { Projects, ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import { ErrorGenerator } from '@beyond-js/firestore-collection/errors';
-import { Response } from '@beyond-js/response/main';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
+import type { Application, Response as IResponse, Request } from 'express';
 
 export class ProjectsRoutes {
 	static setup(app: Application) {
@@ -13,6 +10,8 @@ export class ProjectsRoutes {
 		app.post('/projects/', this.publish);
 		app.put('/projects/:id', this.update);
 		app.delete('/projects/:id', this.delete);
+
+		app.post('/projects/:id/agents', this.agent);
 	}
 
 	static async list(req: Request, res: IResponse) {
@@ -65,6 +64,18 @@ export class ProjectsRoutes {
 		try {
 			let response;
 			res.json(new Response(response));
+		} catch (exc) {
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
+		}
+	}
+
+	static async agent(req: Request, res: IResponse) {
+		try {
+			const { id } = req.params;
+			const { name, literals, prompt, model, temperature, ipe } = req.body;
+			const { data, error } = await ProjectsAgents.set(id, { name, literals, prompt, model, temperature, ipe });
+
+			res.json(new Response({ data, error }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}

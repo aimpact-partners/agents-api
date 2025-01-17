@@ -44,11 +44,13 @@ export /*bundle*/ class Agent {
 		async function post(answer: string) {
 			const response = await IPE.process(chat, prompt, answer);
 			if (response.error) {
-				console.error('process IPE');
+				console.error('process IPE', response.error);
 				return;
 			}
 
 			const { ipe } = response;
+
+			// console.log('POST=====> ipe', ipe);
 			const hookSpecs = { ipe, answer, testing: chat.testing };
 			const hookResponse = await hook(chat, user, hookSpecs);
 			if (hookResponse.error) {

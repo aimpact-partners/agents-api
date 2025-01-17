@@ -14,10 +14,6 @@ export /*bundle*/ class Chat {
 
 	#data: IChatData;
 
-	get metadata() {
-		return this.#data?.metadata;
-	}
-
 	#user: User;
 	get user() {
 		return this.#data?.user;
@@ -29,6 +25,10 @@ export /*bundle*/ class Chat {
 
 	get synthesis() {
 		return this.#data?.synthesis;
+	}
+
+	get language() {
+		return this.#data?.language?.default ?? this.#data?.language;
 	}
 
 	#promptTemplate: PromptTemplateProcessor;
@@ -50,6 +50,14 @@ export /*bundle*/ class Chat {
 
 	get testing() {
 		return !this.#data.metadata.assignment;
+	}
+
+	get metadata() {
+		return this.#data?.metadata;
+	}
+
+	get ipe() {
+		return this.#data?.ipe;
 	}
 
 	#error;
@@ -84,13 +92,6 @@ export /*bundle*/ class Chat {
 		this.#data = chat;
 	}
 
-	// async processPrompt(content: string) {
-	// 	const specs: IPromptExecutionParams = prepare(this, content);
-
-	// 	this.#promptTemplate = new PromptTemplateProcessor(specs);
-	// 	await this.#promptTemplate.process();
-	// }
-
 	async storeInteration(params) {
 		try {
 			const promises = [];
@@ -119,7 +120,10 @@ export /*bundle*/ class Chat {
 			promises.push(ChatData.setLastInteractions(this.id, 4));
 
 			// update summary on chat
-			promises.push(ChatData.saveSynthesis(this.id, summary));
+			// promises.push(ChatData.saveSynthesis(this.id, summary));
+
+			// update summary on chat
+			promises.push(ChatData.saveIPE(this.id, metadata));
 
 			const responses = await Promise.all(promises);
 			responses.forEach(response => {
