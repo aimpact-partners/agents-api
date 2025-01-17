@@ -12,7 +12,7 @@ export class IPE {
 	// update for query DB
 	static async get(chat, prompt: string) {
 		const { project } = chat;
-		const response = await ProjectsAgents.get(project.id, project.agent.id);
+		const response = await ProjectsAgents.get(project.id, project.agent);
 		if (response.error) return new BusinessResponse({ error: response.error });
 
 		const { metadata } = chat;

@@ -1,5 +1,6 @@
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { User } from '@aimpact/agents-api/business/user';
+import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 
@@ -12,8 +13,14 @@ export const hook = async (chat: Chat, user: User, params = {}) => {
 		const method = 'POST';
 		const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${AGENT_API_TOKEN}` };
 
-		const hookUrl = chat.project.agent.hook ?? `//agent/hook`;
-		const URL = `${chat.project.agent.url}${hookUrl}`;
+		let agent;
+		if (chat.project.agent) {
+			const agentResponse = await ProjectsAgents.get(chat.project.id, chat.project.agent);
+			if (agentResponse.error) return { error: agentResponse.error };
+			agent = agentResponse.data;
+		} else agent = { hook: `${chat.project.agent.url}/agent/hook` };
+
+		const URL = agent.hook;
 
 		// Prepare the parameters
 		const specs = {
