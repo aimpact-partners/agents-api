@@ -13,8 +13,8 @@ export class ChatsRoutes {
 	static setup(app: Application) {
 		ChatMessagesRoutes.setup(app);
 
-		app.post('/chats', ChatsRoutes.save);
-		// app.post('/chats', middleware.validate, ChatsRoutes.save);
+		app.post('/chats', ChatsRoutes.create);
+		// app.post('/chats', middleware.validate, ChatsRoutes.create);
 
 		app.get('/chats', middleware.validate, ChatsRoutes.list);
 		app.get('/chats/:id', middleware.validate, ChatsRoutes.get);
@@ -27,7 +27,7 @@ export class ChatsRoutes {
 		/**
 		 * @deprecated
 		 */
-		app.post('/conversations', middleware.validate, ChatsRoutes.save);
+		app.post('/conversations', middleware.validate, ChatsRoutes.create);
 		app.get('/conversations/:id', middleware.validate, ChatsRoutes.get);
 	}
 
@@ -53,7 +53,7 @@ export class ChatsRoutes {
 		}
 	}
 
-	static async save(req: Request, res: IResponse) {
+	static async create(req: Request, res: IResponse) {
 		try {
 			const params: IChatDataSpecs = req.body;
 			const { data, error } = await Chat.save(params);

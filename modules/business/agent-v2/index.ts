@@ -50,7 +50,6 @@ export /*bundle*/ class Agent {
 
 			const { ipe } = response;
 
-			// console.log('POST=====> ipe', ipe);
 			const hookSpecs = { ipe, answer, testing: chat.testing };
 			const hookResponse = await hook(chat, user, hookSpecs);
 			if (hookResponse.error) {

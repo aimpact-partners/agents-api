@@ -13,4 +13,4 @@ class Projects extends Collection<IProjectData> {
 	}
 }
 
-export /*bundle*/ const projects: Collection<IProjectData> = new Projects();
+export /*bundle*/ const projects = new Projects();

@@ -1,17 +1,17 @@
-import type { IChatData, IUserBase, ILastIterationsData, IChatDataSpecs } from '@aimpact/agents-api/data/interfaces';
-import type { IMessageSpecs } from './message';
+import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
+import { BusinessResponse } from '@aimpact/agents-api/business/response';
+import { User } from '@aimpact/agents-api/business/user';
+import type { IChatData, IChatDataSpecs, ILastIterationsData, IUserBase } from '@aimpact/agents-api/data/interfaces';
+import { chats, projects } from '@aimpact/agents-api/data/model';
+import { Timestamp } from '@aimpact/agents-api/utils/timestamp';
+import { db } from '@beyond-js/firestore-collection/db';
 import type { firestore } from 'firebase-admin';
 import type { Transaction } from 'firebase-admin/firestore';
 import { v4 as uuid } from 'uuid';
-import { db } from '@beyond-js/firestore-collection/db';
-import { Message } from './message';
-import { Timestamp } from '@aimpact/agents-api/utils/timestamp';
 import { BatchDeleter } from './firestore/delete';
 import { FirestoreService } from './firestore/service';
-import { User } from '@aimpact/agents-api/business/user';
-import { chats, projects } from '@aimpact/agents-api/data/model';
-import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
+import type { IMessageSpecs } from './message';
+import { Message } from './message';
 
 export /*bundle*/ class Chat {
 	private collection: firestore.CollectionReference;
@@ -83,11 +83,16 @@ export /*bundle*/ class Chat {
 				if (!response.data.exists) return new BusinessResponse({ error: response.data.error });
 
 				const project = response.data.data;
+				const parents = { Projects: project.id };
+				const agentResponse = await projects.agents.data({ id: data.agent, parents });
+				if (agentResponse.error) return new BusinessResponse({ error: agentResponse.error });
+				if (!agentResponse.data.exists) return new BusinessResponse({ error: agentResponse.data.error });
+
 				specs.project = {
 					id: project.id,
 					name: project.name,
 					identifier: project.identifier,
-					agent: project.agent
+					agent: data.agent
 				};
 			}
 

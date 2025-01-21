@@ -18,7 +18,7 @@ export const hook = async (chat: Chat, user: User, params = {}) => {
 			const agentResponse = await ProjectsAgents.get(chat.project.id, chat.project.agent);
 			if (agentResponse.error) return { error: agentResponse.error };
 			agent = agentResponse.data;
-		} else agent = { hook: `${chat.project.agent.url}/agent/hook` };
+		} else agent = { hook: `${chat.project.agent.url}/agent/hook` }; // OLD Chats
 
 		const URL = agent.hook;
 

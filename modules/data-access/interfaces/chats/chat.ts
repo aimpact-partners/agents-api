@@ -24,17 +24,18 @@ export /*bundle*/ interface IChatBase {
 
 export /*bundle*/ interface IChatData extends IChatBase {
 	synthesis?: string;
-	project: { id: string; name: string; identifier: string; agent: { url: string } };
+	project: { id: string; name: string; identifier: string; agent: string };
 	usage?: { completionTokens: number; promptTokens: number; totalTokens: number };
 }
 
 export /*bundle*/ interface IChatDataSpecs {
 	id: string;
+	projectId: string;
+	agent: string;
+	uid: string;
 	name: string;
 	metadata: {};
 	parent?: string;
 	children?: string;
 	language: { default: string };
-	uid: string;
-	projectId: string;
 }
