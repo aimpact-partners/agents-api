@@ -2,13 +2,9 @@ import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompt
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { User } from '@aimpact/agents-api/business/user';
-import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 import { hook } from './hook';
 import { IPE } from './ipe';
-
-dotenv.config();
-const { AGENT_API_URL, AGENT_API_TOKEN } = process.env;
 
 interface IParams {
 	content: string;
@@ -19,7 +15,8 @@ interface IParams {
 interface IMetadata {
 	answer: string;
 	summary?: string;
-	progress?: string;
+	objectives?: [];
+	credits?: { total: number; consumed: number };
 	error?: { code: number; text: string };
 }
 
@@ -44,17 +41,14 @@ export /*bundle*/ class Agent {
 		async function post(answer: string) {
 			const response = await IPE.process(chat, prompt, answer);
 			if (response.error) {
-				console.error('process IPE', response.error);
-				return;
+				return { error: response.error };
 			}
 
 			const { ipe } = response;
-
 			const hookSpecs = { ipe, answer, testing: chat.testing };
 			const hookResponse = await hook(chat, user, hookSpecs);
 			if (hookResponse.error) {
-				console.error('Hook ', hookResponse.error);
-				return;
+				return { error: hookResponse.error };
 			}
 
 			// Store messages
@@ -63,22 +57,38 @@ export /*bundle*/ class Agent {
 				console.error('store user msg', chat.error);
 				return;
 			}
+
+			return { ipe, credits: hookResponse.data.credits };
 		}
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {
-			const metadata: IMetadata = { answer: '', progress: '' };
+			const metadata: IMetadata = { answer: '', objectives: [] };
 			for await (const part of execution) {
 				if (part.error) metadata.error = part.error;
 
 				const chunk = part.chunk?.replace('ÿ', 'y').replace('😸', '😺').replace('🖋️', '✒️');
 
 				// Yield the answer of the response of a function, but only compute the chunks for the answer of the answer
-				if (chunk || part.fnc) yield { chunk: chunk ? chunk : part.fnc.name };
+				if (chunk || part.function) yield { chunk: chunk ? chunk : part.function.content };
 				metadata.answer += chunk ? chunk : '';
 			}
 
 			// Call postProcessor
-			await post(metadata.answer);
+			const response = await post(metadata.answer);
+			if (response.error) metadata.error = response.error;
+
+			response.credits && (metadata.credits = response.credits);
+			if (response.ipe) {
+				response.ipe.forEach(ipe => {
+					if (ipe.key !== 'objectives') return;
+					const { objectives } = ipe.response;
+					metadata.objectives = objectives.map(o => ({
+						name: o.name,
+						relevance: o.relevance,
+						status: o.status
+					}));
+				});
+			}
 
 			yield { metadata };
 		}

@@ -1,7 +1,7 @@
 import { Agent } from '@aimpact/agents-api/business/agent-v2';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
-import { Response } from '@aimpact/agents-api/http/response';
+import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
 import type { Response as IResponse } from 'express';
 
 export interface IMetadata {
@@ -20,10 +20,10 @@ export const v2 = async (req: IAuthenticatedRequest, res: IResponse) => {
 
 	res.setHeader('Content-Type', 'text/plain');
 	res.setHeader('Transfer-Encoding', 'chunked');
-	const done = (specs: { status: boolean; error?: IError }) => {
-		const { status, error } = specs;
+	const done = (specs: { status: boolean; error?: IError; metadata? }) => {
+		const { status, error, metadata } = specs;
 		res.write('ÿ');
-		res.write(JSON.stringify({ status, error }));
+		res.write(JSON.stringify({ status, error, metadata }));
 		res.end();
 	};
 
@@ -50,5 +50,5 @@ export const v2 = async (req: IAuthenticatedRequest, res: IResponse) => {
 
 	if (metadata?.error) return done({ status: false, error: metadata.error });
 
-	done({ status: true });
+	done({ status: true, metadata });
 };

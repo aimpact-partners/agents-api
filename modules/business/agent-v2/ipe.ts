@@ -9,11 +9,10 @@ dotenv.config();
 const { GPT_MODEL } = process.env;
 
 export class IPE {
-	// update for query DB
 	static async get(chat, prompt: string) {
 		const { project } = chat;
 		const response = await ProjectsAgents.get(project.id, project.agent);
-		if (response.error) return new BusinessResponse({ error: response.error });
+		if (response.error) return { error: response.error };
 
 		const { metadata } = chat;
 		const agentData = response.data;
@@ -38,12 +37,14 @@ export class IPE {
 			ipe.push(Object.assign({}, item, { language: metadata.language, literals, reserved }));
 		});
 
-		return ipe;
+		return { ipe };
 	}
 
 	static async process(chat, message: string, answer: string) {
-		const ipe = await IPE.get(chat, message);
+		const response = await IPE.get(chat, message);
+		if (response.error) return { error: response.error };
 
+		const { ipe } = response;
 		const promises: Promise<any>[] = [];
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
 			const reservedValues = {};
@@ -73,8 +74,6 @@ export class IPE {
 				format: format ?? 'text',
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
-
-			// console.log(`IPE specs_________________\n`, specs, `\n_________________`);
 
 			const promptExecutor = new PromptTemplateExecutor(specs);
 			promises.push(promptExecutor.execute());
