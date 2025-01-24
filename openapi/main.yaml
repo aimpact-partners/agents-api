@@ -10,6 +10,12 @@ paths:
         $ref: 'home.yaml'
     /chats:
         $ref: 'chats/index.yaml'
+    /prompts/templates/project/{id}:
+        $ref: 'prompts/list.yaml'
+    /prompts/templates:
+        $ref: 'prompts/create.yaml'
+    /prompts/templates/{id}:
+        $ref: 'prompts/index.yaml'
 
 components:
     securitySchemes:

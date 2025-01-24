@@ -87,7 +87,7 @@ export /*bundle*/ class PromptsTemplate {
 
 			const items = await query.get();
 			const entries = items.docs.map(item => item.data());
-			return new BusinessResponse({ data: { entries } });
+			return new BusinessResponse({ data: { items: entries, entries } });
 		} catch (exc) {
 			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
