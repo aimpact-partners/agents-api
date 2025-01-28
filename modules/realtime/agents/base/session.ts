@@ -103,7 +103,7 @@ export class AgentSession extends Events {
 
 				this.off('session.created', oncreated);
 
-				console.log('agent trigger: session.created');
+				// console.log('agent trigger: session.created');
 				this.#agent.trigger('session.created');
 
 				// @TODO: Session created. @TODO: handle session data (id, settings)
@@ -152,7 +152,7 @@ export class AgentSession extends Events {
 			console.error('message', message);
 		}
 
-		console.log('server trigger', message.type);
+		// console.log('server trigger', message.type);
 		this.trigger(message.type, message);
 
 		if (message.type === 'session.updated') {

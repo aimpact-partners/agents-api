@@ -56,6 +56,10 @@ export class RealtimeConversationConnection {
 
 		try {
 			switch (event) {
+				case 'connect':
+					// Update the agent
+					this.#agent.update(data);
+					break;
 				case 'listen':
 					const audio = RealtimeUtils.base64ToArrayBuffer(data.audio);
 					this.#agent.manager.listen(new Int16Array(audio));

@@ -1,0 +1,12 @@
+{
+	"name": "realtime/console-original",
+	"widget": {
+		"route": "/console/henry",
+		"is": "page",
+		"scss": "*",
+		"ts": "*",
+		"element": {
+			"name": "beyondjs-agents-realtime-console-original"
+		}
+	}
+}

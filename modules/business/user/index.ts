@@ -1,12 +1,12 @@
-import type { IUserData, IUserBase } from '@aimpact/agents-api/data/interfaces';
-import type { Transaction } from 'firebase-admin/firestore';
-import * as admin from 'firebase-admin';
-import * as jwt from 'jsonwebtoken';
-import * as dayjs from 'dayjs';
-import { users } from '@aimpact/agents-api/data/model';
-import { db } from '@beyond-js/firestore-collection/db';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
+import type { IUserBase, IUserData } from '@aimpact/agents-api/data/interfaces';
+import { users } from '@aimpact/agents-api/data/model';
+import { db } from '@beyond-js/firestore-collection/db';
+import * as dayjs from 'dayjs';
+import * as admin from 'firebase-admin';
+import type { Transaction } from 'firebase-admin/firestore';
+import * as jwt from 'jsonwebtoken';
 
 export /*bundle*/ interface IUser extends IUserBase {}
 
@@ -184,5 +184,25 @@ export /*bundle*/ class User implements IUser {
 			photoURL: this.#photoURL,
 			phoneNumber: this.#phoneNumber
 		};
+	}
+
+	static async verifyToken(token: string) {
+		try {
+			const decodedToken = await admin.auth().verifyIdToken(token);
+			if (!decodedToken) return new BusinessResponse({ error: ErrorGenerator.invalidAccessToken() });
+
+			const user = {
+				uid: decodedToken.uid,
+				id: decodedToken.uid,
+				name: decodedToken.name,
+				displayName: decodedToken.name,
+				email: decodedToken.email,
+				photoURL: decodedToken.photoURL,
+				phoneNumber: decodedToken.phoneNumber
+			};
+			return new BusinessResponse({ data: user });
+		} catch (exc) {
+			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+		}
 	}
 }

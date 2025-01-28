@@ -33,7 +33,9 @@ export /*bundle*/ class ClientSession extends ClientSessionBase {
 		return await super.close();
 	}
 
-	async update(settings: { conversation: { id: string } }): Promise<void> {}
+	async update(settings: { conversation: { id: string }; token: string }): Promise<void> {
+		this.#channel.send('connect', settings);
+	}
 
 	listen(data: { mono: Int16Array; raw: Int16Array }): void {
 		const audio = RealtimeUtils.arrayBufferToBase64(data.mono);

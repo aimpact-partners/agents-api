@@ -24,5 +24,7 @@ export /*bundle*/ enum ErrorCodes {
 	llmGenerationError,
 	functionExecutionError,
 	parsingIPE,
-	processingIPE
+	processingIPE,
+	invalidAccessToken,
+	insufficientCredits
 }

@@ -129,4 +129,13 @@ export /*bundle*/ class ErrorGenerator {
 	static processingIPE(name: string) {
 		return new BusinessErrorManager(ErrorCodes.processingIPE, `Error processing IPE: "${name}"`);
 	}
+	static invalidAccessToken() {
+		return new BusinessErrorManager(
+			ErrorCodes.invalidAccessToken,
+			`Invalid Access token or Access token not provided`
+		);
+	}
+	static insufficientCredits() {
+		return new BusinessErrorManager(ErrorCodes.insufficientCredits, `insufficient credits`);
+	}
 }
