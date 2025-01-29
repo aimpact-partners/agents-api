@@ -1,4 +1,4 @@
-import { Agent } from '@aimpact/agents-api/business/agent';
+import { Agent } from '@aimpact/agents-api/business/agent-v2';
 import { Chat } from '@aimpact/agents-api/business/chats';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
@@ -37,10 +37,10 @@ export const audio = async (req: IAuthenticatedRequest, res: IResponse) => {
 		return res.json({ status: false, error: exc.message });
 	}
 
-	const done = (specs: { status: boolean; error?: IError }) => {
-		const { status, error } = specs;
+	const done = (specs: { status: boolean; error?: IError; metadata? }) => {
+		const { status, error, metadata } = specs;
 		res.write('ÿ');
-		res.write(JSON.stringify({ status, error }));
+		res.write(JSON.stringify({ status, error, metadata }));
 		res.end();
 	};
 	res.setHeader('Content-Type', 'text/plain');
@@ -54,7 +54,7 @@ export const audio = async (req: IAuthenticatedRequest, res: IResponse) => {
 		const action = { type: 'transcription', data: { transcription: content } };
 		res.write('😸' + JSON.stringify(action) + '🖋️');
 
-		const { iterator, error } = await Agent.sendMessage(chatId, data, user.uid);
+		const { iterator, error } = await Agent.processIncremental(chatId, data, user);
 		if (error) return done({ status: false, error });
 
 		for await (const part of iterator) {
@@ -70,7 +70,7 @@ export const audio = async (req: IAuthenticatedRequest, res: IResponse) => {
 		return done({ status: false, error: ErrorGenerator.internalError('HRC101') });
 	}
 
-	if (metadata.error) return done({ status: false, error: metadata.error });
+	if (metadata?.error) return done({ status: false, error: metadata.error });
 
-	done({ status: true });
+	done({ status: true, metadata });
 };

@@ -86,9 +86,9 @@ export /*bundle*/ class Agent {
 			if (response.error) metadata.error = response.error;
 
 			response.credits && (metadata.credits = response.credits);
-			if (response.ipe) {
-				response.ipe.forEach(ipe => {
-					if (ipe.key !== 'objectives') return;
+			response.ipe &&
+				response.ipe?.forEach(ipe => {
+					if (ipe.key !== 'progress') return;
 					const { objectives } = ipe.response;
 					metadata.objectives = objectives.map(o => ({
 						name: o.name,
@@ -96,7 +96,6 @@ export /*bundle*/ class Agent {
 						status: o.status
 					}));
 				});
-			}
 
 			yield { metadata };
 		}

@@ -1,13 +1,13 @@
-import OpenAI from 'openai';
-import fetch from 'node-fetch';
-import * as FormData from 'form-data';
-import { gptTurboPlus, davinci3, whisper } from './utils/models';
 import * as dotenv from 'dotenv';
+import * as FormData from 'form-data';
+import fetch from 'node-fetch';
+import OpenAI from 'openai';
+import { davinci3, gptTurboPlus, whisper } from './utils/models';
 
 dotenv.config();
 
 export /*bundle*/ class OpenAIBackend {
-	#openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
+	#openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 	async completions(prompt: string, text: string) {
 		const content: string = prompt + `\n` + text;
@@ -72,15 +72,14 @@ export /*bundle*/ class OpenAIBackend {
 	}
 
 	async transcriptionStream(
-		stream: NodeJS.ReadableStream,
-		lang: string
+		stream: NodeJS.ReadableStream
 	): Promise<{ status: boolean; data?: any; error?: string; code?: number }> {
 		let form: FormData = new FormData();
 		form.append('file', stream, 'audio.webm');
 		form.append('model', 'whisper-1');
 
 		let headers = {
-			Authorization: `Bearer ${process.env.OPEN_AI_KEY}`,
+			Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
 			...form.getHeaders()
 		};
 
