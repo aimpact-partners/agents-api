@@ -49,10 +49,10 @@ export /*bundle*/ class Chat {
 	}
 
 	get testing() {
-		return !this.#data.metadata.assignment;
+		return !this.metadata?.assignment;
 	}
 
-	get metadata() {
+	get metadata(): Record<string, any> {
 		return this.#data?.metadata;
 	}
 
