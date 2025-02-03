@@ -1,7 +1,7 @@
 import { Channel as ChannelBase } from '@aimpact/agents-api/realtime/channel';
 import { Events } from '@beyond-js/events/events';
 
-const SERVER_URL = 'ws://localhost:5040';
+const SERVER_URL = 'wss://dev.agents.api.aimpact.partners';
 
 export class Channel extends Events {
 	#channel: ChannelBase;
