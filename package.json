@@ -1,6 +1,6 @@
 {
 	"name": "@aimpact/agents-api",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"title": "Agents API for custom chats using Agents",
 	"description": "",
 	"license": "ISC",
@@ -100,7 +100,7 @@
 		"dotenv": "^16.0.3",
 		"fluent-ffmpeg": "^2.1.2",
 		"dayjs": "^1.11.7",
-		"openai": "~4.72.0",
+		"openai": "~4.83.0",
 		"uuid": "^9.0.0",
 		"find-up": "~7.0.0"
 	},

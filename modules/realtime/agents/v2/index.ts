@@ -33,7 +33,6 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 
 	async update(params: ISpecs): Promise<boolean> {
 		const { conversation } = params;
-		// console.log('connect', params);
 
 		const userResponse = await User.verifyToken(params.token);
 		if (userResponse.error) {
@@ -58,9 +57,8 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 			return false;
 		}
 
-		// console.log(`--------------\n`, chat.messages.last, `\n`, prompt.processedValue);
-
-		this.session.update({ instructions: prompt.processedValue });
+		// voice = 'alloy' | 'shimmer' | 'echo';
+		this.session.update({ voice: 'alloy', instructions: prompt.processedValue });
 
 		return true;
 	}

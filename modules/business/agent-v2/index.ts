@@ -30,7 +30,7 @@ export /*bundle*/ class Agent {
 		const response = await _hook(chat, user);
 		if (!response.data.credits) return { error: response.credits };
 
-		const specs: IPromptExecutionParams = IPE.prepare(chat, prompt);
+		const specs: IPromptExecutionParams = IPE.prepare(chat, prompt, user);
 
 		return { chat, specs };
 	}

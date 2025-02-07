@@ -2,6 +2,7 @@ import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
+import { User } from '@aimpact/agents-api/business/user';
 import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 
@@ -102,7 +103,7 @@ export class IPE {
 	}
 
 	// Assistant Mission
-	static prepare(chat: Chat, content: string) {
+	static prepare(chat: Chat, content: string, user: User) {
 		const { module, activity } = chat.metadata;
 
 		const last = chat.messages?.last ?? [];
@@ -121,14 +122,12 @@ export class IPE {
 
 		const { subject, role, topic, instructions } = specs;
 
-		const audience =
-			typeof module.audience === 'string'
-				? module.audience
-				: `${module.audience.category} level${module.audience.level}`;
+		const audience = module.audience;
 
 		const literals = {
 			user: chat.user.displayName,
 			age: audience,
+			audience,
 			topic: topic ?? '',
 			role: role ?? '',
 			subject: subject ?? '',
@@ -141,9 +140,18 @@ export class IPE {
 		const messages = last.map(message => ({ role: message.role, content: message.content }));
 		messages.push({ role: 'user', content });
 
+		const promptName = `ailearn.activity-${activity.type}-v2`;
+		if (user.email === 'boxenrique@gmail.com') {
+			specs.store = true;
+			specs.metadata = {
+				key: `agent/${activity.type}/${promptName}`,
+				prompt: promptName
+			};
+		}
+
 		return {
 			category: 'agents',
-			name: `ailearn.activity-${activity.type}-v2`,
+			name: promptName,
 			language: activity.language,
 			literals,
 			messages: messages ?? [],
