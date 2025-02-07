@@ -25,6 +25,9 @@ export /*bundle*/ interface IQueryExecutionParams {
 	tools?: AgentTool[];
 	response?: { format: string };
 	browser?: boolean;
+	format?: 'text' | 'json' | 'schema';
+	store?: boolean | null;
+	metadata?: Record<string, string>;
 
 	/**
 	 * @deprecated Use `response.format` instead.
@@ -70,7 +73,7 @@ export /*bundle*/ class OpenAICaller {
 	 * @returns An async generator yielding incremental responses.
 	 */
 	static async *incremental(params: IQueryExecutionParams): IncrementalResponseType {
-		const { messages, model, temperature, tools, browser } = params;
+		const { messages, model, temperature, tools, browser, store, metadata } = params;
 
 		let tool: IResolvedTool | undefined = void 0;
 
@@ -95,7 +98,9 @@ export /*bundle*/ class OpenAICaller {
 				messages,
 				functions: tools, // Using functions parameter to describe tools
 				stream: true,
-				response_format: format
+				response_format: format,
+				store,
+				metadata
 			});
 			let content = '';
 
@@ -166,7 +171,7 @@ export /*bundle*/ class OpenAICaller {
 	 * @returns A promise that resolves to the API response.
 	 */
 	static async generate(params: IQueryExecutionParams): ResponseType {
-		const { messages, model, temperature, responseFormat } = params;
+		const { messages, model, temperature, store, metadata } = params;
 
 		const MAX_RETRIES = 5;
 		const RETRY_INTERVAL = 5000;
@@ -192,7 +197,9 @@ export /*bundle*/ class OpenAICaller {
 					model,
 					temperature,
 					messages,
-					response_format: format
+					response_format: format,
+					store,
+					metadata
 				});
 
 				let { content } = response.choices[0].message;

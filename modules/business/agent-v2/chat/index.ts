@@ -28,7 +28,7 @@ export /*bundle*/ class Chat {
 	}
 
 	get language() {
-		return this.#data?.language?.default ?? this.#data?.language;
+		return this.#data?.language?.default;
 	}
 
 	#promptTemplate: PromptTemplateProcessor;

@@ -1,5 +1,6 @@
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
+import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { User } from '@aimpact/agents-api/business/user';
@@ -7,7 +8,7 @@ import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 
 dotenv.config();
-const { GPT_MODEL } = process.env;
+const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
 export class IPE {
 	static async get(chat: Chat, prompt: string) {
@@ -41,7 +42,7 @@ export class IPE {
 		return { ipe };
 	}
 
-	static async process(chat: Chat, message: string, answer: string) {
+	static async process(chat: Chat, message: string, answer: string, user: User) {
 		const response = await IPE.get(chat, message);
 		if (response.error) return { error: response.error };
 
@@ -66,7 +67,7 @@ export class IPE {
 				reservedValues[literal] = objectiveProgress;
 			});
 
-			const specs = {
+			const specs: IPromptExecutionParams = {
 				category: prompt.category,
 				name: prompt.name,
 				model: GPT_MODEL,
@@ -76,6 +77,13 @@ export class IPE {
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
 
+			if (user.email === USER_LOGS_PROMPTS) {
+				specs.store = true;
+				specs.metadata = {
+					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
+					prompt: prompt.name
+				};
+			}
 			const promptExecutor = new PromptTemplateExecutor(specs);
 			promises.push(promptExecutor.execute());
 		});
@@ -141,15 +149,8 @@ export class IPE {
 		messages.push({ role: 'user', content });
 
 		const promptName = `ailearn.activity-${activity.type}-v2`;
-		if (user.email === 'boxenrique@gmail.com') {
-			specs.store = true;
-			specs.metadata = {
-				key: `agent/${activity.type}/${promptName}`,
-				prompt: promptName
-			};
-		}
 
-		return {
+		const response = {
 			category: 'agents',
 			name: promptName,
 			language: activity.language,
@@ -158,5 +159,15 @@ export class IPE {
 			model: GPT_MODEL,
 			temperature: 1
 		};
+
+		if (user.email === USER_LOGS_PROMPTS) {
+			response.store = true;
+			response.metadata = {
+				key: `agent/${activity.type}/${promptName}`,
+				prompt: promptName
+			};
+		}
+
+		return response;
 	}
 }

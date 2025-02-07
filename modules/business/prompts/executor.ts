@@ -17,6 +17,8 @@ export /*bundle*/ interface IPromptExecutionParams {
 	format?: 'text' | 'json';
 	options?: Record<string, string>;
 	literals?: Record<string, string>;
+	store?: boolean | null;
+	metadata?: Record<string, string>;
 }
 
 /**
@@ -51,11 +53,23 @@ export /*bundle*/ class PromptTemplateExecutor {
 		return this.#format;
 	}
 
+	#store: boolean;
+	get store() {
+		return this.#store;
+	}
+
+	#metadata: Record<string, any>;
+	get metadata() {
+		return this.#metadata;
+	}
+
 	constructor(params: IPromptExecutionParams) {
 		this.#model = params.model;
 		this.#temperature = params.temperature;
 		// this.#tools = params.tools;
 		this.#format = params.format;
+		this.#store = params.store ?? null;
+		this.#metadata = params.metadata ?? undefined;
 		this.#messages = params.messages ? params.messages : [];
 
 		this.#prompt = new PromptTemplateProcessor(params);
@@ -70,6 +84,8 @@ export /*bundle*/ class PromptTemplateExecutor {
 			temperature: number;
 			// tools: Tools;
 			format: 'text' | 'json';
+			store: boolean;
+			metadata?: Record<string, any>;
 		}>
 	> {
 		const prompt = this.#prompt;
@@ -87,13 +103,16 @@ export /*bundle*/ class PromptTemplateExecutor {
 			: messages.push({ role: 'user', content: prompt.processedValue });
 
 		// const tools = new Tools(prompt.tools, this.#tools);
-		const format = this.#format;
 
-		return { prompt, model, temperature, messages, format };
+		const store = this.#store;
+		const format = this.#format;
+		const metadata = this.#metadata;
+
+		return { prompt, model, temperature, messages, format, store, metadata };
 	}
 
 	async execute(): ResponseType {
-		const { error, prompt, messages, model, temperature, format } = await this.#prepare();
+		const { error, prompt, messages, model, temperature, format, store, metadata } = await this.#prepare();
 		if (error) return new BusinessResponse({ error });
 
 		// Call Open AI to generate the response of the prompt
@@ -105,7 +124,9 @@ export /*bundle*/ class PromptTemplateExecutor {
 				temperature,
 				messages,
 				// tools: prompt.tools,
-				response: { format }
+				response: { format },
+				store,
+				metadata
 			});
 			content = response.data.content;
 			break;
@@ -115,7 +136,7 @@ export /*bundle*/ class PromptTemplateExecutor {
 	}
 
 	async *incremental(): IncrementalResponseType {
-		const { error, prompt, messages, model, temperature, format } = await this.#prepare();
+		const { error, prompt, messages, model, temperature, format, store, metadata } = await this.#prepare();
 
 		if (error) {
 			yield { error };
@@ -131,7 +152,9 @@ export /*bundle*/ class PromptTemplateExecutor {
 				temperature,
 				messages,
 				// tools: prompt.tools,
-				response: { format }
+				response: { format },
+				store,
+				metadata
 			});
 			for await (const data of iterator) {
 				yield data;

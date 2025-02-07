@@ -37,7 +37,7 @@ export /*bundle*/ class Agent {
 
 	// PostProcessor
 	static async post(chat: Chat, prompt: string, answer: string, user: User) {
-		const response = await IPE.process(chat, prompt, answer);
+		const response = await IPE.process(chat, prompt, answer, user);
 		if (response.error) return { error: response.error };
 
 		const { ipe } = response;
