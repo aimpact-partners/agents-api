@@ -78,17 +78,16 @@ export /*bundle*/ class Chat {
 		}
 		const chat = response.data;
 
-		if (!chat) return { error: ErrorGenerator.chatNotValid(this.#id) };
+		if (!chat) return (this.#error = ErrorGenerator.chatNotValid(this.#id));
 		const id = chat.user.uid ?? chat.user.id;
-		if (id !== this.#user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
+		if (id !== this.#user.uid) return (this.#error = ErrorGenerator.unauthorizedUserForChat());
+		if (!chat.language) return (this.#error = ErrorGenerator.chatWithoutLanguages(this.#id));
 
-		if (!chat.language) return { error: ErrorGenerator.chatWithoutLanguages(this.#id) };
 		const language = chat.language.default;
-		if (!language) return { error: ErrorGenerator.chatWithoutDefaultLanguage(this.#id) };
-		if (!chat.project) return { error: ErrorGenerator.chatWithoutDefaultLanguage(this.#id) };
+		if (!language) return (this.#error = ErrorGenerator.chatWithoutDefaultLanguage(this.#id));
+		if (!chat.project) return (this.#error = ErrorGenerator.chatWithoutDefaultLanguage(this.#id));
 
 		if (this.#error) return;
-
 		this.#data = chat;
 	}
 

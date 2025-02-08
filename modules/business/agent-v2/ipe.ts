@@ -117,7 +117,7 @@ export class IPE {
 		const last = chat.messages?.last ?? [];
 		const lastMessage = last.find(messages => messages.role === 'assistant');
 		const synthesis = lastMessage?.metadata.synthesis ?? '';
-		const progress = lastMessage?.metadata.progress ?? '';
+		const progress = lastMessage?.metadata ?? false;
 
 		const objectiveProgress = progress?.objectives
 			? JSON.stringify([{ ...synthesis, ...progress }])

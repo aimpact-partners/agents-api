@@ -21,13 +21,13 @@ interface IMetadata {
 
 export /*bundle*/ class Agent {
 	static async pre(id: string, prompt: string, user: User) {
-		// Get Chat
-		const chat = new Chat(id, user);
+		const chat = new Chat(id, user); // Get Chat
 		await chat.fetch();
 		if (chat.error) return { error: chat.error };
 
 		// Fetch the agent
 		const response = await _hook(chat, user);
+		if (response.error) return { error: response.error };
 		if (!response.data.credits) return { error: response.credits };
 
 		const specs: IPromptExecutionParams = IPE.prepare(chat, prompt, user);

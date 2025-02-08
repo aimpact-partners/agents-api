@@ -10,6 +10,8 @@ export interface /*bundle*/ IPromptLanguageData {
 	id: string; //name.language = header.es/header.en
 	language: string;
 	value?: string;
+	schema?: string;
+	format: string;
 	literals?: IPromptLiterals;
 	project: IProjectSpecification;
 	options?: IPromptOptionData[];

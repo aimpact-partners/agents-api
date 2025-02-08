@@ -11,10 +11,8 @@ import type {
 } from '@aimpact/agents-api/data/interfaces';
 import { prompts } from '@aimpact/agents-api/data/model';
 import { db } from '@beyond-js/firestore-collection/db';
-import { FirestoreErrorManager } from '@beyond-js/firestore-collection/errors';
 import { Response } from '@beyond-js/response/main';
 import OpenAI from 'openai';
-import { v4 as uuid } from 'uuid';
 
 type PromptTemplateResponse = Promise<BusinessResponse<IPromptTemplateData & { value?: string }>>;
 
@@ -42,14 +40,6 @@ export /*bundle*/ class PromptsTemplate {
 
 			const value = Object.assign({}, promptData, { value: languageDoc.data.data.value });
 			return new BusinessResponse({ data: value });
-
-			// if (!option) {
-			// const parents = { Prompts: id, Languages: language };
-			// const subCollection = await prompts.languages.options.data({ id: option, parents });
-			// const value = Object.assign({}, promptData, { ...{ language: languageDoc.data.data } });
-			// value.option = subCollection.data.data;
-			// return new BusinessResponse({ data: value });
-			// }
 		} catch (exc) {
 			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });

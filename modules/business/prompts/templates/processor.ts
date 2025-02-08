@@ -62,10 +62,21 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 		return this.#processedValue;
 	}
 
+	#format: string;
+	get format() {
+		return this.#format;
+	}
+
+	#schema: string;
+	get schema() {
+		return this.#schema;
+	}
+
 	#error: FirestoreErrorManager;
 	get error() {
 		return this.#error;
 	}
+
 	get valid() {
 		return !this.#error;
 	}
@@ -78,7 +89,7 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 
 		if (!params.literals) return;
 
-		// We uppercase the literal identifiers to handle them
+		// Upercase the literal identifiers to handle them
 		const literals: Record<string, string> = {};
 		Object.keys(params.literals).forEach((key: string) => (literals[key.toUpperCase()] = params.literals[key]));
 		this.#literals = literals;
@@ -110,7 +121,10 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 			return;
 		}
 
+		this.#format = this.#data.format;
+		this.#schema = this.#data?.schema;
 		this.#value = this.#data.value;
+
 		// Get the prompts dependencies
 		await (async (): Promise<any> => {
 			if (!this.#data.literals?.dependencies?.length) return (this.#dependencies = []);
