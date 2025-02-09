@@ -138,4 +138,7 @@ export /*bundle*/ class ErrorGenerator {
 	static insufficientCredits() {
 		return new BusinessErrorManager(ErrorCodes.insufficientCredits, `insufficient credits`);
 	}
+	static ipeKeyNotDefined() {
+		return new BusinessErrorManager(ErrorCodes.ipeKeyNotDefined, `IPE key not defined`);
+	}
 }

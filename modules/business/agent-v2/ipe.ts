@@ -49,7 +49,7 @@ export class IPE {
 		const { ipe } = response;
 		const promises: Promise<any>[] = [];
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
-			const reservedValues = {};
+			const reservedValues: Record<string, string> = {};
 			reserved.forEach(literal => {
 				if (literal.toUpperCase() === 'PREVIOUS') {
 					const lastMessage = chat.messages?.last.find(messages => messages.role === 'assistant');
@@ -57,12 +57,15 @@ export class IPE {
 					return;
 				}
 
-				const summary = chat.ipe?.summary;
-				const progress = chat.ipe?.progress?.objectives;
+				const objectiveProgress = (() => {
+					if (!chat.ipe) return `The conversation hasn't started yet.`;
 
-				const objectiveProgress = chat.ipe
-					? JSON.stringify([{ progress, summary }])
-					: `The conversation hasn't started yet.`;
+					const summary = chat.ipe?.summary;
+					const progress = chat.ipe?.progress?.objectives;
+					if (key === 'summary') return summary;
+					else if (key === 'progress') return JSON.stringify([{ summary, progress }]);
+					else throw { error: ErrorGenerator.ipeKeyNotDefined() };
+				})();
 
 				reservedValues[literal] = objectiveProgress;
 			});
@@ -115,12 +118,16 @@ export class IPE {
 		const { module, activity } = chat.metadata;
 
 		const last = chat.messages?.last ?? [];
-		const lastMessage = last.find(messages => messages.role === 'assistant');
-		const synthesis = lastMessage?.metadata.synthesis ?? '';
-		const progress = lastMessage?.metadata ?? false;
+		let lastMessage;
+		for (let i = last.length - 1; i >= 0; i--) {
+			if (last[i].role === 'assistant') lastMessage = last[i];
+		}
+
+		const summary = lastMessage?.metadata.summary ?? '';
+		const progress = lastMessage?.metadata.progress ?? false;
 
 		const objectiveProgress = progress?.objectives
-			? JSON.stringify([{ ...synthesis, ...progress }])
+			? JSON.stringify([{ summary, progress: progress?.objectives }])
 			: `The conversation hasn't started yet.`;
 
 		const specs = activity.resources?.specs ?? activity.specs;
@@ -145,11 +152,10 @@ export class IPE {
 			'activity-objectives-progress': objectiveProgress
 		};
 
-		const messages = last.map(message => ({ role: message.role, content: message.content }));
+		const messages = [...last].reverse().map(({ role, content }) => ({ role, content }));
 		messages.push({ role: 'user', content });
 
 		const promptName = `ailearn.activity-${activity.type}-v2`;
-
 		const response = {
 			category: 'agents',
 			name: promptName,

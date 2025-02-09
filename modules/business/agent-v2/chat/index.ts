@@ -109,11 +109,11 @@ export /*bundle*/ class Chat {
 
 			// store user's message
 			const userData = { content: prompt, role: 'user' };
-			promises.push(await ChatData.saveMessage(this.id, userData, this.user));
+			await ChatData.saveMessage(this.id, userData, this.user);
 
 			// store assistant's message
 			const assistantData = { answer, content: answer, role: 'assistant', metadata, synthesis: summary };
-			promises.push(await ChatData.saveMessage(this.id, assistantData, this.user));
+			await ChatData.saveMessage(this.id, assistantData, this.user);
 
 			// set last interaction on chat
 			promises.push(ChatData.setLastInteractions(this.id, 4));

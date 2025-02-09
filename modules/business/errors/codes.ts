@@ -26,5 +26,6 @@ export /*bundle*/ enum ErrorCodes {
 	parsingIPE,
 	processingIPE,
 	invalidAccessToken,
-	insufficientCredits
+	insufficientCredits,
+	ipeKeyNotDefined
 }
