@@ -1,4 +1,4 @@
-import type { WorkletBridge } from '.';
+import type { WorkletBridge } from './';
 import { WorkletDispatcher } from './dispatcher';
 
 export /*bundle*/ class WorkletNode extends AudioWorkletNode {

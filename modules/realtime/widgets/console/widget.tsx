@@ -13,6 +13,7 @@ export default function Widget() {
 
 	const state: State<{ muted: boolean; speaker: boolean; duration: number }> = new State();
 	state.define({ muted: true, speaker: false, duration: 0 });
+	
 	const { values } = state;
 
 	const invalidate = (() => {
