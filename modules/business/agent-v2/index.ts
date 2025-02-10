@@ -38,23 +38,16 @@ export /*bundle*/ class Agent {
 	// PostProcessor
 	static async post(chat: Chat, prompt: string, answer: string, user: User) {
 		const response = await IPE.process(chat, prompt, answer);
-		if (response.error) {
-			return { error: response.error };
-		}
+		if (response.error) return { error: response.error };
 
 		const { ipe } = response;
 		const hookSpecs = { ipe, answer, testing: chat.testing };
 		const hookResponse = await _hook(chat, user, hookSpecs);
-		if (hookResponse.error) {
-			return { error: hookResponse.error };
-		}
+		if (hookResponse.error) return { error: hookResponse.error };
 
 		// Store messages
 		await chat.storeInteration({ prompt, answer, ipe });
-		if (chat.error) {
-			console.error('store user msg', chat.error);
-			return;
-		}
+		if (chat.error) return { error: chat.error };
 
 		return { ipe, credits: hookResponse.data.credits };
 	}

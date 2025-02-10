@@ -1,15 +1,15 @@
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
+import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
+import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import * as dotenv from 'dotenv';
 import { Chat } from './chat';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
-import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 
 dotenv.config();
 const { GPT_MODEL } = process.env;
 
 export class IPE {
-	static async get(chat, prompt: string) {
+	static async get(chat: Chat, prompt: string) {
 		const { project } = chat;
 		const response = await ProjectsAgents.get(project.id, project.agent);
 		if (response.error) return { error: response.error };
@@ -40,7 +40,7 @@ export class IPE {
 		return { ipe };
 	}
 
-	static async process(chat, message: string, answer: string) {
+	static async process(chat: Chat, message: string, answer: string) {
 		const response = await IPE.get(chat, message);
 		if (response.error) return { error: response.error };
 
@@ -101,14 +101,12 @@ export class IPE {
 		return { ipe, error: responseError };
 	}
 
-	// TODO
 	// Assistant Mission
 	static prepare(chat: Chat, content: string) {
 		const { module, activity } = chat.metadata;
 
-		const lastTwo = chat.messages?.lastTwo ?? [];
-
-		const lastMessage = lastTwo.find(messages => messages.role === 'assistant');
+		const last = chat.messages?.last ?? [];
+		const lastMessage = last.find(messages => messages.role === 'assistant');
 		const synthesis = lastMessage?.metadata.synthesis ?? '';
 		const progress = lastMessage?.metadata.progress ?? '';
 
@@ -117,7 +115,9 @@ export class IPE {
 			: `The conversation hasn't started yet.`;
 
 		const specs = activity.resources?.specs ?? activity.specs;
-		const objectives = specs?.objectives.map(objective => `* ${objective.name}: ${objective.objective}`).join(`\n`);
+		const objectives = specs?.objectives
+			.map((objective: { name: string; objective: string }) => `* ${objective.name}: ${objective.objective}`)
+			.join(`\n`);
 
 		const { subject, role, topic, instructions } = specs;
 
@@ -138,9 +138,7 @@ export class IPE {
 			'activity-objectives-progress': objectiveProgress
 		};
 
-		const messages: MessagesType = lastTwo.map((message: ILastMessages) => {
-			return { role: message.role, content: message.content };
-		});
+		const messages = last.map(message => ({ role: message.role, content: message.content }));
 		messages.push({ role: 'user', content });
 
 		return {
