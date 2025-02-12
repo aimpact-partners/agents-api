@@ -82,12 +82,15 @@ export /*bundle*/ class Agent {
 			response.ipe &&
 				response.ipe?.forEach(ipe => {
 					if (ipe.key !== 'progress') return;
-					const { objectives } = ipe.response;
-					metadata.objectives = objectives.map(o => ({
-						name: o.name,
-						relevance: o.relevance,
-						status: o.status
-					}));
+					// console.log('ipe.response', ipe.response);
+					// const { objectives } = ipe.response;
+					// metadata.objectives =
+					// 	objectives &&
+					// 	objectives.map(o => ({
+					// 		name: o.name,
+					// 		relevance: o.relevance,
+					// 		status: o.status
+					// 	}));
 				});
 
 			yield { metadata };

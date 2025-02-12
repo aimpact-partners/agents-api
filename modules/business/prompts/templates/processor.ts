@@ -181,7 +181,6 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 
 		// Get the prompt  data
 		await (async () => {
-			console.log('name', name);
 			const response = await prompts.data({ id: name });
 			if (response.error) {
 				this.#error = ErrorGenerator.documentNotFound('Prompts', name);

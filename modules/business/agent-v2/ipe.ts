@@ -12,6 +12,8 @@ const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
 const defaultText = `The conversation hasn't started yet.`;
 
+const LOGS = true;
+
 export class IPE {
 	static async get(chat: Chat, prompt: string) {
 		const { project } = chat;
@@ -94,7 +96,7 @@ export class IPE {
 				literals: { ...literals, ...reservedValues, prompt: chat.ipe ? message : '', answer }
 			};
 
-			if (user.email === USER_LOGS_PROMPTS) {
+			if (LOGS && user.email === USER_LOGS_PROMPTS) {
 				specs.store = true;
 				specs.metadata = {
 					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
@@ -122,23 +124,40 @@ export class IPE {
 					return;
 				}
 
-				const current = content;
-				const progress = [];
+				//
+				const check = () => {
+					const newIteration = content;
 
-				// without progress
-				if (!content.objectives) {
-					ipe[index].response = current;
-					return;
-				}
+					let currentProgress = chat.ipe?.progress;
+					if (!currentProgress) {
+						const objectives = chat.metadata['activity-objectives']?.map(item => ({
+							name: item.name,
+							status: 'pending'
+						}));
+						currentProgress = { objectives, reached: [] };
+					}
 
-				chat.metadata['activity-objectives']?.forEach(item => {
-					const found = current.objectives.find(i => i.name === item.name);
-					progress.push(found ? found : { name: item.name, status: 'pending' });
-				});
+					if (!newIteration.objectives) {
+						return { ...currentProgress, summary: newIteration.summary, alert: newIteration.alert };
+					}
 
-				current.objectives = progress;
-				ipe[index].response = current;
-				// console.log('progress... ', ipe[index].response);
+					const objectivesMap = new Map((currentProgress.objectives || []).map(obj => [obj.name, obj]));
+					newIteration.objectives.forEach(obj => objectivesMap.set(obj.name, obj));
+					const updatedObjectives = Array.from(objectivesMap.values());
+
+					return {
+						reached: newIteration.reached,
+						objectives: updatedObjectives,
+						summary: newIteration.summary,
+						alert: newIteration.alert
+					};
+				};
+
+				const progress = check();
+				// console.log('_____________________________________');
+				// console.log(progress);
+				// console.log('_____________________________________');
+				ipe[index].response = progress;
 			} catch (exc) {
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
@@ -207,7 +226,7 @@ export class IPE {
 			temperature: 1
 		};
 
-		if (user.email === USER_LOGS_PROMPTS) {
+		if (LOGS && user.email === USER_LOGS_PROMPTS) {
 			response.store = true;
 			response.metadata = {
 				key: `agent/${activity.type}/${promptName}`,
