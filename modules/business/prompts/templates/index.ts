@@ -38,7 +38,8 @@ export /*bundle*/ class PromptsTemplate {
 			if (languageDoc.error) return new BusinessResponse({ error: languageDoc.error });
 			if (!languageDoc.data.exists) return new BusinessResponse({ data: promptData });
 
-			const value = Object.assign({}, promptData, { value: languageDoc.data.data.value });
+			const { data } = languageDoc.data;
+			const value = Object.assign({}, promptData, { schema: data.schema, value: data.value });
 			return new BusinessResponse({ data: value });
 		} catch (exc) {
 			console.error(exc);
@@ -170,7 +171,8 @@ export /*bundle*/ class PromptsTemplate {
 			const errors = [];
 			if (!params.name) errors.push('name');
 			if (!params.language || !params.language.languages || !params.language.default) errors.push('language');
-			if (params.format !== 'text' && params.format !== 'json') errors.push('format');
+			if (params.format !== 'text' && params.format !== 'json' && params.format !== 'json_schema')
+				errors.push('format');
 			if (params.is !== 'prompt' && params.is !== 'function' && params.is !== 'dependency') {
 				errors.push('is');
 			}

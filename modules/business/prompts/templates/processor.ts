@@ -1,7 +1,7 @@
-import type { IPromptLanguageData } from '@aimpact/agents-api/data/interfaces';
-import { FirestoreErrorManager } from '@beyond-js/firestore-collection/errors';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { prompts } from '@aimpact/agents-api/data/model';
+import type { IPromptLanguageData } from '@aimpact/agents-api/data/interfaces';
+import { prompts, schemas } from '@aimpact/agents-api/data/model';
+import { FirestoreErrorManager } from '@beyond-js/firestore-collection/errors';
 
 export interface IPromptGenerationParams {
 	category: string;
@@ -62,12 +62,12 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 		return this.#processedValue;
 	}
 
-	#format: string;
+	#format: 'text' | 'json' | 'json_schema';
 	get format() {
 		return this.#format;
 	}
 
-	#schema: string;
+	#schema: Record<string, any>;
 	get schema() {
 		return this.#schema;
 	}
@@ -99,7 +99,7 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 		const { name, language } = this;
 		this.#id = `${name}.${language}`;
 
-		// Get the prompt data
+		// Get the prompt language data
 		await (async () => {
 			const response = await prompts.languages.data({ id: language, parents: { Prompts: name } });
 			if (response.error) {
@@ -121,8 +121,6 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 			return;
 		}
 
-		this.#format = this.#data.format;
-		this.#schema = this.#data?.schema;
 		this.#value = this.#data.value;
 
 		// Get the prompts dependencies
@@ -179,6 +177,37 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 			// 	specs[option.data.data.prompt] = option.data.data.value; //@ftovar8 agregar en del publish el prompt en el option
 			// 	this.#data.options.push(specs);
 			// });
+		})();
+
+		// Get the prompt  data
+		await (async () => {
+			console.log('name', name);
+			const response = await prompts.data({ id: name });
+			if (response.error) {
+				this.#error = ErrorGenerator.documentNotFound('Prompts', name);
+				return;
+			}
+			if (!response.data.exists) {
+				this.#error = ErrorGenerator.documentNotFound('Prompts', name);
+				return;
+			}
+
+			const { data } = response.data;
+			this.#format = data.format;
+
+			if (this.#format !== 'json_schema') return;
+
+			const responseSchema = await schemas.languages.data({ id: language, parents: { Schemas: data.schema } });
+			if (responseSchema.error) {
+				this.#error = ErrorGenerator.documentNotFound('Schemas', name);
+				return;
+			}
+			if (!responseSchema.data.exists) {
+				this.#error = ErrorGenerator.documentNotFound('Schemas', name);
+				return;
+			}
+			const d = responseSchema.data.data;
+			this.#schema = d.schema ? JSON.parse(d.schema) : undefined;
 		})();
 	}
 

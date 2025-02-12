@@ -177,7 +177,9 @@ export class PromptsRoutes {
 			}
 
 			const value = promptTemplate.processedValue;
-			res.json(new HttpResponse({ data: { value } }));
+			const { format, schema } = promptTemplate;
+
+			res.json(new HttpResponse({ data: { value, format, schema } }));
 		} catch (exc) {
 			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
 		}

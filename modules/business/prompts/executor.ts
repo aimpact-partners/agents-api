@@ -48,9 +48,14 @@ export /*bundle*/ class PromptTemplateExecutor {
 		return this.#prompt;
 	}
 
-	#format: 'text' | 'json';
+	#format: 'text' | 'json' | 'json_schema';
 	get format() {
 		return this.#format;
+	}
+
+	#schema: Record<string, any>;
+	get schema() {
+		return this.#schema;
 	}
 
 	#store: boolean;
@@ -83,9 +88,10 @@ export /*bundle*/ class PromptTemplateExecutor {
 			model: string;
 			temperature: number;
 			// tools: Tools;
-			format: 'text' | 'json';
+			format: 'text' | 'json' | 'json_schema';
 			store: boolean;
 			metadata?: Record<string, any>;
+			schema?: Record<string, any>;
 		}>
 	> {
 		const prompt = this.#prompt;
@@ -105,14 +111,15 @@ export /*bundle*/ class PromptTemplateExecutor {
 		// const tools = new Tools(prompt.tools, this.#tools);
 
 		const store = this.#store;
-		const format = this.#format;
+		const format = (this.#format = prompt.format);
+		const schema = (this.#schema = prompt.schema);
 		const metadata = this.#metadata;
 
-		return { prompt, model, temperature, messages, format, store, metadata };
+		return { prompt, model, temperature, messages, format, schema, store, metadata };
 	}
 
 	async execute(): ResponseType {
-		const { error, prompt, messages, model, temperature, format, store, metadata } = await this.#prepare();
+		const { error, prompt, messages, model, temperature, format, schema, store, metadata } = await this.#prepare();
 		if (error) return new BusinessResponse({ error });
 
 		// Call Open AI to generate the response of the prompt
@@ -126,6 +133,7 @@ export /*bundle*/ class PromptTemplateExecutor {
 				// tools: prompt.tools,
 				response: { format },
 				store,
+				schema,
 				metadata
 			});
 			content = response.data.content;
@@ -136,7 +144,7 @@ export /*bundle*/ class PromptTemplateExecutor {
 	}
 
 	async *incremental(): IncrementalResponseType {
-		const { error, prompt, messages, model, temperature, format, store, metadata } = await this.#prepare();
+		const { error, prompt, messages, model, temperature, format, schema, store, metadata } = await this.#prepare();
 
 		if (error) {
 			yield { error };
@@ -154,6 +162,7 @@ export /*bundle*/ class PromptTemplateExecutor {
 				// tools: prompt.tools,
 				response: { format },
 				store,
+				schema,
 				metadata
 			});
 			for await (const data of iterator) {

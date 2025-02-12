@@ -10,6 +10,8 @@ import { Chat } from './chat';
 dotenv.config();
 const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
+const defaultText = `The conversation hasn't started yet.`;
+
 export class IPE {
 	static async get(chat: Chat, prompt: string) {
 		const { project } = chat;
@@ -46,28 +48,40 @@ export class IPE {
 		const response = await IPE.get(chat, message);
 		if (response.error) return { error: response.error };
 
+		const last = chat.messages?.last ?? [];
+		let lastMessage = {};
+		for (let i = last.length - 1; i >= 0; i--) {
+			if (last[i].role === 'assistant') lastMessage = last[i];
+		}
+
 		const { ipe } = response;
 		const promises: Promise<any>[] = [];
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
 			const reservedValues: Record<string, string> = {};
-			reserved.forEach(literal => {
+			reserved.forEach((literal: string) => {
 				if (literal.toUpperCase() === 'PREVIOUS') {
-					const lastMessage = chat.messages?.last.find(messages => messages.role === 'assistant');
 					reservedValues[literal] = lastMessage?.content ?? '';
 					return;
 				}
 
-				const objectiveProgress = (() => {
-					if (!chat.ipe) return `The conversation hasn't started yet.`;
+				const summary = chat.ipe?.summary ?? defaultText;
+				reservedValues.summary = summary;
+				reservedValues.objectives = JSON.stringify(chat.metadata['activity-objectives']);
+				if (key == 'progress') {
+					const progress = chat.ipe?.progress ?? {};
 
-					const summary = chat.ipe?.summary;
-					const progress = chat.ipe?.progress?.objectives;
-					if (key === 'summary') return summary;
-					else if (key === 'progress') return JSON.stringify([{ summary, progress }]);
-					else throw { error: ErrorGenerator.ipeKeyNotDefined() };
-				})();
+					let objectiveProgress;
 
-				reservedValues[literal] = objectiveProgress;
+					if (progress.objectives) {
+						objectiveProgress = progress.objectives?.map(obj => {
+							return { name: obj.name, progress: obj.progress, status: obj.status };
+						});
+
+						objectiveProgress = JSON.stringify(objectiveProgress);
+					} else objectiveProgress = defaultText;
+
+					reservedValues.progress = objectiveProgress;
+				}
 			});
 
 			const specs: IPromptExecutionParams = {
@@ -77,7 +91,7 @@ export class IPE {
 				temperature: 1,
 				language: chat.language,
 				format: format ?? 'text',
-				literals: { ...literals, ...reservedValues, prompt: message, answer }
+				literals: { ...literals, ...reservedValues, prompt: chat.ipe ? message : '', answer }
 			};
 
 			if (user.email === USER_LOGS_PROMPTS) {
@@ -98,13 +112,33 @@ export class IPE {
 			const { category, name } = entry.prompt;
 
 			if (error) {
-				console.error('IPE', error);
 				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(`${category}.${name}`) });
 				return;
 			}
 			try {
-				const content = entry.format === 'json' ? JSON.parse(data?.content) : data?.content;
-				ipe[index].response = content;
+				const content = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
+				if (ipe[index].key === 'summary') {
+					ipe[index].response = content;
+					return;
+				}
+
+				const current = content;
+				const progress = [];
+
+				// without progress
+				if (!content.objectives) {
+					ipe[index].response = current;
+					return;
+				}
+
+				chat.metadata['activity-objectives']?.forEach(item => {
+					const found = current.objectives.find(i => i.name === item.name);
+					progress.push(found ? found : { name: item.name, status: 'pending' });
+				});
+
+				current.objectives = progress;
+				ipe[index].response = current;
+				// console.log('progress... ', ipe[index].response);
 			} catch (exc) {
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
@@ -123,18 +157,19 @@ export class IPE {
 			if (last[i].role === 'assistant') lastMessage = last[i];
 		}
 
-		const summary = lastMessage?.metadata.summary ?? '';
-		const progress = lastMessage?.metadata.progress ?? false;
+		const summary = lastMessage?.metadata.summary ?? defaultText;
+		const progress = lastMessage?.metadata.progress ?? {};
 
-		const objectiveProgress = progress?.objectives
-			? JSON.stringify([{ summary, progress: progress?.objectives }])
-			: `The conversation hasn't started yet.`;
+		// new
+		let objectiveProgress;
+		if (progress.objectives) {
+			objectiveProgress = progress.objectives?.map(obj => {
+				return { name: obj.name, progress: obj.progress, status: obj.status };
+			});
+			objectiveProgress = JSON.stringify(objectiveProgress);
+		} else objectiveProgress = defaultText;
 
 		const specs = activity.resources?.specs ?? activity.specs;
-		const objectives = specs?.objectives
-			.map((objective: { name: string; objective: string }) => `* ${objective.name}: ${objective.objective}`)
-			.join(`\n`);
-
 		const { subject, role, topic, instructions } = specs;
 
 		const audience = module.audience;
@@ -148,14 +183,20 @@ export class IPE {
 			subject: subject ?? '',
 			instructions: instructions ?? '',
 			objective: activity.objective ?? '',
-			'activity-objectives': objectives,
+			objectives: JSON.stringify(specs?.objectives), // NEW
+			summary, // NEW
+			progress: objectiveProgress, // NEW
+			'activity-objectives': JSON.stringify(specs?.objectives), // OLD
 			'activity-objectives-progress': objectiveProgress
+				? JSON.stringify(objectiveProgress)
+				: `The conversation hasn't started yet.` // OLD
 		};
 
 		const messages = [...last].reverse().map(({ role, content }) => ({ role, content }));
 		messages.push({ role: 'user', content });
 
-		const promptName = `ailearn.activity-${activity.type}-v2`;
+		const version = activity.type === 'content-theory' ? `v3` : `v2`;
+		const promptName = `ailearn.activity-${activity.type}-${version}`;
 		const response = {
 			category: 'agents',
 			name: promptName,

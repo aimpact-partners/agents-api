@@ -1,7 +1,7 @@
-import OpenAI from 'openai';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { BusinessErrorManager, ErrorGenerator } from '@aimpact/agents-api/business/errors';
+import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { key } from '@aimpact/agents-api/models/open-ai/key';
+import OpenAI from 'openai';
 
 // Define the type for messages used in chat completions
 export /*bundle*/ type MessagesType = OpenAI.Chat.ChatCompletionMessageParam[];
@@ -25,14 +25,15 @@ export /*bundle*/ interface IQueryExecutionParams {
 	tools?: AgentTool[];
 	response?: { format: string };
 	browser?: boolean;
-	format?: 'text' | 'json' | 'schema';
+	format?: 'text' | 'json' | 'json_schema';
 	store?: boolean | null;
 	metadata?: Record<string, string>;
+	schema?: Record<string, any>;
 
 	/**
 	 * @deprecated Use `response.format` instead.
 	 */
-	responseFormat?: 'text' | 'json'; // @deprecated
+	responseFormat?: 'text' | 'json' | 'json_schema'; // @deprecated
 }
 
 // Define the interface for a resolved tool with parameters and response content
@@ -64,6 +65,8 @@ export /*bundle*/ interface IIncrementalResponseMetadata {
 	messages: MessagesType;
 }
 
+type FormatResponse = OpenAI.ResponseFormatText | OpenAI.ResponseFormatJSONObject | OpenAI.ResponseFormatJSONSchema;
+
 // Define the OpenAICaller class for handling OpenAI API calls
 export /*bundle*/ class OpenAICaller {
 	/**
@@ -79,12 +82,20 @@ export /*bundle*/ class OpenAICaller {
 
 		// Determine the response format based on provided parameters
 		const format = (() => {
-			const { response, responseFormat } = params;
-			let format: OpenAI.ResponseFormatText | OpenAI.ResponseFormatJSONObject | OpenAI.ResponseFormatJSONSchema =
-				{ type: 'text' };
-
-			if (responseFormat === 'json' || response?.format === 'json') format = { type: 'json_object' };
-			return format;
+			const { format, responseFormat, schema } = params;
+			let response: FormatResponse = { type: 'text' };
+			if (responseFormat === 'json' || format === 'json') response = { type: 'json_object' };
+			if (responseFormat === 'json_schema' || format === 'json_schema')
+				response = {
+					type: 'json_schema',
+					json_schema: {
+						name: schema.name,
+						description: schema.description ?? undefined,
+						schema: schema.schema,
+						strict: schema.stict ?? null
+					}
+				};
+			return response;
 		})();
 
 		try {
@@ -181,12 +192,24 @@ export /*bundle*/ class OpenAICaller {
 		const apiKey = await key.get();
 		const openai = new OpenAI({ apiKey });
 
+		// Determine the response format based on provided parameters
 		const format = (() => {
-			const { response, responseFormat } = params;
-			let format: OpenAI.ResponseFormatText | OpenAI.ResponseFormatJSONObject | OpenAI.ResponseFormatJSONSchema =
-				{ type: 'text' };
+			const { response, responseFormat, schema } = params;
 
-			if (responseFormat === 'json' || response?.format === 'json') format = { type: 'json_object' };
+			let format: FormatResponse = { type: 'text' };
+			if (responseFormat === 'json' || response.format === 'json') format = { type: 'json_object' };
+			if (responseFormat === 'json_schema' || response.format === 'json_schema') {
+				console.log('schema', schema);
+				format = {
+					type: 'json_schema',
+					json_schema: {
+						name: schema.name,
+						description: schema.description ?? undefined,
+						schema: schema.schema,
+						strict: schema.stict ?? null
+					}
+				};
+			}
 			return format;
 		})();
 
