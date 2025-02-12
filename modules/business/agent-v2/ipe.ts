@@ -10,7 +10,10 @@ import { Chat } from './chat';
 dotenv.config();
 const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
-const defaultText = `The conversation hasn't started yet.`;
+const defaultTexts = {
+	es: `La conversación aún no ha comenzado.`,
+	en: `The conversation hasn't started yet.`
+};
 
 const LOGS = true;
 
@@ -55,6 +58,8 @@ export class IPE {
 		for (let i = last.length - 1; i >= 0; i--) {
 			if (last[i].role === 'assistant') lastMessage = last[i];
 		}
+
+		const defaultText = defaultTexts[chat.metadata.language];
 
 		const { ipe } = response;
 		const promises: Promise<any>[] = [];
@@ -174,6 +179,8 @@ export class IPE {
 		for (let i = last.length - 1; i >= 0; i--) {
 			if (last[i].role === 'assistant') lastMessage = last[i];
 		}
+
+		const defaultText = defaultTexts[chat.metadata.language];
 
 		const summary = lastMessage?.metadata.summary ?? defaultText;
 		const progress = lastMessage?.metadata.progress ?? {};
