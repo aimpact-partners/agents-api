@@ -60,20 +60,21 @@ export class IPE {
 		const promises: Promise<any>[] = [];
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
 			const reservedValues: Record<string, string> = {};
+
+			reservedValues.objectives = JSON.stringify(chat.metadata['activity-objectives']);
 			reserved.forEach((literal: string) => {
 				if (literal.toUpperCase() === 'PREVIOUS') {
 					reservedValues[literal] = lastMessage?.content ?? '';
 					return;
 				}
-
-				const summary = chat.ipe?.summary ?? defaultText;
-				reservedValues.summary = summary;
-				reservedValues.objectives = JSON.stringify(chat.metadata['activity-objectives']);
-				if (key == 'progress') {
+				if (literal.toUpperCase() === 'SUMMARY') {
+					reservedValues[literal] = chat.ipe?.summary ?? defaultText;
+					return;
+				}
+				if (literal.toUpperCase() === 'PROGRESS') {
 					const progress = chat.ipe?.progress ?? {};
 
 					let objectiveProgress;
-
 					if (progress.objectives) {
 						objectiveProgress = progress.objectives?.map(obj => {
 							return { name: obj.name, progress: obj.progress, status: obj.status };
@@ -82,7 +83,8 @@ export class IPE {
 						objectiveProgress = JSON.stringify(objectiveProgress);
 					} else objectiveProgress = defaultText;
 
-					reservedValues.progress = objectiveProgress;
+					reservedValues[literal] = objectiveProgress;
+					return;
 				}
 			});
 
@@ -93,7 +95,7 @@ export class IPE {
 				temperature: 1,
 				language: chat.language,
 				format: format ?? 'text',
-				literals: { ...literals, ...reservedValues, prompt: chat.ipe ? message : '', answer }
+				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
 
 			if (LOGS && user.email === USER_LOGS_PROMPTS) {
@@ -124,8 +126,8 @@ export class IPE {
 					return;
 				}
 
-				//
-				const check = () => {
+				let progress;
+				progress = (() => {
 					const newIteration = content;
 
 					let currentProgress = chat.ipe?.progress;
@@ -151,12 +153,9 @@ export class IPE {
 						summary: newIteration.summary,
 						alert: newIteration.alert
 					};
-				};
+				})();
+				//
 
-				const progress = check();
-				// console.log('_____________________________________');
-				// console.log(progress);
-				// console.log('_____________________________________');
 				ipe[index].response = progress;
 			} catch (exc) {
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
@@ -182,9 +181,11 @@ export class IPE {
 		// new
 		let objectiveProgress;
 		if (progress.objectives) {
-			objectiveProgress = progress.objectives?.map(obj => {
-				return { name: obj.name, progress: obj.progress, status: obj.status };
-			});
+			objectiveProgress = progress.objectives?.map(obj => ({
+				name: obj.name,
+				progress: obj.progress,
+				status: obj.status
+			}));
 			objectiveProgress = JSON.stringify(objectiveProgress);
 		} else objectiveProgress = defaultText;
 
@@ -195,7 +196,6 @@ export class IPE {
 
 		const literals = {
 			user: chat.user.displayName,
-			age: audience,
 			audience,
 			topic: topic ?? '',
 			role: role ?? '',
@@ -205,6 +205,7 @@ export class IPE {
 			objectives: JSON.stringify(specs?.objectives), // NEW
 			summary, // NEW
 			progress: objectiveProgress, // NEW
+			age: audience, // OLD
 			'activity-objectives': JSON.stringify(specs?.objectives), // OLD
 			'activity-objectives-progress': objectiveProgress
 				? JSON.stringify(objectiveProgress)
@@ -214,8 +215,7 @@ export class IPE {
 		const messages = [...last].reverse().map(({ role, content }) => ({ role, content }));
 		messages.push({ role: 'user', content });
 
-		const version = activity.type === 'content-theory' ? `v3` : `v2`;
-		const promptName = `ailearn.activity-${activity.type}-${version}`;
+		const promptName = `ailearn.activity-${activity.type}-v2`;
 		const response = {
 			category: 'agents',
 			name: promptName,
