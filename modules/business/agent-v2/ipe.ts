@@ -198,9 +198,9 @@ export class IPE {
 
 		const specs = activity.resources?.specs ?? activity.specs;
 		const { subject, role, topic, instructions } = specs;
+		const { format, entity, level } = chat.metadata;
 
 		const audience = module.audience;
-
 		const literals = {
 			user: chat.user.displayName,
 			audience,
@@ -210,6 +210,9 @@ export class IPE {
 			instructions: instructions ?? '',
 			objective: activity.objective ?? '',
 			objectives: JSON.stringify(specs?.objectives), // NEW
+			format, // NEW
+			entity, // NEW
+			level, // NEW
 			summary, // NEW
 			progress: objectiveProgress, // NEW
 			age: audience, // OLD
