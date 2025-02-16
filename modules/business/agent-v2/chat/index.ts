@@ -1,10 +1,8 @@
 import { Chat as ChatData } from '@aimpact/agents-api/business/chats';
-import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
+import { BusinessErrorManager, ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
 import { User } from '@aimpact/agents-api/business/user';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
-// import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
-// import { prepare } from './prepare';
 
 export /*bundle*/ class Chat {
 	#id: string;
@@ -93,7 +91,7 @@ export /*bundle*/ class Chat {
 
 	async storeInteration(params) {
 		try {
-			const promises = [];
+			const promises: Promise<any>[] = [];
 
 			const { prompt, answer, ipe } = params;
 
@@ -107,13 +105,17 @@ export /*bundle*/ class Chat {
 				}
 			});
 
+			let response;
+
 			// store user's message
 			const userData = { content: prompt, role: 'user' };
-			await ChatData.saveMessage(this.id, userData, this.user);
+			response = await ChatData.saveMessage(this.id, userData, this.user);
+			if (response.error) throw response.error;
 
 			// store assistant's message
 			const assistantData = { answer, content: answer, role: 'assistant', metadata, synthesis: summary };
-			await ChatData.saveMessage(this.id, assistantData, this.user);
+			response = await ChatData.saveMessage(this.id, assistantData, this.user);
+			if (response.error) throw response.error;
 
 			// set last interaction on chat
 			promises.push(ChatData.setLastInteractions(this.id, 4));
@@ -130,7 +132,7 @@ export /*bundle*/ class Chat {
 				this.#error = response.error;
 			});
 		} catch (exc) {
-			console.error(`BAG102 storeInteration:`, exc);
+			if (exc instanceof BusinessErrorManager) return exc;
 			this.#error = ErrorGenerator.internalError('BAG102', `Failed to store message`, exc.message);
 		}
 	}

@@ -26,9 +26,10 @@ export /*bundle*/ class UserMiddlewareHandler {
 				name: decodedToken.name,
 				displayName: decodedToken.name,
 				email: decodedToken.email,
-				photoURL: decodedToken.photoURL,
+				photoURL: decodedToken.photoURL ?? decodedToken.picture,
 				phoneNumber: decodedToken.phoneNumber
 			};
+
 			next();
 		} catch (exc) {
 			const code = exc.message.includes('401') ? 401 : 500;

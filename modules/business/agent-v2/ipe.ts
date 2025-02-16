@@ -10,24 +10,26 @@ import { Chat } from './chat';
 dotenv.config();
 const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
+const LOGS = false;
+type ILanguage = 'es' | 'en' | 'de' | 'it' | 'pt';
+
 const defaultTexts = {
 	es: `La conversación aún no ha comenzado.`,
-	en: `The conversation hasn't started yet.`
+	en: `The conversation hasn't started yet.`,
+	de: `Das Gespräch hat noch nicht begonnen.`,
+	it: `La conversazione non è ancora iniziata.`,
+	pt: `A conversa ainda não começou.`
 };
 
-const LOGS = true;
-
 export class IPE {
-	static async get(chat: Chat, prompt: string) {
-		const { project } = chat;
+	static async get(chat: Chat) {
+		const { project, metadata } = chat;
 		const response = await ProjectsAgents.get(project.id, project.agent);
 		if (response.error) return { error: response.error };
+		const agent = response.data;
 
-		const { metadata } = chat;
-		const agentData = response.data;
-		//
 		const ipe = [];
-		agentData.ipe.forEach(item => {
+		agent.ipe.forEach(item => {
 			const literals = {};
 			item.literals.pure.forEach(literal => {
 				literals[literal] =
@@ -40,7 +42,7 @@ export class IPE {
 						: metadata[literal];
 			});
 
-			const reserved = [];
+			const reserved: string[] = [];
 			item.literals.reserved.forEach(literal => reserved.push(literal));
 
 			ipe.push(Object.assign({}, item, { language: metadata.language, literals, reserved }));
@@ -50,7 +52,7 @@ export class IPE {
 	}
 
 	static async process(chat: Chat, message: string, answer: string, user: User) {
-		const response = await IPE.get(chat, message);
+		const response = await IPE.get(chat);
 		if (response.error) return { error: response.error };
 
 		const last = chat.messages?.last ?? [];
@@ -59,7 +61,7 @@ export class IPE {
 			if (last[i].role === 'assistant') lastMessage = last[i];
 		}
 
-		const defaultText = defaultTexts[chat.metadata.language];
+		const defaultText = defaultTexts[<ILanguage>chat.metadata.language];
 
 		const { ipe } = response;
 		const promises: Promise<any>[] = [];
@@ -124,6 +126,7 @@ export class IPE {
 				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(`${category}.${name}`) });
 				return;
 			}
+
 			try {
 				const content = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
 				if (ipe[index].key === 'summary') {
@@ -141,7 +144,7 @@ export class IPE {
 							name: item.name,
 							status: 'pending'
 						}));
-						currentProgress = { objectives, reached: [] };
+						currentProgress = { objectives: objectives ?? [], reached: [] };
 					}
 
 					if (!newIteration.objectives) {
@@ -149,17 +152,19 @@ export class IPE {
 					}
 
 					const objectivesMap = new Map((currentProgress.objectives || []).map(obj => [obj.name, obj]));
-					newIteration.objectives.forEach(obj => objectivesMap.set(obj.name, obj));
+					newIteration.objectives.forEach(obj => {
+						obj = { ...obj, analysis: obj.progress, impact: obj.integration }; // property backward support
+						objectivesMap.set(obj.name, obj);
+					});
 					const updatedObjectives = Array.from(objectivesMap.values());
 
 					return {
 						reached: newIteration.reached,
-						objectives: updatedObjectives,
+						objectives: updatedObjectives ?? [],
 						summary: newIteration.summary,
 						alert: newIteration.alert
 					};
 				})();
-				//
 
 				ipe[index].response = progress;
 			} catch (exc) {
@@ -168,82 +173,5 @@ export class IPE {
 		});
 
 		return { ipe, error: responseError };
-	}
-
-	// Assistant Mission
-	static prepare(chat: Chat, content: string, user: User) {
-		const { module, activity } = chat.metadata;
-
-		const last = chat.messages?.last ?? [];
-		let lastMessage;
-		for (let i = last.length - 1; i >= 0; i--) {
-			if (last[i].role === 'assistant') lastMessage = last[i];
-		}
-
-		const defaultText = defaultTexts[chat.metadata.language];
-
-		const summary = lastMessage?.metadata.summary ?? defaultText;
-		const progress = lastMessage?.metadata.progress ?? {};
-
-		// new
-		let objectiveProgress;
-		if (progress.objectives) {
-			objectiveProgress = progress.objectives?.map(obj => ({
-				name: obj.name,
-				progress: obj.progress,
-				status: obj.status
-			}));
-			objectiveProgress = JSON.stringify(objectiveProgress);
-		} else objectiveProgress = defaultText;
-
-		const specs = activity.resources?.specs ?? activity.specs;
-		const { subject, role, topic, instructions } = specs;
-		const { format, entity, level } = chat.metadata;
-
-		const audience = module.audience;
-		const literals = {
-			user: chat.user.displayName,
-			audience,
-			topic: topic ?? '',
-			role: role ?? '',
-			subject: subject ?? '',
-			instructions: instructions ?? '',
-			objective: activity.objective ?? '',
-			objectives: JSON.stringify(specs?.objectives), // NEW
-			format, // NEW
-			entity, // NEW
-			level, // NEW
-			summary, // NEW
-			progress: objectiveProgress, // NEW
-			age: audience, // OLD
-			'activity-objectives': JSON.stringify(specs?.objectives), // OLD
-			'activity-objectives-progress': objectiveProgress
-				? JSON.stringify(objectiveProgress)
-				: `The conversation hasn't started yet.` // OLD
-		};
-
-		const messages = [...last].reverse().map(({ role, content }) => ({ role, content }));
-		messages.push({ role: 'user', content });
-
-		const promptName = `ailearn.activity-${activity.type}-v2`;
-		const response = {
-			category: 'agents',
-			name: promptName,
-			language: activity.language,
-			literals,
-			messages: messages ?? [],
-			model: GPT_MODEL,
-			temperature: 1
-		};
-
-		if (LOGS && user.email === USER_LOGS_PROMPTS) {
-			response.store = true;
-			response.metadata = {
-				key: `agent/${activity.type}/${promptName}`,
-				prompt: promptName
-			};
-		}
-
-		return response;
 	}
 }

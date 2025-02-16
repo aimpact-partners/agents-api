@@ -1,6 +1,6 @@
-import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { User } from '@aimpact/agents-api/business/user';
+import { AssistantMission } from './assistan-mission';
 import { Chat } from './chat';
 import { _hook } from './hook';
 import { IPE } from './ipe';
@@ -20,17 +20,18 @@ interface IMetadata {
 }
 
 export /*bundle*/ class Agent {
+	// PreProcessor
 	static async pre(id: string, prompt: string, user: User) {
-		const chat = new Chat(id, user); // Get Chat
+		const chat = new Chat(id, user);
 		await chat.fetch();
 		if (chat.error) return { error: chat.error };
 
 		// Fetch the agent
 		const response = await _hook(chat, user);
 		if (response.error) return { error: response.error };
-		if (!response.data.credits) return { error: response.credits };
 
-		const specs: IPromptExecutionParams = IPE.prepare(chat, prompt, user);
+		const { specs, error } = await AssistantMission.get(chat, prompt, user);
+		if (error) return { error };
 
 		return { chat, specs };
 	}
@@ -41,7 +42,7 @@ export /*bundle*/ class Agent {
 		if (response.error) return { error: response.error };
 
 		const { ipe } = response;
-		const hookSpecs = { ipe, answer, testing: chat.testing };
+		const hookSpecs = { ipe, prompt, answer, testing: chat.testing };
 		const hookResponse = await _hook(chat, user, hookSpecs);
 		if (hookResponse.error) return { error: hookResponse.error };
 
@@ -50,6 +51,11 @@ export /*bundle*/ class Agent {
 		if (chat.error) return { error: chat.error };
 
 		return { ipe, credits: hookResponse.data.credits };
+	}
+
+	// Hook
+	static async hook(chat: Chat, user: User, params = {}) {
+		return _hook(chat, user, params);
 	}
 
 	static async processIncremental(chatId: string, params: IParams, user: User) {
@@ -82,15 +88,14 @@ export /*bundle*/ class Agent {
 			response.ipe &&
 				response.ipe?.forEach(ipe => {
 					if (ipe.key !== 'progress') return;
-					// console.log('ipe.response', ipe.response);
-					// const { objectives } = ipe.response;
-					// metadata.objectives =
-					// 	objectives &&
-					// 	objectives.map(o => ({
-					// 		name: o.name,
-					// 		relevance: o.relevance,
-					// 		status: o.status
-					// 	}));
+					const { objectives } = ipe.response;
+					metadata.objectives =
+						objectives &&
+						objectives.map(o => ({
+							name: o.name,
+							relevance: o.relevance,
+							status: o.status
+						}));
 				});
 
 			yield { metadata };
@@ -99,8 +104,5 @@ export /*bundle*/ class Agent {
 		return { status: true, iterator: iterator() };
 	}
 
-	static async hook(chat: Chat, user: User, params = {}) {
-		return _hook(chat, user, params);
-	}
 	static async processRealtime(chatId: string, params: IParams, user: User) {}
 }

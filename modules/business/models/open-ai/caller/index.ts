@@ -4,7 +4,7 @@ import { key } from '@aimpact/agents-api/models/open-ai/key';
 import OpenAI from 'openai';
 
 // Define the type for messages used in chat completions
-export /*bundle*/ type MessagesType = OpenAI.Chat.ChatCompletionMessageParam[];
+export /*bundle*/ type MessagesType = Omit<OpenAI.Chat.ChatCompletionMessageParam[], 'name'>;
 
 // Define the interface for an AgentTool with its properties and parameters
 export /*bundle*/ interface AgentTool {
@@ -199,7 +199,6 @@ export /*bundle*/ class OpenAICaller {
 			let format: FormatResponse = { type: 'text' };
 			if (responseFormat === 'json' || response.format === 'json') format = { type: 'json_object' };
 			if (responseFormat === 'json_schema' || response.format === 'json_schema') {
-				console.log('schema', schema);
 				format = {
 					type: 'json_schema',
 					json_schema: {
