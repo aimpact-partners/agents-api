@@ -10,7 +10,7 @@ import { Chat } from './chat';
 dotenv.config();
 const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
-const LOGS = false;
+const LOGS = true;
 type ILanguage = 'es' | 'en' | 'de' | 'it' | 'pt';
 
 const defaultTexts = {
