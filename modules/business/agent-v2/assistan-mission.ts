@@ -46,7 +46,8 @@ export class AssistantMission {
 
 		const defaultText = defaultTexts[<ILanguage>chat.metadata.language];
 
-		literals.objectives = JSON.stringify(metadata.objectives);
+		const objectives = metadata?.objectives ?? metadata['activity-objectives']; // property backward support
+		literals.objectives = JSON.stringify(objectives);
 
 		const summary = lastMessage?.metadata.summary ?? defaultText;
 		literals.summary = summary;
