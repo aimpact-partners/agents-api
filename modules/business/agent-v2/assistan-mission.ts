@@ -10,6 +10,7 @@ dotenv.config();
 const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
 const LOGS = true;
+const USERS_LOGS = ['felix@beyondjs.com', 'boxenrique@gmail.com'];
 
 interface IResponse {
 	error?: BusinessErrorManager;
@@ -74,7 +75,7 @@ export class AssistantMission {
 			temperature: 1
 		};
 
-		if (LOGS && user.email === USER_LOGS_PROMPTS) {
+		if (LOGS && USERS_LOGS.includes(user.email)) {
 			specs.store = true;
 			specs.metadata = { key: `agent/${activity.type}/${promptName}`, prompt: promptName };
 		}
