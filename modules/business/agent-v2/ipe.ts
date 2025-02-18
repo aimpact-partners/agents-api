@@ -11,6 +11,8 @@ dotenv.config();
 const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
 
 const LOGS = true;
+const USERS_LOGS = ['felix@beyondjs.com', 'boxenrique@gmail.com'];
+
 type ILanguage = 'es' | 'en' | 'de' | 'it' | 'pt';
 
 const defaultTexts = {
@@ -20,6 +22,16 @@ const defaultTexts = {
 	it: `La conversazione non è ancora iniziata.`,
 	pt: `A conversa ainda não começou.`
 };
+
+function toKebabCase(text: string) {
+	return text
+		.normalize('NFD')
+		.replace(/[̀-ͯ]/g, '')
+		.replace(/([a-z])([A-Z])/g, '$1-$2')
+		.replace(/\s+/g, '-')
+		.replace(/_/g, '-')
+		.toLowerCase();
+}
 
 export class IPE {
 	static async get(chat: Chat) {
@@ -68,7 +80,9 @@ export class IPE {
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
 			const reservedValues: Record<string, string> = {};
 
-			reservedValues.objectives = JSON.stringify(chat.metadata['activity-objectives']);
+			const objectives = chat.metadata?.objectives ?? chat.metadata['activity-objectives'];
+			reservedValues.objectives = JSON.stringify(objectives); // property backward support
+
 			reserved.forEach((literal: string) => {
 				if (literal.toUpperCase() === 'PREVIOUS') {
 					reservedValues[literal] = lastMessage?.content ?? '';
@@ -86,7 +100,6 @@ export class IPE {
 						objectiveProgress = progress.objectives?.map(obj => {
 							return { name: obj.name, progress: obj.progress, status: obj.status };
 						});
-
 						objectiveProgress = JSON.stringify(objectiveProgress);
 					} else objectiveProgress = defaultText;
 
@@ -105,7 +118,7 @@ export class IPE {
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
 
-			if (LOGS && user.email === USER_LOGS_PROMPTS) {
+			if (LOGS && USERS_LOGS.includes(user.email)) {
 				specs.store = true;
 				specs.metadata = {
 					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
@@ -128,41 +141,39 @@ export class IPE {
 			}
 
 			try {
-				const content = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
+				const iteration = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
 				if (ipe[index].key === 'summary') {
-					ipe[index].response = content;
+					ipe[index].response = iteration;
 					return;
 				}
 
 				let progress;
 				progress = (() => {
-					const newIteration = content;
-
-					let currentProgress = chat.ipe?.progress;
-					if (!currentProgress) {
-						const objectives = chat.metadata['activity-objectives']?.map(item => ({
-							name: item.name,
-							status: 'pending'
-						}));
-						currentProgress = { objectives: objectives ?? [], reached: [] };
+					let current = chat.ipe?.progress;
+					if (!current) {
+						const objectives = chat.metadata?.objectives ?? chat.metadata['activity-objectives'];
+						const items = objectives?.map(item => {
+							return { id: toKebabCase(item.name), name: item.name, status: 'pending' };
+						});
+						current = { objectives: items ?? [], reached: [] };
 					}
 
-					if (!newIteration.objectives) {
-						return { ...currentProgress, summary: newIteration.summary, alert: newIteration.alert };
+					if (!iteration.objectives) {
+						return { ...current, summary: iteration.summary, alert: iteration.alert };
 					}
 
-					const objectivesMap = new Map((currentProgress.objectives || []).map(obj => [obj.name, obj]));
-					newIteration.objectives.forEach(obj => {
+					const objectivesMap = new Map((current.objectives || []).map(obj => [toKebabCase(obj.name), obj]));
+					iteration.objectives.forEach(obj => {
 						obj = { ...obj, analysis: obj.progress, impact: obj.integration }; // property backward support
-						objectivesMap.set(obj.name, obj);
+						objectivesMap.set(toKebabCase(obj.name), obj);
 					});
 					const updatedObjectives = Array.from(objectivesMap.values());
 
 					return {
-						reached: newIteration.reached,
+						reached: iteration.reached,
 						objectives: updatedObjectives ?? [],
-						summary: newIteration.summary,
-						alert: newIteration.alert
+						summary: iteration.summary,
+						alert: iteration.alert
 					};
 				})();
 
