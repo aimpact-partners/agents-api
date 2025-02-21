@@ -8,7 +8,7 @@ import { Chat } from './chat';
 
 dotenv.config();
 const { GPT_MODEL, LOGS_PROMPTS } = process.env;
-const USERS_LOGS = ['felix@beyondjs.com', 'boxenrique@gmail.com'];
+const USERS_LOGS = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
 
 interface IResponse {
 	error?: BusinessErrorManager;
