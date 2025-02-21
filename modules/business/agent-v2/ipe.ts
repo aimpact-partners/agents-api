@@ -34,7 +34,8 @@ function toKebabCase(text: string) {
 export class IPE {
 	static async get(chat: Chat) {
 		const { project, metadata } = chat;
-		const response = await ProjectsAgents.get(project.id, project.agent);
+		const agentName = typeof project.agent === 'string' ? project.agent : metadata.activity?.type;
+		const response = await ProjectsAgents.get(project.id, agentName);
 		if (response.error) return { error: response.error };
 		const agent = response.data;
 
