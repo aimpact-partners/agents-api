@@ -14,7 +14,7 @@ export const _hook = async (chat: Chat, user: User, params = {}) => {
 		const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${AGENT_API_TOKEN}` };
 
 		let agent;
-		if (chat.project.agent) {
+		if (typeof chat.project.agent === 'string') {
 			const agentResponse = await ProjectsAgents.get(chat.project.id, chat.project.agent);
 			if (agentResponse.error) return { error: agentResponse.error };
 			agent = agentResponse.data;
