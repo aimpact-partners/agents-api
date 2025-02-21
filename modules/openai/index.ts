@@ -7,7 +7,7 @@ import { davinci3, gptTurboPlus, whisper } from './utils/models';
 dotenv.config();
 
 export /*bundle*/ class OpenAIBackend {
-	#openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+	#openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
 
 	async completions(prompt: string, text: string) {
 		const content: string = prompt + `\n` + text;
@@ -79,7 +79,7 @@ export /*bundle*/ class OpenAIBackend {
 		form.append('model', 'whisper-1');
 
 		let headers = {
-			Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+			Authorization: `Bearer ${process.env.OPEN_AI_KEY}`,
 			...form.getHeaders()
 		};
 

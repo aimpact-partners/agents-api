@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const { OPENAI_API_KEY } = process.env;
+const { OPEN_AI_KEY } = process.env;
 
 type RouterFunctionType = (event: string, data: any) => void;
 
@@ -24,7 +24,7 @@ export class RealtimeConversationConnection {
 		ws.on('message', this.#onmessage);
 		ws.on('close', this.#onclose);
 
-		const agent = (this.#agent = new AgentV2({ key: OPENAI_API_KEY }));
+		const agent = (this.#agent = new AgentV2({ key: OPEN_AI_KEY }));
 
 		/**
 		 * Route the events from the agent to the client
