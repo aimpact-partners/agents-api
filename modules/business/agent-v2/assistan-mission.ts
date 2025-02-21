@@ -7,9 +7,7 @@ import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 
 dotenv.config();
-const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
-
-const LOGS = true;
+const { GPT_MODEL, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'boxenrique@gmail.com'];
 
 interface IResponse {
@@ -76,7 +74,7 @@ export class AssistantMission {
 			temperature: 1
 		};
 
-		if (LOGS && USERS_LOGS.includes(user.email)) {
+		if (LOGS_PROMPTS === 'true' && USERS_LOGS.includes(user.email)) {
 			specs.store = true;
 			specs.metadata = { key: `agent/${activity.type}/${promptName}`, prompt: promptName };
 		}

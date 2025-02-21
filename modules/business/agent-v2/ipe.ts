@@ -8,9 +8,7 @@ import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 
 dotenv.config();
-const { GPT_MODEL, USER_LOGS_PROMPTS } = process.env;
-
-const LOGS = true;
+const { GPT_MODEL, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'boxenrique@gmail.com'];
 
 type ILanguage = 'es' | 'en' | 'de' | 'it' | 'pt';
@@ -118,7 +116,7 @@ export class IPE {
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
 
-			if (LOGS && USERS_LOGS.includes(user.email)) {
+			if (LOGS_PROMPTS === 'true' && USERS_LOGS.includes(user.email)) {
 				specs.store = true;
 				specs.metadata = {
 					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
@@ -147,8 +145,7 @@ export class IPE {
 					return;
 				}
 
-				let progress;
-				progress = (() => {
+				const progress = (() => {
 					let current = chat.ipe?.progress;
 					if (!current) {
 						const objectives = chat.metadata?.objectives ?? chat.metadata['activity-objectives'];
@@ -179,6 +176,7 @@ export class IPE {
 
 				ipe[index].response = progress;
 			} catch (exc) {
+				console.error(999, exc);
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
 		});

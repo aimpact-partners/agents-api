@@ -19,16 +19,15 @@ export const _hook = async (chat: Chat, user: User, params = {}) => {
 			if (agentResponse.error) return { error: agentResponse.error };
 			agent = agentResponse.data;
 		} else agent = { hook: `${chat.project.agent.url}/agent/hook` }; // OLD Chats
-
 		const URL = agent.hook;
 
 		// Prepare the parameters
 		const specs = {
-			metadata: chat.metadata,
-			chatId: chat.id,
+			...params,
 			user,
-			messages: chat.messages,
-			...params
+			chatId: chat.id,
+			metadata: chat.metadata,
+			messages: chat.messages
 		};
 
 		const body = JSON.stringify(specs);
