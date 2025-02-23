@@ -6,20 +6,11 @@ import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { User } from '@aimpact/agents-api/business/user';
 import * as dotenv from 'dotenv';
 import { Chat } from './chat';
+import { ILanguage, defaultTexts } from './common';
 
 dotenv.config();
 const { GPT_MODEL, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
-
-type ILanguage = 'es' | 'en' | 'de' | 'it' | 'pt';
-
-const defaultTexts = {
-	es: `La conversación aún no ha comenzado.`,
-	en: `The conversation hasn't started yet.`,
-	de: `Das Gespräch hat noch nicht begonnen.`,
-	it: `La conversazione non è ancora iniziata.`,
-	pt: `A conversa ainda não começou.`
-};
 
 function toKebabCase(text: string) {
 	return text
@@ -32,12 +23,27 @@ function toKebabCase(text: string) {
 }
 
 export class IPE {
-	static async get(chat: Chat) {
+	static async get(chat: Chat, prompt: string) {
 		const { project, metadata } = chat;
 		const agentName = typeof project.agent === 'string' ? project.agent : metadata.activity?.type;
 		const response = await ProjectsAgents.get(project.id, agentName);
 		if (response.error) return { error: response.error };
 		const agent = response.data;
+
+		const specs = metadata.activity.specs ?? metadata.activity.resources?.specs;
+		if (!specs.objectives) {
+			const previous = chat.synthesis ?? defaultTexts[<ILanguage>metadata.activity.language];
+			const ipe = [
+				{
+					key: 'summary',
+					format: 'json',
+					language: metadata.activity.language,
+					prompt: { category: 'agents', name: 'ailearn.agent-synthesis' },
+					literals: { user: chat.user.displayName, prompt, previous }
+				}
+			];
+			return { ipe };
+		}
 
 		const ipe = [];
 		agent.ipe.forEach(item => {
@@ -55,15 +61,14 @@ export class IPE {
 
 			const reserved: string[] = [];
 			item.literals.reserved.forEach(literal => reserved.push(literal));
-
-			ipe.push(Object.assign({}, item, { language: metadata.language, literals, reserved }));
+			ipe.push({ ...item, language: metadata.language, literals, reserved });
 		});
 
 		return { ipe };
 	}
 
 	static async process(chat: Chat, message: string, answer: string, user: User) {
-		const response = await IPE.get(chat);
+		const response = await IPE.get(chat, message);
 		if (response.error) return { error: response.error };
 
 		const last = chat.messages?.last ?? [];
@@ -73,7 +78,6 @@ export class IPE {
 		}
 
 		const defaultText = defaultTexts[<ILanguage>chat.metadata.language];
-
 		const { ipe } = response;
 		const promises: Promise<any>[] = [];
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
@@ -82,7 +86,7 @@ export class IPE {
 			const objectives = chat.metadata?.objectives ?? chat.metadata['activity-objectives'];
 			reservedValues.objectives = JSON.stringify(objectives); // property backward support
 
-			reserved.forEach((literal: string) => {
+			reserved?.forEach((literal: string) => {
 				if (literal.toUpperCase() === 'PREVIOUS') {
 					reservedValues[literal] = lastMessage?.content ?? '';
 					return;
@@ -113,7 +117,7 @@ export class IPE {
 				model: GPT_MODEL,
 				temperature: 1,
 				language: chat.language,
-				format: format ?? 'text',
+				format,
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
 
@@ -181,7 +185,6 @@ export class IPE {
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
 		});
-
 		return { ipe, error: responseError };
 	}
 }

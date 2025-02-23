@@ -285,10 +285,10 @@ export /*bundle*/ class PromptTemplateProcessor implements IPromptGenerationPara
 			// Replace the pure literals
 			this.literals && replacement(this.literals, true);
 
-			// console.log('/-----------------------------------');
-			// console.log(this.#name);
-			// console.log(value);
-			// console.log('----------------------------------- /');
+			console.log('/-----------------------------------');
+			console.log(this.#name);
+			console.log(value);
+			console.log('------------------------------------/');
 			return value;
 		})();
 	}

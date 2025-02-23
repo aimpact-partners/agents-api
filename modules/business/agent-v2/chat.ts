@@ -1,7 +1,7 @@
 import { Chat as ChatData } from '@aimpact/agents-api/business/chats';
 import { BusinessErrorManager, ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
-import { User } from '@aimpact/agents-api/business/user';
+import type { User } from '@aimpact/agents-api/business/user';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 
 export /*bundle*/ class Chat {
@@ -22,7 +22,7 @@ export /*bundle*/ class Chat {
 	}
 
 	get synthesis() {
-		return this.#data?.synthesis;
+		return this.#data?.synthesis ?? this.#data.ipe?.summary;
 	}
 
 	get language() {
@@ -114,6 +114,8 @@ export /*bundle*/ class Chat {
 
 			// store assistant's message
 			const assistantData = { answer, content: answer, role: 'assistant', metadata, synthesis: summary };
+
+			console.log('saveMessage--------', assistantData);
 			response = await ChatData.saveMessage(this.id, assistantData, this.user);
 			if (response.error) throw response.error;
 

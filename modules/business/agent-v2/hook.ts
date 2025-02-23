@@ -1,6 +1,6 @@
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { User } from '@aimpact/agents-api/business/user';
 import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
+import type { User } from '@aimpact/agents-api/business/user';
 import * as dotenv from 'dotenv';
 import { Chat } from './chat';
 
