@@ -2,7 +2,8 @@ import config from '@aimpact/agents-api/config';
 import { Channel as ChannelBase } from '@aimpact/agents-api/realtime/channel';
 import { Events } from '@beyond-js/events/events';
 
-const SERVER_URL = config.params.wsUrl;
+// const SERVER_URL = config.params.wsUrl;
+const SERVER_URL = `wss://agents.api.aimpact.partners`;
 
 export class Channel extends Events {
 	#channel: ChannelBase;
