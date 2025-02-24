@@ -106,6 +106,7 @@
 		"@beyond-js/firestore-collection": "~0.0.9",
 		"@google-cloud/storage": "^7.7.0",
 		"@google-cloud/tasks": "^5.3.0",
+		"@pinecone-database/pinecone": "^0.1.6",
 		"ws": "~8.18.0",
 		"firebase-admin": "^13.0.0",
 		"jsonwebtoken": "^9.0.1",
