@@ -1,8 +1,8 @@
-import type { WebSocket } from 'ws';
-import type { IncomingMessage } from 'http';
 import { AgentV2 } from '@aimpact/agents-api/realtime/agents/v2';
 import { RealtimeUtils } from '@aimpact/agents-api/realtime/utils';
 import * as dotenv from 'dotenv';
+import type { IncomingMessage } from 'http';
+import type { WebSocket } from 'ws';
 
 dotenv.config();
 
@@ -57,8 +57,7 @@ export class RealtimeConversationConnection {
 		try {
 			switch (event) {
 				case 'connect':
-					// Update the agent
-					this.#agent.update(data);
+					this.#agent.update(data); // Update the agent
 					break;
 				case 'listen':
 					const audio = RealtimeUtils.base64ToArrayBuffer(data.audio);

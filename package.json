@@ -17,6 +17,23 @@
 	"modules": {
 		"path": "modules"
 	},
+	"params": {
+		"local": {
+			"wsUrl": "ws://localhost:5040"
+		},
+		"development": {
+			"wsUrl": "wss://dev.agents.api.aimpact.partners"
+		},
+		"testing": {
+			"wsUrl": "wss://test.agents.api.aimpact.partners"
+		},
+		"quality": {
+			"wsUrl": "wss://beta.agents.api.aimpact.partners"
+		},
+		"production": {
+			"wsUrl": "wss://agents.api.aimpact.partners"
+		}
+	},
 	"deployment": {
 		"distributions": [
 			{
@@ -83,25 +100,24 @@
 	},
 	"dependencies": {
 		"@beyond-js/events": "~0.0.7",
+		"@beyond-js/response": "~0.0.3",
 		"express": "~4.21.1",
 		"express-openapi-validator": "~5.3.9",
+		"@beyond-js/firestore-collection": "~0.0.9",
+		"@google-cloud/storage": "^7.7.0",
+		"@google-cloud/tasks": "^5.3.0",
+		"ws": "~8.18.0",
+		"firebase-admin": "^13.0.0",
+		"jsonwebtoken": "^9.0.1",
 		"busboy": "^1.6.0",
 		"form-data": "^4.0.0",
-		"jsonwebtoken": "^9.0.1",
-		"ws": "~8.18.0",
 		"socket.io": "~4.8.1",
 		"node-fetch": "^2.6.12",
-		"firebase-admin": "^12.1.0",
-		"@beyond-js/firestore-collection": "~0.0.9",
-		"@google-cloud/storage": "^6.10.1",
-		"@google-cloud/tasks": "^5.3.0",
-		"@pinecone-database/pinecone": "^0.1.6",
-		"@beyond-js/response": "~0.0.3",
 		"dotenv": "^16.0.3",
 		"fluent-ffmpeg": "^2.1.2",
 		"dayjs": "^1.11.7",
 		"openai": "~4.83.0",
-		"uuid": "^9.0.0",
+		"uuid": "^11.0.0",
 		"find-up": "~7.0.0"
 	},
 	"devDependencies": {
@@ -112,7 +128,7 @@
 		"@types/busboy": "1.5.3",
 		"@types/jsonwebtoken": "^9.0.2",
 		"@types/express": "~5.0.0",
-		"@types/node": "~20.6.0",
+		"@types/node": "~22.13.5",
 		"@types/uuid": "~9.0.7",
 		"@types/ws": "~8.5.12",
 		"@types/react": "~18.3.11",
