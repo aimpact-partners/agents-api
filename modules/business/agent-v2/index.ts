@@ -12,7 +12,6 @@ interface IParams {
 }
 
 interface IMetadata {
-	answer: string;
 	summary?: string;
 	objectives?: [];
 	credits?: { total: number; consumed: number };
@@ -69,7 +68,7 @@ export /*bundle*/ class Agent {
 		const execution = promptTemplate.incremental();
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {
-			const metadata: IMetadata = { answer: '', objectives: [] };
+			const metadata: IMetadata = { objectives: [] };
 			for await (const part of execution) {
 				if (part.error) metadata.error = part.error;
 
@@ -77,7 +76,9 @@ export /*bundle*/ class Agent {
 
 				// Yield the answer of the response of a function, but only compute the chunks for the answer of the answer
 				if (chunk || part.function) yield { chunk: chunk ? chunk : part.function.content };
-				metadata.answer += chunk ? chunk : '';
+
+				// Yield the delimiter character because the llm metadata arrived
+				if (part.metadata) yield { chunk: 'ÿ' };
 			}
 
 			// Call postProcessor
@@ -89,13 +90,12 @@ export /*bundle*/ class Agent {
 				response.ipe?.forEach(ipe => {
 					if (ipe.key !== 'progress') return;
 					const { objectives } = ipe.response;
-					metadata.objectives =
-						objectives &&
-						objectives.map(o => ({
-							name: o.name,
-							relevance: o.relevance,
-							status: o.status
-						}));
+					if (!objectives) return;
+					metadata.objectives = objectives.map(o => ({
+						name: o.name,
+						status: o.status,
+						relevance: o.relevance
+					}));
 				});
 
 			yield { metadata };

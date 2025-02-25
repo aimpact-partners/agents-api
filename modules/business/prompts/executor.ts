@@ -1,6 +1,10 @@
 import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
-import type { IncrementalResponseType, IResolvedTool, ResponseType } from '@aimpact/agents-api/models/open-ai/caller';
-import { MessagesType, OpenAICaller } from '@aimpact/agents-api/models/open-ai/caller';
+import type {
+	IncrementalResponseType,
+	IResolvedTool,
+	ResponseType
+} from '@aimpact/agents-api/business/models/open-ai/caller';
+import { MessagesType, OpenAICaller } from '@aimpact/agents-api/business/models/open-ai/caller';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { PromptTemplateProcessor } from './templates/processor';
 // import type { IToolSpecs } from './tools';

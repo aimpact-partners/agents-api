@@ -1,4 +1,4 @@
-import config from '@aimpact/agents-api/config';
+// import config from '@aimpact/agents-api/config';
 import { Channel as ChannelBase } from '@aimpact/agents-api/realtime/channel';
 import { Events } from '@beyond-js/events/events';
 

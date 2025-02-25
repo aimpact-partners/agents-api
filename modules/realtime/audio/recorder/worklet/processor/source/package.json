@@ -3,6 +3,6 @@
 		"build": "esbuild index.ts --bundle --minify --sourcemap --outfile=../index.js"
 	},
 	"devDependencies": {
-		"esbuild": "~0.24.0"
+		"esbuild": "~0.25.0"
 	}
 }

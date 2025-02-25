@@ -3,26 +3,15 @@ import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
 import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
 import type { Response as IResponse } from 'express';
-
-export interface IMetadata {
-	answer: string;
-	summary?: string;
-	progress?: string;
-	error?: IError;
-}
-export interface IError {
-	code: number;
-	text: string;
-}
+import type { IError, IMetadata } from './index';
 
 export const v2 = async (req: IAuthenticatedRequest, res: IResponse) => {
 	if (!req.body.content) return res.json(new Response({ error: ErrorGenerator.invalidParameters(['content']) }));
 
 	res.setHeader('Content-Type', 'text/plain');
 	res.setHeader('Transfer-Encoding', 'chunked');
-	const done = (specs: { status: boolean; error?: IError; metadata? }) => {
+	const done = (specs: { status: boolean; error?: IError; metadata?: IMetadata }) => {
 		const { status, error, metadata } = specs;
-		res.write('ÿ');
 		res.write(JSON.stringify({ status, error, metadata }));
 		res.end();
 	};

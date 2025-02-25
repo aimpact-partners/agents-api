@@ -114,8 +114,6 @@ export /*bundle*/ class Chat {
 
 			// store assistant's message
 			const assistantData = { answer, content: answer, role: 'assistant', metadata, synthesis: summary };
-
-			console.log('saveMessage--------', assistantData);
 			response = await ChatData.saveMessage(this.id, assistantData, this.user);
 			if (response.error) throw response.error;
 

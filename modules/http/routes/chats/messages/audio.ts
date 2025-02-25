@@ -37,7 +37,7 @@ export const audio = async (req: IAuthenticatedRequest, res: IResponse) => {
 		return res.json({ status: false, error: exc.message });
 	}
 
-	const done = (specs: { status: boolean; error?: IError; metadata? }) => {
+	const done = (specs: { status: boolean; error?: IError; metadata?: IMetadata }) => {
 		const { status, error, metadata } = specs;
 		res.write('ÿ');
 		res.write(JSON.stringify({ status, error, metadata }));

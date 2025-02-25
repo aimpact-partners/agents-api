@@ -1,7 +1,7 @@
 import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import type { User } from '@aimpact/agents-api/business/user';
-import { MessagesType } from '@aimpact/agents-api/models/open-ai/caller';
+import { MessagesType } from '@aimpact/agents-api/business/models/open-ai/caller';
 import * as dotenv from 'dotenv';
 import { Chat } from '../chat';
 import { v1 } from './v1';

@@ -1,5 +1,5 @@
 {
-	"name": "models/open-ai/caller",
+	"name": "business/models/open-ai/caller",
 	"platforms": ["*"],
 	"bundle": "ts",
 	"files": "*"

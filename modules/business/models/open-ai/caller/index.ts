@@ -1,6 +1,6 @@
 import { BusinessErrorManager, ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
-import { key } from '@aimpact/agents-api/models/open-ai/key';
+import { key } from '@aimpact/agents-api/business/models/open-ai/key';
 import OpenAI from 'openai';
 
 // Define the type for messages used in chat completions

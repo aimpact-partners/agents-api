@@ -4,9 +4,9 @@ import { audio } from './audio';
 import { v2 } from './v2';
 
 export interface IMetadata {
-	answer: string;
 	summary?: string;
-	progress?: string;
+	objectives?: [];
+	credits?: { total: number; consumed: number };
 	error?: IError;
 }
 export interface IError {
@@ -17,11 +17,9 @@ export interface IError {
 export class ChatMessagesRoutes {
 	static setup(app: Application) {
 		app.post('/chats/:id/messages/audio', UserMiddlewareHandler.validate, audio);
-
-		// v1
-		// app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.sendMessage);
 		app.post('/chats/:id/messages', UserMiddlewareHandler.validate, v2);
-		app.post('/chats/:id/messages/v2', UserMiddlewareHandler.validate, v2);
+
+		// v1 -- app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.sendMessage);
 	}
 
 	// static async sendMessage(req: IAuthenticatedRequest, res: IResponse) {

@@ -1,6 +1,6 @@
 {
 	"name": "business/response",
-	"platforms": ["node"],
+	"platforms": ["*"],
 	"bundle": "ts",
 	"files": "*"
 }

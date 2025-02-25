@@ -1,6 +1,6 @@
 {
 	"name": "business/errors",
-	"platforms": ["node", "backend"],
+	"platforms": ["*"],
 	"bundle": "ts",
 	"files": "*"
 }
