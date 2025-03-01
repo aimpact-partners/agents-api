@@ -68,6 +68,7 @@ export /*bundle*/ class Agent {
 		const execution = promptTemplate.incremental();
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {
+			let answer = '';
 			const metadata: IMetadata = { objectives: [] };
 			for await (const part of execution) {
 				if (part.error) metadata.error = part.error;
@@ -77,12 +78,13 @@ export /*bundle*/ class Agent {
 				// Yield the answer of the response of a function, but only compute the chunks for the answer of the answer
 				if (chunk || part.function) yield { chunk: chunk ? chunk : part.function.content };
 
+				answer += chunk ? chunk : '';
 				// Yield the delimiter character because the llm metadata arrived
 				if (part.metadata) yield { chunk: 'ÿ' };
 			}
 
 			// Call postProcessor
-			const response = await Agent.post(chat, prompt, metadata.answer, user);
+			const response = await Agent.post(chat, prompt, answer, user);
 			if (response.error) metadata.error = response.error;
 
 			response.credits && (metadata.credits = response.credits);

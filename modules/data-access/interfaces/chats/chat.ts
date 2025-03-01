@@ -23,6 +23,7 @@ export /*bundle*/ interface IChatBase {
 }
 
 export /*bundle*/ interface IChatData extends IChatBase {
+	ipe?: Record<string, any>;
 	synthesis?: string;
 	project: { id: string; name: string; identifier: string; agent: string };
 	usage?: { completionTokens: number; promptTokens: number; totalTokens: number };

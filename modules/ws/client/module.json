@@ -1,0 +1,6 @@
+{
+	"name": "ws/client",
+	"bundle": "start",
+	"platforms": ["node", "backend"],
+	"ts": { "files": "*" }
+}

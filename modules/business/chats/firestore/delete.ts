@@ -14,9 +14,9 @@ export class BatchDeleter {
 
 		const snapshot = await query.get();
 		const batch = this.collectionRef.firestore.batch();
-		const ids = [];
+		const ids: string[] = [];
 
-		const promises = [];
+		const promises: any[] = [];
 		snapshot.docs.forEach(doc => {
 			ids.push(doc.id);
 			batch.delete(doc.ref);
@@ -28,7 +28,7 @@ export class BatchDeleter {
 		const results = await Promise.all(promises);
 		results.forEach(result => {
 			if (!!result.error) return;
-			result.docs.forEach(doc => batch.delete(doc.ref));
+			result.docs.forEach((doc: any) => batch.delete(doc.ref));
 		});
 
 		await batch.commit();

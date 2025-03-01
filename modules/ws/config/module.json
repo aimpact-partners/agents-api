@@ -1,0 +1,6 @@
+{
+	"name": "ws/config",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}

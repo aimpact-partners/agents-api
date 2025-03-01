@@ -183,7 +183,6 @@ export /*bundle*/ class Chat {
 
 					return data;
 				});
-
 				const count = chat.data.data?.messages?.count ?? 0;
 				const data = { messages: { count, lastTwo } };
 
@@ -197,7 +196,7 @@ export /*bundle*/ class Chat {
 		});
 	}
 
-	static async saveIPE(id: string, ipe: string) {
+	static async saveIPE(id: string, ipe: Record<string, any>) {
 		return await db.runTransaction(async (transaction: Transaction) => {
 			try {
 				const response = await chats.data({ id, transaction });
@@ -223,7 +222,7 @@ export /*bundle*/ class Chat {
 
 		const batch = db.batch();
 		const collection = this.collection;
-		const persisted = [];
+		const persisted: IChatData[] = [];
 		items.forEach(item => {
 			const id = item.id ?? uuid();
 			const persistedItem = { ...item, id };
@@ -254,7 +253,7 @@ export /*bundle*/ class Chat {
 		}
 	}
 
-	async deleteAll(field, values) {
+	async deleteAll(field: string, values?: any | any[]) {
 		try {
 			return this.#deleter.deleteAll(field, values);
 		} catch (e) {
@@ -262,7 +261,7 @@ export /*bundle*/ class Chat {
 		}
 	}
 
-	validate(item) {
+	validate() {
 		return true;
 	}
 }

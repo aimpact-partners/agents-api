@@ -105,28 +105,31 @@ export /*bundle*/ class Chat {
 				}
 			});
 
+			let responses: any[];
+			const userData = { content: prompt, role: <'user'>'user' };
+			const assistantData = {
+				answer,
+				content: answer,
+				role: <'assistant'>'assistant',
+				metadata,
+				synthesis: summary
+			};
+
 			let response;
-
-			// store user's message
-			const userData = { content: prompt, role: 'user' };
 			response = await ChatData.saveMessage(this.id, userData, this.user);
-			if (response.error) throw response.error;
-
-			// store assistant's message
-			const assistantData = { answer, content: answer, role: 'assistant', metadata, synthesis: summary };
+			if (response.error) {
+				this.#error = response.error;
+				return;
+			}
 			response = await ChatData.saveMessage(this.id, assistantData, this.user);
-			if (response.error) throw response.error;
+			if (response.error) {
+				this.#error = response.error;
+				return;
+			}
 
-			// set last interaction on chat
 			promises.push(ChatData.setLastInteractions(this.id, 4));
-
-			// update summary on chat
-			// promises.push(ChatData.saveSynthesis(this.id, summary));
-
-			// update summary on chat
 			promises.push(ChatData.saveIPE(this.id, metadata));
-
-			const responses = await Promise.all(promises);
+			responses = await Promise.all(promises);
 			responses.forEach(response => {
 				if (!response.error) return;
 				this.#error = response.error;

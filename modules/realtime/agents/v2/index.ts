@@ -1,5 +1,6 @@
 import { Agent } from '@aimpact/agents-api/business/agent-v2';
 import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
+import { metadata } from '@aimpact/agents-api/data/model';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
 import { User } from '@aimpact/agents-api/business/user';
 import type { ISessionSettings } from '@aimpact/agents-api/realtime/agents/base';
@@ -41,6 +42,20 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 			return false;
 		}
 		const user = userResponse.data;
+		console.log('user', user);
+
+		const authorizations = await metadata.data({ id: 'authorizations' });
+		if (authorizations.error) {
+			console.error(23, this.#error);
+			this.#error = authorizations.error;
+			return false;
+		}
+		const userRealtime = authorizations.data.exists ? authorizations.data.data.realtime : [];
+		if (!!(userRealtime && userRealtime.includes(user.email))) {
+			console.error(24, this.#error);
+			this.#error = userResponse.error;
+			return false;
+		}
 
 		// Call preProcessor
 		const { chat, specs, error } = await Agent.pre(conversation.id, '', user);
@@ -57,6 +72,8 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 			return false;
 		}
 
+		console.log(1, chat, specs);
+		console.log(2, prompt.processedValue);
 		// voice = 'alloy' | 'shimmer' | 'echo';
 		this.session.update({ voice: 'alloy', instructions: prompt.processedValue });
 
