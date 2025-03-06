@@ -67,6 +67,11 @@
 				"platform": "node"
 			},
 			{
+				"name": "development-web",
+				"environment": "development",
+				"platform": "web"
+			},
+			{
 				"name": "local-web",
 				"environment": "local",
 				"platform": "web",
