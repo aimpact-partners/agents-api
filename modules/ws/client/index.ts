@@ -1,4 +1,4 @@
-import { setEnv } from '@aimpact/agents-api/ws/config';
+import { setEnv } from '@aimpact/agents-api/ws-config';
 import * as dotenv from 'dotenv';
 
 dotenv.config();

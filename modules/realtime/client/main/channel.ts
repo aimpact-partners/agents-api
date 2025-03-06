@@ -1,8 +1,7 @@
-import { url as wsUrl } from '@aimpact/agents-api/ws/config';
+import { url as wsUrl } from '@aimpact/agents-api/ws-config';
 import { Channel as ChannelBase } from '@aimpact/agents-api/realtime/channel';
 import { Events } from '@beyond-js/events/events';
 
-console.log('wsUrl______', wsUrl);
 const SERVER_URL = wsUrl;
 
 export class Channel extends Events {
