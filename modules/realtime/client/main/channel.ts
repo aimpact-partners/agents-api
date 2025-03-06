@@ -19,6 +19,7 @@ export class Channel extends Events {
 
 	constructor() {
 		super();
+		console.log(10, wsUrl, SERVER_URL);
 		this.#channel = new ChannelBase({ url: SERVER_URL });
 
 		this.#channel.on('open', this.#onopen);

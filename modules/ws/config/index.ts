@@ -1,4 +1,4 @@
-type Environments = 'development' | 'testing' | 'beta' | 'production';
+type Environments = 'development' | 'testing' | 'beta' | 'production' | 'local';
 interface IEndpoint {
 	port?: number;
 	environment: Environments;
@@ -6,6 +6,7 @@ interface IEndpoint {
 
 const environments: { [key in Environments]: string } = {
 	development: 'wss://dev.agents.api.aimpact.partners',
+	local: 'wss://dev.agents.api.aimpact.partners',
 	testing: 'wss://test.agents.api.aimpact.partners',
 	beta: 'wss://beta.agents.api.aimpact.partners',
 	production: 'wss://agents.api.aimpact.partners'
