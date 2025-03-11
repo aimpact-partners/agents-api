@@ -9,7 +9,7 @@ export class FilestoreFile {
 	#storageBucket = process.env.STORAGEBUCKET;
 
 	constructor() {
-		const file = join(__dirname, './credentials/gcloud.json');
+		const file = join(__dirname, '../credentials/gcloud.json');
 		const specs: { keyFilename?: string } = {};
 		specs.keyFilename = fs.existsSync(file) ? file : void 0;
 		this.storage = new Storage(specs);

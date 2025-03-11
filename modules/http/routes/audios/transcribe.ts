@@ -62,15 +62,18 @@ function processAudio(req: IAuthenticatedRequest, chat?: IChatData): Promise<IAu
 		let fileSpecs = {};
 		if (chat) {
 			const name = `${generateCustomName(filename)}${getExtension(mimeType)}`;
-			const identifier = chat?.project.identifier ?? 'undefined-project';
+			const identifier = chat?.project.identifier ?? 'default-project';
 			let dest = join(identifier, user.uid, 'audio', name);
 			dest = dest.replace(/\\/g, '/');
 
-			// TODO validar guardado
-			// const fileManager = new FilestoreFile();
-			// const bucketFile = fileManager.getFile(dest);
-			// const write = bucketFile.createWriteStream();
-			// file.pipe(write);
+			//
+			const fileManager = new FilestoreFile();
+			const bucketFile = fileManager.getFile(dest);
+			const write = bucketFile.createWriteStream({ resumable: false });
+			file.pipe(write);
+
+			console.log('info', info, mimeType);
+
 			fileSpecs = { name, dest, mimeType };
 		}
 
