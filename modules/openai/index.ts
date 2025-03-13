@@ -2,7 +2,10 @@ import * as dotenv from 'dotenv';
 import * as FormData from 'form-data';
 import fetch from 'node-fetch';
 import OpenAI from 'openai';
-import { davinci3, gptTurboPlus, whisper } from './utils/models';
+
+const whisper = 'whisper-1';
+const gptTurboPlus = 'gpt-3.5-turbo-0613';
+const davinci3 = 'text-davinci-003';
 
 dotenv.config();
 
@@ -64,31 +67,6 @@ export /*bundle*/ class OpenAIBackend {
 
 			return { status: true, data: response.text };
 		} catch (e) {
-			const code = e.message.includes('401') ? 401 : 500;
-			return { status: false, error: e.message, code };
-		}
-	}
-
-	// stream: NodeJS.ReadableStream
-	async ___transcriptionStream(
-		stream: NodeJS.ReadableStream
-	): Promise<{ status: boolean; data?: any; error?: string; code?: number }> {
-		let form: FormData = new FormData();
-		form.append('file', stream, 'audio.webm');
-		form.append('model', 'whisper-1');
-
-		const headers = { Authorization: `Bearer ${process.env.OPEN_AI_KEY}`, ...form.getHeaders() };
-		try {
-			const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-				method: 'POST',
-				body: form,
-				headers
-			});
-			const json = await response.json();
-
-			return { status: !!json.text, data: { ...json }, error: json.error?.message };
-		} catch (e) {
-			console.error(e);
 			const code = e.message.includes('401') ? 401 : 500;
 			return { status: false, error: e.message, code };
 		}

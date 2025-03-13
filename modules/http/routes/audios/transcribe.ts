@@ -30,12 +30,11 @@ export const transcribe = async function (req: Request, chat?: IChatData) {
 
 			fileSpecs = { name, dest, mimetype };
 		}
-
 		const transcription = await oaiBackend.transcriptionStream(buffer, mimetype);
 		if (transcription.error) return { error: ErrorGenerator.transcribe(transcription.error) };
 
 		return { transcription, file: fileSpecs };
-	} catch (error) {
-		return { error: 'Internal Server Error' };
+	} catch (exc) {
+		return { error: ErrorGenerator.internalError(exc) };
 	}
 };
