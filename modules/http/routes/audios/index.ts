@@ -10,7 +10,7 @@ const upload = multer({ storage });
 
 export class AudiosRoutes {
 	static setup(app: Application) {
-		app.post('/audios/transcribe', upload.single('file'), AudiosRoutes.process);
+		app.post('/audios/transcribe', upload.single('audio'), AudiosRoutes.process);
 	}
 
 	static async process(req: IAuthenticatedRequest, res: IResponse) {

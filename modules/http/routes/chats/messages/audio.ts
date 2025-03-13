@@ -18,7 +18,7 @@ export class AudioMessagesRoutes {
 		app.post(
 			'/chats/:id/messages/audio',
 			UserMiddlewareHandler.validate,
-			upload.single('file'),
+			upload.single('audio'),
 			AudioMessagesRoutes.process
 		);
 	}
