@@ -37,22 +37,20 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 
 		const userResponse = await User.verifyToken(params.token);
 		if (userResponse.error) {
-			this.#error = userResponse.error;
 			console.error(this.#error);
+			this.#error = userResponse.error;
 			return false;
 		}
 		const user = userResponse.data;
-		console.log('user', user);
 
 		const authorizations = await metadata.data({ id: 'authorizations' });
 		if (authorizations.error) {
-			console.error(23, this.#error);
 			this.#error = authorizations.error;
 			return false;
 		}
 		const userRealtime = authorizations.data.exists ? authorizations.data.data.realtime : [];
-		if (!!(userRealtime && userRealtime.includes(user.email))) {
-			console.error(24, this.#error);
+
+		if (!userRealtime.includes(user.email)) {
 			this.#error = userResponse.error;
 			return false;
 		}
@@ -72,8 +70,8 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 			return false;
 		}
 
-		console.log(1, chat, specs);
-		console.log(2, prompt.processedValue);
+		// console.log(1, chat, specs);
+		// console.log(2, prompt.processedValue);
 		// voice = 'alloy' | 'shimmer' | 'echo';
 		this.session.update({ voice: 'alloy', instructions: prompt.processedValue });
 
