@@ -5,7 +5,8 @@ export /*bundle*/ enum ErrorCodes {
 	invalidParameters = 10500,
 	userNotValid,
 	invalidToken,
-	testingError
+	testing,
+	transcribe
 }
 
 export /*bundle*/ class ErrorGenerator {
@@ -25,7 +26,11 @@ export /*bundle*/ class ErrorGenerator {
 		return new HTTPErrorManager(ErrorCodes.userNotValid, `User not valid`);
 	}
 
-	static testingError() {
-		return new HTTPErrorManager(ErrorCodes.testingError, `Testing error message`);
+	static testing() {
+		return new HTTPErrorManager(ErrorCodes.testing, `Testing error message`);
+	}
+
+	static transcribe(text: string) {
+		return new HTTPErrorManager(ErrorCodes.transcribe, text);
 	}
 }

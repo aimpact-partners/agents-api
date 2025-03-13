@@ -8,7 +8,7 @@ import { IPE } from './ipe';
 interface IParams {
 	content: string;
 	id?: string;
-	systemId: string;
+	systemId?: string;
 }
 
 interface IMetadata {

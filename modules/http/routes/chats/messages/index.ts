@@ -1,7 +1,10 @@
+import { Agent } from '@aimpact/agents-api/business/agent-v2';
+import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
+import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
 import { UserMiddlewareHandler } from '@aimpact/agents-api/http/middleware';
-import type { Application } from 'express';
-import { audio } from './audio';
-import { v2 } from './v2';
+import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
+import type { Application, Response as IResponse } from 'express';
+import { AudioMessagesRoutes } from './audio';
 
 export interface IMetadata {
 	summary?: string;
@@ -16,60 +19,43 @@ export interface IError {
 
 export class ChatMessagesRoutes {
 	static setup(app: Application) {
-		app.post('/chats/:id/messages/audio', UserMiddlewareHandler.validate, audio);
-		app.post('/chats/:id/messages', UserMiddlewareHandler.validate, v2);
-
-		// v1 -- app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.sendMessage);
+		AudioMessagesRoutes.setup(app);
+		app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.process);
 	}
 
-	// static async sendMessage(req: IAuthenticatedRequest, res: IResponse) {
-	// 	const { test } = req.query;
-	// 	if (!!test) {
-	// 		return res.status(400).json(new Response({ error: ErrorGenerator.testingError() }));
-	// 	}
+	static async process(req: IAuthenticatedRequest, res: IResponse) {
+		if (!req.body.content) return res.json(new Response({ error: ErrorGenerator.invalidParameters(['content']) }));
 
-	// 	const chatId = req.params.id;
-	// 	if (!chatId) return res.status(400).json({ status: false, error: 'Parameter chatId is required' });
+		res.setHeader('Content-Type', 'text/plain');
+		res.setHeader('Transfer-Encoding', 'chunked');
+		const done = (specs: { status: boolean; error?: IError; metadata?: IMetadata }) => {
+			const { status, error, metadata } = specs;
+			res.write(JSON.stringify({ status, error, metadata }));
+			res.end();
+		};
 
-	// 	let chat: IChatData;
-	// 	try {
-	// 		const response = await Chat.get(chatId, 'false');
-	// 		if (response.error) return res.status(400).json({ status: false, error: response.error });
-	// 		chat = response.data;
-	// 	} catch (exc) {
-	// 		res.json({ status: false, error: exc.message });
-	// 	}
+		const { user } = req;
+		const { id } = req.params;
+		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
+		let metadata: IMetadata;
+		try {
+			const { iterator, error } = await Agent.processIncremental(id, specs, user);
+			if (error) return done({ status: false, error });
 
-	// 	const done = (specs: { status: boolean; error?: IError }) => {
-	// 		const { status, error } = specs;
-	// 		res.write('ÿ');
-	// 		res.write(JSON.stringify({ status, error }));
-	// 		res.end();
-	// 	};
-	// 	res.setHeader('Content-Type', 'text/plain');
-	// 	res.setHeader('Transfer-Encoding', 'chunked');
+			for await (const part of iterator) {
+				const { chunk } = part;
+				chunk && res.write(chunk);
+				if (part.metadata) {
+					metadata = part.metadata;
+					break;
+				}
+			}
+		} catch (exc) {
+			return done({ status: false, error: ErrorGenerator.internalError('HRC100') });
+		}
 
-	// 	const { user } = req;
-	// 	let metadata: IMetadata;
-	// 	try {
-	// 		const { iterator, error } = await Agent.sendMessage(chatId, req.body, user.uid);
-	// 		if (error) return done({ status: false, error });
+		if (metadata?.error) return done({ status: false, error: metadata.error });
 
-	// 		for await (const part of iterator) {
-	// 			const { chunk } = part;
-	// 			chunk && res.write(chunk);
-	// 			if (part.metadata) {
-	// 				metadata = part.metadata;
-	// 				break;
-	// 			}
-	// 		}
-	// 	} catch (exc) {
-	// 		console.error(exc);
-	// 		return done({ status: false, error: ErrorGenerator.internalError('HRC100') });
-	// 	}
-
-	// 	if (metadata?.error) return done({ status: false, error: metadata.error });
-
-	// 	done({ status: true });
-	// }
+		done({ status: true, metadata });
+	}
 }

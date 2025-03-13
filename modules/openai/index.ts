@@ -86,7 +86,6 @@ export /*bundle*/ class OpenAIBackend {
 			});
 			const json = await response.json();
 
-			console.log('json', json);
 			return { status: !!json.text, data: { ...json }, error: json.error?.message };
 		} catch (e) {
 			console.error(e);
@@ -95,9 +94,9 @@ export /*bundle*/ class OpenAIBackend {
 		}
 	}
 
-	async transcriptionStream(stream: NodeJS.ReadableStream) {
+	async transcriptionStream(buffer: Buffer, mimeType: string) {
 		const form = new FormData();
-		form.append('file', stream, { filename: 'audio.webm', contentType: 'audio/webm' });
+		form.append('file', buffer, { filename: 'audio.webm', contentType: mimeType });
 		form.append('model', 'whisper-1');
 
 		try {
@@ -108,9 +107,7 @@ export /*bundle*/ class OpenAIBackend {
 
 			return { status: !!json.text, data: json, error: json.error?.message };
 		} catch (e) {
-			console.error(e);
-			const code = e.message.includes('401') ? 401 : 500;
-			return { status: false, error: e.message, code };
+			return { status: false, error: e.message };
 		}
 	}
 }
