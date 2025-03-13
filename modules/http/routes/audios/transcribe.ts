@@ -47,7 +47,7 @@ function processAudio(req: IAuthenticatedRequest, chat?: IChatData): Promise<IAu
 		const pass = new stream.PassThrough();
 		file.pipe(pass);
 		files.push({ file: pass, info });
-		oaiBackend.transcriptionStream(file).then(response => transcription.resolve(response));
+		oaiBackend.transcriptionStream(pass).then(response => transcription.resolve(response));
 	});
 	bb.on('finish', async () => {
 		if (!files.length) {

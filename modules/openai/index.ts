@@ -96,12 +96,8 @@ export /*bundle*/ class OpenAIBackend {
 	}
 
 	async transcriptionStream(stream: NodeJS.ReadableStream) {
-		const buffers: Buffer[] = [];
-		for await (const chunk of stream) buffers.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-		const buffer = Buffer.concat(buffers);
-
 		const form = new FormData();
-		form.append('file', buffer, { filename: 'audio.webm', contentType: 'audio/webm' });
+		form.append('file', stream, { filename: 'audio.webm', contentType: 'audio/webm' });
 		form.append('model', 'whisper-1');
 
 		try {
