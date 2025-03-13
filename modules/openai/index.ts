@@ -96,7 +96,7 @@ export /*bundle*/ class OpenAIBackend {
 
 	async transcriptionStream(buffer: Buffer, mimeType: string) {
 		const form = new FormData();
-		form.append('file', buffer, { filename: 'audio.webm', contentType: mimeType });
+		form.append('file', buffer, { filename: 'audio.mp4', contentType: 'audio/mp4' });
 		form.append('model', 'whisper-1');
 
 		try {
