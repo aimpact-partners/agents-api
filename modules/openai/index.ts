@@ -21,7 +21,6 @@ export /*bundle*/ class OpenAIBackend {
 
 			return { status: true, data: response.choices[0].text };
 		} catch (e) {
-			console.error(e.message);
 			return { status: false, error: e.message };
 		}
 	}
@@ -36,7 +35,6 @@ export /*bundle*/ class OpenAIBackend {
 
 			return { status: true, data: response.choices[0].message.content };
 		} catch (e) {
-			console.error(e.message);
 			return { status: false, error: e.message };
 		}
 	}
@@ -66,32 +64,53 @@ export /*bundle*/ class OpenAIBackend {
 
 			return { status: true, data: response.text };
 		} catch (e) {
-			const code = e.message.includes('401' ? 401 : 500);
+			const code = e.message.includes('401') ? 401 : 500;
 			return { status: false, error: e.message, code };
 		}
 	}
 
-	async transcriptionStream(
+	// stream: NodeJS.ReadableStream
+	async ___transcriptionStream(
 		stream: NodeJS.ReadableStream
 	): Promise<{ status: boolean; data?: any; error?: string; code?: number }> {
 		let form: FormData = new FormData();
 		form.append('file', stream, 'audio.webm');
 		form.append('model', 'whisper-1');
 
-		let headers = {
-			Authorization: `Bearer ${process.env.OPEN_AI_KEY}`,
-			...form.getHeaders()
-		};
-
+		const headers = { Authorization: `Bearer ${process.env.OPEN_AI_KEY}`, ...form.getHeaders() };
 		try {
 			const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
 				method: 'POST',
 				body: form,
 				headers
 			});
-			const data = await response.json();
+			const json = await response.json();
 
-			return { status: true, data };
+			console.log('json', json);
+			return { status: !!json.text, data: { ...json }, error: json.error?.message };
+		} catch (e) {
+			console.error(e);
+			const code = e.message.includes('401') ? 401 : 500;
+			return { status: false, error: e.message, code };
+		}
+	}
+
+	async transcriptionStream(stream: NodeJS.ReadableStream) {
+		const buffers: Buffer[] = [];
+		for await (const chunk of stream) buffers.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+		const buffer = Buffer.concat(buffers);
+
+		const form = new FormData();
+		form.append('file', buffer, { filename: 'audio.webm', contentType: 'audio/webm' });
+		form.append('model', 'whisper-1');
+
+		try {
+			const headers = { Authorization: `Bearer ${process.env.OPEN_AI_KEY}`, ...form.getHeaders() };
+			const url = 'https://api.openai.com/v1/audio/transcriptions';
+			const response = await fetch(url, { method: 'POST', body: form, headers });
+			const json = await response.json();
+
+			return { status: !!json.text, data: json, error: json.error?.message };
 		} catch (e) {
 			console.error(e);
 			const code = e.message.includes('401') ? 401 : 500;

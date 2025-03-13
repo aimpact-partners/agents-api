@@ -72,8 +72,6 @@ function processAudio(req: IAuthenticatedRequest, chat?: IChatData): Promise<IAu
 			const write = bucketFile.createWriteStream({ resumable: false });
 			file.pipe(write);
 
-			console.log('info', info, mimeType);
-
 			fileSpecs = { name, dest, mimeType };
 		}
 
@@ -90,7 +88,7 @@ export const transcribe = async function (req: IAuthenticatedRequest, chat?: ICh
 	const { transcription, fields, file, error } = await processAudio(req, chat);
 
 	if (error) return { error };
-	if (transcription.error) return { error: `Error transcribing audio: ${transcription.error}` };
+	if (transcription.error) return { error: `Error transcribing audio. ${transcription.error}` };
 
 	return { transcription, fields, file };
 };
