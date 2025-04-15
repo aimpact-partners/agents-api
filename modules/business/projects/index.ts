@@ -1,14 +1,15 @@
-import type { CollectionResponseType } from '@beyond-js/firestore-collection/collection';
-import type { IProjectData } from '@aimpact/agents-api/data/interfaces';
-import { v4 as uuid } from 'uuid';
-import { FirestoreErrorManager } from '@beyond-js/firestore-collection/errors';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { Response } from '@beyond-js/response/main';
+import { Group } from '@aimpact/agents-api/business/group';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
-import { db } from '@beyond-js/firestore-collection/db';
+import type { IProjectData } from '@aimpact/agents-api/data/interfaces';
 import { projects } from '@aimpact/agents-api/data/model';
+import type { CollectionResponseType } from '@beyond-js/firestore-collection/collection';
+import { db } from '@beyond-js/firestore-collection/db';
+import { FirestoreErrorManager } from '@beyond-js/firestore-collection/errors';
+import { Response } from '@beyond-js/response/main';
+import { v4 as uuid } from 'uuid';
 
-export /*bundle*/ class Projects {
+export /*bundle*/ class Projects extends Group {
 	static async data(id?: string): Promise<CollectionResponseType<IProjectData>> {
 		return await projects.data({ id });
 	}

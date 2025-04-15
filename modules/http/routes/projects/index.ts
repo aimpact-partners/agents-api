@@ -12,6 +12,8 @@ export class ProjectsRoutes {
 		app.delete('/projects/:id', this.delete);
 
 		app.post('/projects/:id/agents', this.agent);
+
+		
 	}
 
 	static async list(req: Request, res: IResponse) {

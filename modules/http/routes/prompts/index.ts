@@ -27,8 +27,8 @@ export class PromptsRoutes {
 
 		app.post('/prompts/templates/:id/languages/update', this.updateLanguage);
 
+		app.post('/prompts/templates/process/completion', this.processLiteral);
 		app.post('/prompts/templates/:id/process', this.process);
-		app.post('/prompts/templates/:id/process-literal', this.processLiteral);
 	}
 
 	static async list(req: Request, res: Response) {

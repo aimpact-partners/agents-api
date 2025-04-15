@@ -1,0 +1,6 @@
+{
+	"name": "start-client",
+	"bundle": "start",
+	"platforms": ["*"],
+	"ts": { "files": "*" }
+}

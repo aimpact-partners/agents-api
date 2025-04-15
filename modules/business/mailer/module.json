@@ -1,0 +1,6 @@
+{
+	"name": "business/mailer",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}
