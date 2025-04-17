@@ -2,8 +2,9 @@ import { HTTPErrorManager } from './manager';
 
 export /*bundle*/ enum ErrorCodes {
 	internalError = 500,
+	userNotValid = 403,
+	userNotAuthorized = 403,
 	invalidParameters = 10500,
-	userNotValid,
 	invalidToken,
 	testing,
 	transcribe
@@ -20,6 +21,10 @@ export /*bundle*/ class ErrorGenerator {
 
 	static invalidToken() {
 		return new HTTPErrorManager(ErrorCodes.invalidToken, `Invalid token`);
+	}
+
+	static userNotAuthorized() {
+		return new BusinessErrorManager(ErrorCodes.userNotAuthorized, `Forbidden: User not authorized`);
 	}
 
 	static userNotValid() {

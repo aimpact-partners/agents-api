@@ -112,7 +112,9 @@ export class UsersRoutes {
 				'michael.halbwirth@betterknow.de'
 			];
 
-			if (!users.includes(user.email)) return res.json(new Response({ error: ErrorGenerator.userNotValid() }));
+			if (!users.includes(user.email)) {
+				return res.json(new Response({ error: ErrorGenerator.userNotAuthorized() }));
+			}
 
 			res.json(new Response({ data: user }));
 		} catch (exc) {
