@@ -14,6 +14,7 @@ export class UsersRoutes {
 		app.post('/auth/login', UsersRoutes.login);
 		app.post('/auth/register', UsersRoutes.register);
 		app.post('/integrations/tokens/verify', UsersRoutes.verify);
+		app.post('/users/login', UsersRoutes.login);
 		app.post('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
 	}
 
@@ -103,7 +104,13 @@ export class UsersRoutes {
 	static async me(req: IAuthenticatedRequest, res: IResponse) {
 		try {
 			const { user } = req;
-			const users = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
+			const users = [
+				'felix@beyondjs.com',
+				'julio@beyondjs.com',
+				'boxenrique@gmail.com',
+				'waldemar.maier@betterknow.de',
+				'michael.halbwirth@betterknow.de'
+			];
 
 			if (!users.includes(user.email)) return res.json(new Response({ error: ErrorGenerator.userNotValid() }));
 
