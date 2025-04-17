@@ -24,7 +24,7 @@ export /*bundle*/ class ErrorGenerator {
 	}
 
 	static userNotAuthorized() {
-		return new BusinessErrorManager(ErrorCodes.userNotAuthorized, `Forbidden: User not authorized`);
+		return new HTTPErrorManager(ErrorCodes.userNotAuthorized, `Forbidden: User not authorized`);
 	}
 
 	static userNotValid() {
