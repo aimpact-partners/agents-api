@@ -1,4 +1,4 @@
-import type { IUserData } from '@aimpact/agents-api/data/interfaces';
+import type { IUserData, IPeopleData } from '@aimpact/agents-api/data/interfaces';
 import { Collection, SubCollection } from '@beyond-js/firestore-collection/collection';
 
 class Users extends Collection<IUserData> {

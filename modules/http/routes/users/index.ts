@@ -15,7 +15,7 @@ export class UsersRoutes {
 		app.post('/auth/register', UsersRoutes.register);
 		app.post('/integrations/tokens/verify', UsersRoutes.verify);
 		app.post('/users/login', UsersRoutes.login);
-		app.post('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
+		app.get('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
 	}
 
 	static async login(req: Request, res: IResponse) {
