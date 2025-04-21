@@ -113,7 +113,7 @@ export class UsersRoutes {
 			];
 
 			if (!users.includes(user.email)) {
-				return res.json(new Response({ error: ErrorGenerator.userNotAuthorized() }));
+				return res.status(403).json(new Response({ error: ErrorGenerator.userNotAuthorized() }));
 			}
 
 			res.json(new Response({ data: user }));
