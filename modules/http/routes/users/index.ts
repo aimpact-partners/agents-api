@@ -108,6 +108,7 @@ export class UsersRoutes {
 				'felix@beyondjs.com',
 				'julio@beyondjs.com',
 				'boxenrique@gmail.com',
+				'betterknow.demos@gmail.com',
 				'waldemar.maier@betterknow.de',
 				'michael.halbwirth@betterknow.de'
 			];
