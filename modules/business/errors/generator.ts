@@ -1,6 +1,6 @@
 import { ErrorManager } from '@beyond-js/response/main';
-import { BusinessErrorManager } from './manager';
 import { ErrorCodes } from './codes';
+import { BusinessErrorManager } from './manager';
 
 export /*bundle*/ class ErrorGenerator {
 	static internalError(log?: string, message?: string, exc?: Error) {
@@ -32,6 +32,9 @@ export /*bundle*/ class ErrorGenerator {
 	}
 	static projectNotFound(id: string) {
 		return new BusinessErrorManager(ErrorCodes.projectNotFound, `Project "${id}" not found`);
+	}
+	static userNotAuthorized() {
+		return new BusinessErrorManager(ErrorCodes.userNotAuthorized, `Forbidden: User not authorized for this action`);
 	}
 	static languageNotSupport(collectionName: string, parameter: string, exc?: Error) {
 		return new BusinessErrorManager(
@@ -142,10 +145,10 @@ export /*bundle*/ class ErrorGenerator {
 		return new BusinessErrorManager(ErrorCodes.ipeKeyNotDefined, `IPE key not defined`);
 	}
 
-	static classroomAccessForbidden(user: User, classroomId: string) {
+	static classroomAccessForbidden(user: string, classroomId: string) {
 		return new BusinessErrorManager(
 			ErrorCodes.classroomAccessForbidden,
-			`User "${user.name} [${user.uid}]" does not have access to classroom "${classroomId}", or classroom not found`
+			`User "${user}" does not have access to classroom "${classroomId}", or classroom not found`
 		);
 	}
 
@@ -232,5 +235,4 @@ export /*bundle*/ class ErrorGenerator {
 			)}`
 		);
 	}
-
 }

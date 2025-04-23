@@ -2,6 +2,7 @@ import type { Application, Response as IResponse, Request } from 'express';
 import { join } from 'path';
 import { AudiosRoutes } from './audios';
 import { ChatsRoutes } from './chats';
+import { OpenAIRoutes } from './openai';
 import { ProjectsRoutes } from './projects';
 import { PromptsRoutes } from './prompts';
 import { SchemasRoutes } from './schemas';
@@ -15,6 +16,7 @@ export /*bundle*/ function setup(app: Application) {
 
 		AudiosRoutes.setup(app);
 		ChatsRoutes.setup(app);
+		OpenAIRoutes.setup(app);
 		ProjectsRoutes.setup(app);
 		PromptsRoutes.setup(app);
 		SchemasRoutes.setup(app);

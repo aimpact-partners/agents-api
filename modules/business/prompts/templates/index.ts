@@ -85,22 +85,6 @@ export /*bundle*/ class PromptsTemplate {
 		}
 	}
 
-	static async process(content: string, model: string, temperature: number) {
-		try {
-			const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [{ role: 'user', content }];
-			const openai = new OpenAIBackend();
-			const response = await openai.chatCompletions(messages, model, temperature);
-
-			const { error } = response;
-			const data = response.data ? { output: response.data } : undefined;
-
-			return new BusinessResponse({ error, data });
-		} catch (exc) {
-			console.error(exc);
-			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
-		}
-	}
-
 	static async delete(id: string) {
 		if (!id) return new BusinessResponse({ error: ErrorGenerator.invalidParameters(['id']) });
 
@@ -218,6 +202,22 @@ export /*bundle*/ class PromptsTemplate {
 			await prompts.languages.set({ id: params.language.default, parents, data });
 
 			return await PromptsTemplate.data(id);
+		} catch (exc) {
+			console.error(exc);
+			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+		}
+	}
+
+	static async process(content: string, model: string, temperature: number) {
+		try {
+			const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [{ role: 'user', content }];
+			const openai = new OpenAIBackend();
+			const response = await openai.chatCompletions(messages, model, temperature);
+
+			const { error } = response;
+			const data = response.data ? { output: response.data } : undefined;
+
+			return new BusinessResponse({ error, data });
 		} catch (exc) {
 			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });

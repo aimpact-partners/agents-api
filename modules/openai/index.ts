@@ -12,22 +12,6 @@ dotenv.config();
 export /*bundle*/ class OpenAIBackend {
 	#openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
 
-	async completions(prompt: string, text: string) {
-		const content: string = prompt + `\n` + text;
-
-		try {
-			const response = await this.#openai.completions.create({
-				model: davinci3,
-				prompt: content,
-				temperature: 0.2
-			});
-
-			return { status: true, data: response.choices[0].text };
-		} catch (e) {
-			return { status: false, error: e.message };
-		}
-	}
-
 	async chatCompletions(
 		messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
 		model = gptTurboPlus,
@@ -49,7 +33,6 @@ export /*bundle*/ class OpenAIBackend {
 	 * @returns
 	 */
 	async transcription(file, lang = 'en'): Promise<any> {
-		//    const blob = await getFile(path);
 		const prompt =
 			lang === 'en'
 				? 'Please, transcribe the following text in English'

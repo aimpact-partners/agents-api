@@ -1,5 +1,5 @@
 import type { IUser } from '@aimpact/agents-api/business/user';
-import { User } from '@aimpact/agents-api/business/user';
+import { User, UserAccess } from '@aimpact/agents-api/business/user';
 import type { IUserData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
@@ -14,6 +14,7 @@ export class UsersRoutes {
 		app.post('/auth/login', UsersRoutes.login);
 		app.post('/auth/register', UsersRoutes.register);
 		app.post('/integrations/tokens/verify', UsersRoutes.verify);
+
 		app.post('/users/login', UsersRoutes.login);
 		app.get('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
 	}
@@ -104,17 +105,12 @@ export class UsersRoutes {
 	static async me(req: IAuthenticatedRequest, res: IResponse) {
 		try {
 			const { user } = req;
-			const users = [
-				'felix@beyondjs.com',
-				'julio@beyondjs.com',
-				'boxenrique@gmail.com',
-				'betterknow.demos@gmail.com',
-				'waldemar.maier@betterknow.de',
-				'michael.halbwirth@betterknow.de'
-			];
 
-			if (!users.includes(user.email)) {
-				return res.status(403).json(new Response({ error: ErrorGenerator.userNotAuthorized() }));
+			const response = await UserAccess.authorizations(user);
+			if (response.error) {
+				if (response.error.code === 404) return res.status(404).json(new Response({ error: response.error }));
+				if (response.error.code === 403) return res.status(403).json(new Response({ error: response.error }));
+				return res.json(new Response({ error: response.error }));
 			}
 
 			res.json(new Response({ data: user }));
