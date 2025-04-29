@@ -17,23 +17,6 @@
 	"modules": {
 		"path": "modules"
 	},
-	"params": {
-		"local": {
-			"wsUrl": "ws://localhost:5040"
-		},
-		"development": {
-			"wsUrl": "wss://dev.agents.api.aimpact.partners"
-		},
-		"testing": {
-			"wsUrl": "wss://test.agents.api.aimpact.partners"
-		},
-		"quality": {
-			"wsUrl": "wss://beta.agents.api.aimpact.partners"
-		},
-		"production": {
-			"wsUrl": "wss://agents.api.aimpact.partners"
-		}
-	},
 	"deployment": {
 		"distributions": [
 			{
