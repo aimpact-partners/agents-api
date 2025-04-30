@@ -98,6 +98,7 @@ export /*bundle*/ class PromptTemplateLanguages {
 			if (error) return new BusinessResponse({ error });
 
 			prompt.language.updated = ['de'].concat(supported);
+			prompt.language.languages = ['de'].concat(prompt.language.languages);
 			const specs = { id, language: prompt.language };
 			const r = await PromptsTemplate.update(specs);
 			if (r.error) return new BusinessResponse({ error: r.error });
