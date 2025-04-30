@@ -1,17 +1,20 @@
-import type { IUserData } from '@aimpact/agents-api/data/interfaces';
-import type { Request, Response as IResponse, Application } from 'express';
 import type { IUser } from '@aimpact/agents-api/business/user';
+import { User } from '@aimpact/agents-api/business/user';
+import type { IUserData } from '@aimpact/agents-api/data/interfaces';
+import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
+import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
+import { UserMiddlewareHandler } from '@aimpact/agents-api/http/middleware';
+import { Response } from '@beyond-js/response/main';
+import type { Application, Response as IResponse, Request } from 'express';
 import type { JwtPayload } from 'jsonwebtoken';
 import * as jwt from 'jsonwebtoken';
-import { User } from '@aimpact/agents-api/business/user';
-import { Response } from '@beyond-js/response/main';
-import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 
 export class UsersRoutes {
 	static setup(app: Application) {
 		app.post('/auth/login', UsersRoutes.login);
 		app.post('/auth/register', UsersRoutes.register);
 		app.post('/integrations/tokens/verify', UsersRoutes.verify);
+		app.post('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
 	}
 
 	static async login(req: Request, res: IResponse) {
@@ -94,6 +97,19 @@ export class UsersRoutes {
 			});
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
+		}
+	}
+
+	static async me(req: IAuthenticatedRequest, res: IResponse) {
+		try {
+			const { user } = req;
+			const users = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
+
+			if (!users.includes(user.email)) return res.json(new Response({ error: ErrorGenerator.userNotValid() }));
+
+			res.json(new Response({ data: user }));
+		} catch (exc) {
+			res.json(new Response({ error: ErrorGenerator.internalError('H210', exc) }));
 		}
 	}
 }

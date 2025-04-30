@@ -51,10 +51,10 @@ export default function Widget() {
 			interval = setInterval(() => values.duration++, 1000);
 		};
 		const initiate = () => {
-			const chatId = `221caa6f-3486-4f27-b554-36ddb4869ca1`;
+			const chatId = ``;
 			console.log('client.update... send: conversation and firebaseToken', chatId);
 
-			const token = `eyJhbGciOiJSUzI1NiIsImtpZCI6IjBjYmJiZDI2NjNhY2U4OTU4YTFhOTY4ZmZjNDQxN2U4MDEyYmVmYmUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiRsOpbGl4IFRvdmFyIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0tFR0hwZVJFOGJYT055dXhTQjByUnlNOXJGZnhJZ2xGUVcwdUZOa3lNej1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9haW1wYWN0LXBhcnRuZXJzLXByb2QiLCJhdWQiOiJhaW1wYWN0LXBhcnRuZXJzLXByb2QiLCJhdXRoX3RpbWUiOjE3MzY4ODExNzcsInVzZXJfaWQiOiJZR29PYVN2VTloTzhndHlxVHJaSUZXRGRaTGIyIiwic3ViIjoiWUdvT2FTdlU5aE84Z3R5cVRyWklGV0RkWkxiMiIsImlhdCI6MTc0MDQyNDMyOCwiZXhwIjoxNzQwNDI3OTI4LCJlbWFpbCI6ImZlbGl4QGJleW9uZGpzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTEwNDcxNTE1MzE1OTYzOTg4NjA5Il0sImVtYWlsIjpbImZlbGl4QGJleW9uZGpzLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.Wbmx3NaLyeDFt1W1td5zUC0iSlAYX3lru0eYRlJ0Z_V5UWrMwuyv6JZq_lBt1JmRmJan-PGVEUMWfRqhK2a-C6fdA3y5wpI0xkKkuR4EbsRw3xbR2kvZl4UZkdY4Qki2jpuzvCYJs9qerKhATcSCT1sr6JjBE0ak9O2hCw6Ok3uNTvAF65Lr4lZbQvuYrmAtQf9FZNKF05BCBuFEBF7KN4LGCjuhPACZiwy24zhZVn9LEUEUD6fk-ApGQV2GHQoCaQnvaIprWpsr1spuUKwt-hr0n0ucoZkpB9U9QcVCiDvTps1V3gkPNVwshdEzW8mjnf663moZG-dE7Ap-epgAEQ`;
+			const token = ``;
 			// Add error handling
 			client.update({ conversation: { id: chatId }, token });
 			interval = setInterval(() => values.duration++, 1000);

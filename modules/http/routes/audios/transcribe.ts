@@ -16,9 +16,12 @@ export const transcribe = async function (req: Request, chat?: IChatData) {
 	try {
 		const { buffer, mimetype, originalname } = req.file;
 
-		const name = `${generateCustomName(originalname)}${getExtension(mimetype)}`;
+		const transcription = await oaiBackend.transcriptionStream(buffer, mimetype);
+		if (transcription.error) return { error: ErrorGenerator.transcribe(transcription.error) };
+
 		let fileSpecs = {};
 		if (chat) {
+			const name = `${generateCustomName(originalname)}${getExtension(mimetype)}`;
 			const identifier = chat?.project.identifier ?? 'default-project';
 			let dest = join(identifier, chat.user.id ?? chat.user.uid, 'audio', name);
 			dest = dest.replace(/\\/g, '/');
@@ -30,8 +33,6 @@ export const transcribe = async function (req: Request, chat?: IChatData) {
 
 			fileSpecs = { name, dest, mimetype };
 		}
-		const transcription = await oaiBackend.transcriptionStream(buffer, mimetype);
-		if (transcription.error) return { error: ErrorGenerator.transcribe(transcription.error) };
 
 		return { transcription, file: fileSpecs };
 	} catch (exc) {

@@ -141,4 +141,96 @@ export /*bundle*/ class ErrorGenerator {
 	static ipeKeyNotDefined() {
 		return new BusinessErrorManager(ErrorCodes.ipeKeyNotDefined, `IPE key not defined`);
 	}
+
+	static classroomAccessForbidden(user: User, classroomId: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.classroomAccessForbidden,
+			`User "${user.name} [${user.uid}]" does not have access to classroom "${classroomId}", or classroom not found`
+		);
+	}
+
+	static joinWaitingToConfirm(email: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.joinWaitingToConfirm,
+			`The join request of user "${email}" is waiting to be confirmed.`
+		);
+	}
+
+	static invitationAlreadyExists(email: string, entity: string, id: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.invitationAlreadyExists,
+			`There is already an invitation for "${email}" in the ${entity} "${id}".`
+		);
+	}
+
+	static userAlreadyExistOnGroup(email: string, entity: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.userAlreadyExistOnGroup,
+			`User "${email}" is already authorized in the ${entity}.`
+		);
+	}
+
+	static mailTemplatesNotDefined(template: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.mailTemplatesNotDefined,
+			`Could not send email to user. "${template}" not defined`
+		);
+	}
+
+	static mailNotSend() {
+		return new BusinessErrorManager(ErrorCodes.mailNotSend, `Could not send email to user.`);
+	}
+
+	static invitationNotValid(email: string, entity: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.invitationNotValid,
+			`The "${email}" invitation in the ${entity} is inactive or not exist.`
+		);
+	}
+
+	static codeNotFound(code: string, entity: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.codeNotFound,
+			`Code "${code}" not valid for ${entity}. Please check the code and try again.`
+		);
+	}
+
+	static userNotAuthorizedOnGroup(group: { entity: { name: string }; id: string }) {
+		return new BusinessErrorManager(
+			ErrorCodes.userNotAuthorizedOnGroup,
+			`User not authorized on ${group.entity.name} "${group.id}".`
+		);
+	}
+
+	static entityNotValid(entity: string) {
+		return new BusinessErrorManager(ErrorCodes.entityNotValid, `Entity "${entity}" not valid for Code collection.`);
+	}
+
+	static noAdministratorsToNotify() {
+		return new BusinessErrorManager(ErrorCodes.noAdministratorsToNotify, `No admins to notify free trial`);
+	}
+
+	static userPendingRequestOnGroup(userId: string, groupId: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.userPendingRequestOnGroup,
+			`User "${userId}" has a pending request in the group "${groupId}"`
+		);
+	}
+
+	static userInvitePendingOnGroup(userId: string, groupId: string) {
+		return new BusinessErrorManager(
+			ErrorCodes.userInvitePendingOnGroup,
+			`User "${userId}" has a pending invitation in the group "${groupId}"`
+		);
+	}
+
+	static invalidToDelete(collection: string, id: string, entities: string[]) {
+		return new BusinessErrorManager(
+			ErrorCodes.invalidToDelete,
+			`${collection} "${id}" cannot be deleted because it has associated data from the following entities: ${entities.join(
+				', '
+			)}`
+		);
+	}
+
 }

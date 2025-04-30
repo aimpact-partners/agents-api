@@ -1,7 +1,22 @@
 export /*bundle*/ enum ErrorCodes {
+	internalServerError = 500,
 	internalError = 500,
+	userNotAuthorized = 403,
+	userNotAuthorizedOnGroup = 403,
+	teacherIsNotDraftCreator = 403,
+	teacherNotInOrganization = 403,
+	classroomAccessForbidden = 403,
+	insufficientPermissions = 403,
+	invalidAccess = 404,
 	documentNotFound = 404,
 	documentNotSaved = 800,
+	codeNotFound = 100,
+	joinWaitingToConfirm = 101,
+	invitationNotValid = 102,
+	invitationAlreadyExists = 103,
+	userAlreadyExistOnGroup = 104,
+	userPendingRequestOnGroup = 105,
+	userInvitePendingOnGroup = 106,
 	documentAlreadyExist,
 	invalidParameters,
 	projectNotFound,
@@ -27,5 +42,7 @@ export /*bundle*/ enum ErrorCodes {
 	processingIPE,
 	invalidAccessToken,
 	insufficientCredits,
-	ipeKeyNotDefined
+	ipeKeyNotDefined,
+	mailTemplatesNotDefined,
+	mailNotSend
 }

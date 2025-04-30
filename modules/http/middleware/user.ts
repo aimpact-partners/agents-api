@@ -36,4 +36,6 @@ export /*bundle*/ class UserMiddlewareHandler {
 			return res.status(500).json({ status: false, error: exc.message, code });
 		}
 	}
+
+	
 }
