@@ -25,7 +25,7 @@ export /*bundle*/ class Chat {
 		this.firestoreService = new FirestoreService(this.table);
 	}
 
-	static async get(id: string, uid?: string, showMessages: boolean = false): Promise<BusinessResponse<IChatData>> {
+	static async get(id: string, showMessages: boolean = false): Promise<BusinessResponse<IChatData>> {
 		if (!id) return new BusinessResponse({ error: ErrorGenerator.invalidParameters(['id']) });
 
 		try {
@@ -95,9 +95,7 @@ export /*bundle*/ class Chat {
 				};
 			}
 
-			if (data.user) {
-				specs.user = data.user;
-			}
+			if (data.user) specs.user = data.user;
 
 			// only for RVD.users
 			if (data.uid) {

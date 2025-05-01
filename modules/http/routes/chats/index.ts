@@ -17,9 +17,9 @@ export class ChatsRoutes {
 		// app.post('/chats', middleware.validate, ChatsRoutes.create);
 
 		app.get('/chats', middleware.validate, ChatsRoutes.list);
-		app.get('/chats/:id', middleware.validate, ChatsRoutes.get);
+		app.get('/chats/:id', ChatsRoutes.get);
 		app.delete('/chats', middleware.validate, ChatsRoutes.deleteAll);
-		app.delete('/chats/:id', middleware.validate, ChatsRoutes.delete);
+		app.delete('/chats/:id', ChatsRoutes.delete);
 
 		app.post('/chats/bulk', ChatsRoutes.bulk);
 		app.put('/chats/:id', ChatsRoutes.update);
@@ -46,7 +46,7 @@ export class ChatsRoutes {
 			const { id } = req.params;
 			const { uid } = req.user;
 
-			const { data, error } = await Chat.get(id, uid, true); // true for get messages
+			const { data, error } = await Chat.get(id, true); // true for get messages
 			res.json(new Response({ data, error }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));

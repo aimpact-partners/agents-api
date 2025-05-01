@@ -53,6 +53,11 @@ export /*bundle*/ class User implements IUser {
 		return this.#photoURL;
 	}
 
+	#photoUrl: string;
+	get photoUrl() {
+		return this.#photoUrl;
+	}
+
 	private collection;
 	private table = 'Users';
 	constructor(id: string) {
@@ -108,6 +113,7 @@ export /*bundle*/ class User implements IUser {
 					firebaseToken: user.firebaseToken,
 					token: customToken,
 					custom: customToken,
+					photoUrl: user.photoUrl,
 					photoURL: user.photoURL,
 					phoneNumber: user.phoneNumber,
 					createdOn: dayjs().unix(),
@@ -156,6 +162,7 @@ export /*bundle*/ class User implements IUser {
 				firebaseToken: user.firebaseToken,
 				token: customToken,
 				custom: customToken,
+				photoUrl: user.photoUrl,
 				photoURL: user.photoURL,
 				phoneNumber: user.phoneNumber,
 				createdOn: date,
@@ -181,6 +188,7 @@ export /*bundle*/ class User implements IUser {
 			name: this.#name,
 			displayName: this.#displayName,
 			email: this.#email,
+			photoUrl: this.#photoUrl,
 			photoURL: this.#photoURL,
 			phoneNumber: this.#phoneNumber
 		};

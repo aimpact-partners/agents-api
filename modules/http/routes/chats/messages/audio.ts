@@ -27,7 +27,7 @@ export class AudioMessagesRoutes {
 		let chat: IChatData;
 		let content: string;
 		try {
-			const response = await Chat.get(chatId, 'false');
+			const response = await Chat.get(chatId, false);
 			if (response.error) return res.status(400).json({ status: false, error: response.error });
 			chat = response.data;
 
