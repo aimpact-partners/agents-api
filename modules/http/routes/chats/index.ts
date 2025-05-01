@@ -44,7 +44,6 @@ export class ChatsRoutes {
 	static async get(req: IAuthenticatedRequest, res: IResponse) {
 		try {
 			const { id } = req.params;
-			const { uid } = req.user;
 
 			const { data, error } = await Chat.get(id, true); // true for get messages
 			res.json(new Response({ data, error }));
