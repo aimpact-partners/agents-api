@@ -3,7 +3,6 @@ import { Chat } from '@aimpact/agents-api/business/chats';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
-import { UserMiddlewareHandler } from '@aimpact/agents-api/http/middleware';
 import { Response } from '@beyond-js/response/main';
 import type { Application, Response as IResponse } from 'express';
 import * as multer from 'multer';
@@ -15,12 +14,7 @@ const upload = multer({ storage });
 
 export class AudioMessagesRoutes {
 	static setup(app: Application) {
-		app.post(
-			'/chats/:id/messages/audio',
-			UserMiddlewareHandler.validate,
-			upload.single('audio'),
-			AudioMessagesRoutes.process
-		);
+		app.post('/chats/:id/messages/audio', upload.single('audio'), AudioMessagesRoutes.process);
 	}
 
 	static async process(req: IAuthenticatedRequest, res: IResponse) {
@@ -55,13 +49,12 @@ export class AudioMessagesRoutes {
 		res.setHeader('Content-Type', 'text/plain');
 		res.setHeader('Transfer-Encoding', 'chunked');
 
-		const { user } = req;
 		let metadata: IMetadata;
 		try {
 			const action = { type: 'transcription', data: { transcription: content } };
 			res.write('😸' + JSON.stringify(action) + '🖋️');
 
-			const { iterator, error } = await Agent.processIncremental(chatId, { content }, user);
+			const { iterator, error } = await Agent.processIncremental(chatId, { content });
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {

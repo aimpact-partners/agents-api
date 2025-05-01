@@ -35,7 +35,9 @@ export class Message {
 				if (!data.exists) return { error: data.error };
 				const chat = data.data;
 
-				if (user.id !== chat.user.uid) return { error: ErrorGenerator.unauthorizedUserForChat() };
+				if (user.uid !== chat.user.uid && user.id !== chat.user.uid) {
+					return { error: ErrorGenerator.unauthorizedUserForChat() };
+				}
 
 				const id = params.id ? params.id : uuid();
 				delete params.id;

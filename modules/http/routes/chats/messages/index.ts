@@ -1,7 +1,6 @@
 import { Agent } from '@aimpact/agents-api/business/agent-v2';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
-import { UserMiddlewareHandler } from '@aimpact/agents-api/http/middleware';
 import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
 import type { Application, Response as IResponse } from 'express';
 import { AudioMessagesRoutes } from './audio';
@@ -20,7 +19,7 @@ export interface IError {
 export class ChatMessagesRoutes {
 	static setup(app: Application) {
 		AudioMessagesRoutes.setup(app);
-		app.post('/chats/:id/messages', UserMiddlewareHandler.validate, ChatMessagesRoutes.process);
+		app.post('/chats/:id/messages', ChatMessagesRoutes.process);
 	}
 
 	static async process(req: IAuthenticatedRequest, res: IResponse) {
@@ -34,12 +33,11 @@ export class ChatMessagesRoutes {
 			res.end();
 		};
 
-		const { user } = req;
 		const { id } = req.params;
 		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
 		let metadata: IMetadata;
 		try {
-			const { iterator, error } = await Agent.processIncremental(id, specs, user);
+			const { iterator, error } = await Agent.processIncremental(id, specs);
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {
@@ -51,6 +49,7 @@ export class ChatMessagesRoutes {
 				}
 			}
 		} catch (exc) {
+			console.log('exc', exc);
 			return done({ status: false, error: ErrorGenerator.internalError('HRC100') });
 		}
 

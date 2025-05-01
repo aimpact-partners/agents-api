@@ -1,0 +1,7 @@
+{
+	"name": "business/agent-rvd",
+	"platforms": ["node", "backend"],
+	"ts": {
+		"files": ["*"]
+	}
+}
