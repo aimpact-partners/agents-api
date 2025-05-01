@@ -1,5 +1,5 @@
 {
-	"name": "backend-openai",
+	"name": "openai-backend",
 	"platforms": ["node", "backend"],
 	"bundle": "ts",
 	"files": ["*"]

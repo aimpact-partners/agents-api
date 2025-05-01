@@ -1,6 +1,0 @@
-{
-	"name": "openai/model",
-	"platforms": ["node", "backend"],
-	"bundle": "ts",
-	"files": ["*"]
-}

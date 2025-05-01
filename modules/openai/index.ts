@@ -2,19 +2,32 @@ import * as dotenv from 'dotenv';
 import * as FormData from 'form-data';
 import fetch from 'node-fetch';
 import OpenAI from 'openai';
-
-const whisper = 'whisper-1';
-const gptTurboPlus = 'gpt-3.5-turbo-0613';
-const davinci3 = 'text-davinci-003';
+import { models } from './utils/models';
 
 dotenv.config();
+
+interface ICompletionsParams {
+	messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+	model?: string;
+	temperature?: number;
+}
 
 export /*bundle*/ class OpenAIBackend {
 	#openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
 
+	async completions({ messages, model = models.GPT_3_5_TURBO, temperature = 0.2 }: ICompletionsParams) {
+		try {
+			const response = await this.#openai.chat.completions.create({ model, messages, temperature });
+
+			return { status: true, data: response.choices[0].message.content };
+		} catch (e) {
+			return { status: false, error: e.message };
+		}
+	}
+
 	async chatCompletions(
 		messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-		model = gptTurboPlus,
+		model = models.GPT_3_5_TURBO,
 		temperature = 0.2
 	) {
 		try {
@@ -41,7 +54,7 @@ export /*bundle*/ class OpenAIBackend {
 		try {
 			const response = await this.#openai.audio.transcriptions.create({
 				file,
-				model: whisper,
+				model: models.WHISPER_1,
 				language: lang,
 				prompt,
 				response_format: 'json',
@@ -58,7 +71,7 @@ export /*bundle*/ class OpenAIBackend {
 	async transcriptionStream(buffer: Buffer, mimeType: string) {
 		const form = new FormData();
 		form.append('file', buffer, { filename: 'audio.mp4', contentType: 'audio/mp4' });
-		form.append('model', 'whisper-1');
+		form.append('model', models.WHISPER_1);
 
 		try {
 			const headers = { Authorization: `Bearer ${process.env.OPEN_AI_KEY}`, ...form.getHeaders() };

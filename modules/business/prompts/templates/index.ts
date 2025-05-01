@@ -1,4 +1,4 @@
-import { OpenAIBackend } from '@aimpact/agents-api/backend-openai';
+import { OpenAIBackend } from '@aimpact/agents-api/openai-backend';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { Projects } from '@aimpact/agents-api/business/projects';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';

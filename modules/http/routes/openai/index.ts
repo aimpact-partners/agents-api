@@ -1,4 +1,4 @@
-import { OpenAIBackend } from '@aimpact/agents-api/openai/model';
+import { OpenAIBackend } from '@aimpact/agents-api/openai-backend';
 import { Express, Request, Response } from 'express';
 
 export class OpenAIRoutes {
