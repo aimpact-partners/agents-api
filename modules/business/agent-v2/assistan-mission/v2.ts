@@ -12,8 +12,8 @@ export const v2 = async (chat: Chat, lastMessage) => {
 	const literals: Record<string, string> = {};
 	agent.literals.agent.pure.forEach(literal => (literals[literal] = chat.metadata[literal]));
 
-	if (literals[literal].user) {
-		literals[literal].user = literals[literal].user.replace(/^(\S+).*/, '$1');
+	if (literals.user) {
+		literals.user = literals.user.replace(/^(\S+).*/, '$1');
 	}
 
 	const defaultText = defaultTexts[<ILanguage>chat.metadata.language];
@@ -37,6 +37,8 @@ export const v2 = async (chat: Chat, lastMessage) => {
 	literals.progress = objectiveProgress;
 
 	const { activity } = chat.metadata;
+
+	console.log('v2', literals);
 
 	return { prompt: `ailearn.activity-${activity.type}-v2`, literals };
 };

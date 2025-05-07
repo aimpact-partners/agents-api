@@ -59,8 +59,8 @@ export class IPE {
 						: metadata[literal];
 			});
 
-			if (literals[literal].user) {
-				literals[literal].user = literals[literal].user.replace(/^(\S+).*/, '$1');
+			if (literals.user) {
+				literals.user = literals.user.replace(/^(\S+).*/, '$1');
 			}
 
 			const reserved: string[] = [];
