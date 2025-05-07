@@ -64,14 +64,14 @@ export /*bundle*/ class PromptTemplateLanguages {
 			const promises: any[] = [];
 			const supported = prompt.language.languages.filter((l: string) => l !== language);
 
-			supported.forEach((lang: string) => {
+			['de'].forEach((lang: string) => {
 				const promptExecutor = new PromptTemplateExecutor({
 					category: 'helper',
 					name: 'ailearn.prompts-translate',
-					language: lang,
+					language: 'en',
 					model: 'gpt-4o-mini',
 					temperature: 1,
-					literals: { TEXT: prompt.value },
+					literals: { TEXT: prompt.value, SOURCE: 'english', TARGET: 'german' },
 					format: 'text'
 				});
 				promises.push(promptExecutor.execute());
@@ -86,7 +86,7 @@ export /*bundle*/ class PromptTemplateLanguages {
 					return;
 				}
 				const text = response.data?.content;
-				promises.push(PromptTemplateLanguages.set(id, { language: supported[index], text }));
+				promises.push(PromptTemplateLanguages.set(id, { language: 'de', text }));
 			});
 			if (error) return new BusinessResponse({ error });
 			responses = await Promise.all(promises);
@@ -97,7 +97,8 @@ export /*bundle*/ class PromptTemplateLanguages {
 			});
 			if (error) return new BusinessResponse({ error });
 
-			prompt.language.updated = [language].concat(supported);
+			prompt.language.updated = ['de'].concat(supported);
+			prompt.language.languages = ['de'].concat(prompt.language.languages);
 			const specs = { id, language: prompt.language };
 			const r = await PromptsTemplate.update(specs);
 			if (r.error) return new BusinessResponse({ error: r.error });
