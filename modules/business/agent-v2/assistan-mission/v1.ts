@@ -5,8 +5,10 @@ export const v1 = (chat: Chat) => {
 	let error;
 
 	const { subject, role, instructions } = activity.specs ?? activity.resources.specs;
+
+	const name = chat.user.displayName.replace(/^(\S+).*/, '$1');
 	const literals = {
-		user: chat.user.displayName,
+		user: name,
 		role: role ?? '',
 		subject: subject ?? '',
 		age: module.audience ?? '',
