@@ -58,6 +58,10 @@ export class IPE {
 						: metadata[literal];
 			});
 
+			if (literals.user) {
+				literals.user = literals.user.replace(/^(\S+).*/, '$1');
+			}
+
 			const reserved: string[] = [];
 			item.literals.reserved.forEach(literal => reserved.push(literal));
 			ipe.push({ ...item, language: metadata.language, literals, reserved });
