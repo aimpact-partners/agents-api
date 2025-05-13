@@ -8,6 +8,6 @@ const { ENVIRONMENT } = process.env;
 let port;
 let environment;
 if (ENVIRONMENT === 'local') port = 5040;
-else environment = <'development' | 'testing' | 'beta' | 'production'>ENVIRONMENT;
+else environment = <'development' | 'testing' | 'quality' | 'production'>ENVIRONMENT;
 
 setEnv({ port, environment });
