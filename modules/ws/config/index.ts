@@ -10,23 +10,23 @@ interface IEndpoint {
 const environments: { [key in Environments]: { rvd: string; 'better-mind': string } } = {
 	local: {
 		rvd: 'wss://dev.agents.api.aimpact.partners',
-		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
+		'better-mind': 'wss://agents-api-883367315651.europe-west10.run.app'
 	},
 	development: {
 		rvd: 'wss://dev.agents.api.aimpact.partners',
-		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
+		'better-mind': 'wss://agents-api-883367315651.europe-west10.run.app'
 	},
 	testing: {
 		rvd: 'wss://test.agents.api.aimpact.partners',
-		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
+		'better-mind': 'wss://agents-api-883367315651.europe-west10.run.app'
 	},
 	quality: {
 		rvd: 'wss://beta.agents.api.aimpact.partners',
-		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
+		'better-mind': 'wss://agents-api-883367315651.europe-west10.run.app'
 	},
 	production: {
 		rvd: 'wss://agents.api.aimpact.partners',
-		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
+		'better-mind': 'wss://agents-api-883367315651.europe-west10.run.app'
 	}
 };
 
