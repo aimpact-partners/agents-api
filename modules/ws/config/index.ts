@@ -1,7 +1,7 @@
 import config from '@aimpact/agents-api/config';
 
 const project = <'rvd' | 'better-mind'>config.params.project;
-type Environments = 'local' | 'development' | 'testing' | 'beta' | 'production';
+type Environments = 'local' | 'development' | 'testing' | 'quality' | 'production';
 interface IEndpoint {
 	port?: number;
 	environment: Environments;
@@ -20,7 +20,7 @@ const environments: { [key in Environments]: { rvd: string; 'better-mind': strin
 		rvd: 'wss://test.agents.api.aimpact.partners',
 		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
 	},
-	beta: {
+	quality: {
 		rvd: 'wss://beta.agents.api.aimpact.partners',
 		'better-mind': 'ws://agents-api-883367315651.europe-west10.run.app'
 	},

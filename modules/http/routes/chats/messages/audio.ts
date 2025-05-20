@@ -40,14 +40,13 @@ export class AudioMessagesRoutes {
 			return res.json({ status: false, error: exc.message });
 		}
 
+		res.setHeader('Content-Type', 'text/plain');
+		res.setHeader('Transfer-Encoding', 'chunked');
 		const done = (specs: { status: boolean; error?: IError; metadata?: IMetadata }) => {
 			const { status, error, metadata } = specs;
-			res.write('ÿ');
 			res.write(JSON.stringify({ status, error, metadata }));
 			res.end();
 		};
-		res.setHeader('Content-Type', 'text/plain');
-		res.setHeader('Transfer-Encoding', 'chunked');
 
 		let metadata: IMetadata;
 		try {

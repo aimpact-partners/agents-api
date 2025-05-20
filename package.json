@@ -17,6 +17,9 @@
 	"modules": {
 		"path": "modules"
 	},
+	"params": {
+		"project": "better-mind"
+	},
 	"deployment": {
 		"distributions": [
 			{
