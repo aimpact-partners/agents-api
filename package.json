@@ -53,8 +53,8 @@
 				"platform": "node"
 			},
 			{
-				"name": "local-web",
-				"environment": "local",
+				"name": "web-development",
+				"environment": "development",
 				"platform": "web",
 				"ports": {
 					"bundles": 6400
