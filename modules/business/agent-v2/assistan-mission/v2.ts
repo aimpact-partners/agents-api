@@ -12,6 +12,10 @@ export const v2 = async (chat: Chat, lastMessage) => {
 	const literals: Record<string, string> = {};
 	agent.literals.agent.pure.forEach(literal => (literals[literal] = chat.metadata[literal]));
 
+	if (literals.user) {
+		literals.user = literals.user.replace(/^(\S+).*/, '$1');
+	}
+
 	const defaultText = defaultTexts[<ILanguage>chat.metadata.language];
 
 	const objectives = metadata?.objectives ?? metadata['activity-objectives']; // property backward support
