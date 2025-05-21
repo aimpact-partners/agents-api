@@ -35,6 +35,11 @@ export class CompletionsRoutes {
 	static async completions(req: Request, res: IResponse) {
 		const { prompt, text, model, temperature, format, schema, interactions } = <ICompletionsSpecs>req.body;
 
+		if (!prompt)
+			return res.status(400).json({ error: { code: 100, text: `Missing required parameter: ${prompt}` } });
+		if (!text) return res.status(400).json({ error: { code: 100, text: `Missing required parameter: ${text}` } });
+		if (!model) return res.status(400).json({ error: { code: 100, text: `Missing required parameter: ${model}` } });
+
 		try {
 			let messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 			messages = messages
@@ -55,7 +60,7 @@ export class CompletionsRoutes {
 				return res.status(data ? 200 : 500).json({ data, error });
 			}
 			if (!MODELS.openai.includes(model)) {
-				return res.status(500).json({ error: { code: 100, text: 'Model not supported' } });
+				return res.status(400).json({ error: { code: 100, text: 'Model not supported' } });
 			}
 
 			const openAIBackend = new OpenAIBackend();
