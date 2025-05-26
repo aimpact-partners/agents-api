@@ -8,7 +8,8 @@ import { MODELS } from './models';
 
 interface ICompletionsSpecs {
 	prompt: string;
-	text: string;
+	text?: string;
+	type: 'chat' | 'instruction';
 	model?: string;
 	temperature?: number;
 	format?: 'text' | 'json' | 'json_schema';
@@ -26,25 +27,19 @@ export class CompletionsRoutes {
 	static async models(req: Request, res: IResponse) {
 		try {
 			const models = MODELS.openai.concat(MODELS.comind);
-			res.status(200).json({ data: models });
+			res.status(200).json({ status: true, data: models });
 		} catch (error) {
 			res.status(500).json({ status: false, error: error.message });
 		}
 	}
 
 	static async completions(req: Request, res: IResponse) {
-		const { prompt, text, model, temperature, format, schema, interactions } = <ICompletionsSpecs>req.body;
-
-		if (!prompt) return res.status(400).json({ error: { code: 100, text: `Missing required parameter: prompt` } });
-		if (!text) return res.status(400).json({ error: { code: 100, text: `Missing required parameter: text` } });
-		if (!model) return res.status(400).json({ error: { code: 100, text: `Missing required parameter: model` } });
+		const { prompt, text, model, temperature, format, schema, type, interactions } = <ICompletionsSpecs>req.body;
 
 		try {
 			let messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
-			messages = messages
-				.concat([{ role: 'system', content: prompt }])
-				.concat(interactions ?? [])
-				.concat({ role: 'user', content: text });
+			messages = messages.concat([{ role: 'system', content: prompt }]).concat(interactions ?? []);
+			if (type === 'chat') messages = messages.concat({ role: 'user', content: text });
 
 			const specs = {
 				model,
