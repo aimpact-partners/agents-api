@@ -1,9 +1,4 @@
-import { setEnv } from '@aimpact/agents-api/ws-config';
-import config from '@aimpact/agents-api/config';
+import { setUrl } from '@aimpact/agents-api/ws-config';
 
-let port;
-let environment;
-if (config.environment === 'local') port = 5040;
-else environment = <'development' | 'testing' | 'beta' | 'production'>config.environment;
-
-setEnv({ port, environment });
+const url = 'wss://agents-api-883367315651.europe-west10.run.app';
+setUrl(url);
