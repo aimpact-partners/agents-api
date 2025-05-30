@@ -80,8 +80,6 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 			return false;
 		}
 
-		// console.log(1, chat, specs);
-		// console.log(2, prompt.processedValue);
 		// voice = 'alloy' | 'shimmer' | 'echo';
 		this.session.update({ voice: 'alloy', instructions: prompt.processedValue });
 

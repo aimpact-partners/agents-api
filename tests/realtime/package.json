@@ -1,0 +1,57 @@
+{
+	"name": "@aimpact/agents-api-realtime-tests",
+	"version": "0.0.1",
+	"title": "Tests for realtime API",
+	"description": "",
+	"license": "ISC",
+	"languages": {
+		"default": "en",
+		"supported": [
+			"en",
+			"es"
+		]
+	},
+	"modules": {
+		"path": "modules"
+	},
+	"libraries": {
+		"imports": [
+			"@aimpact/agents-api"
+		]
+	},
+	"deployment": {
+		"distributions": [
+			{
+				"name": "web",
+				"environment": "development",
+				"platform": "web",
+				"ports": {
+					"bundles": 6405
+				}
+			},
+			{
+				"name": "local-web",
+				"environment": "development",
+				"platform": "web",
+				"ts": {
+					"compiler": "tsc"
+				},
+				"ports": {
+					"bundles": 6406
+				}
+			}
+		]
+	},
+	"dependencies": {
+		"@beyond-js/events": "~0.0.7",
+		"@beyond-js/response": "~0.0.3",
+		"socket.io": "~4.8.1"
+	},
+	"devDependencies": {
+		"socket.io-client": "^4.5.4",
+		"@beyond-js/react-18-widgets": "~1.1.2",
+		"@beyond-js/bee": "0.0.6",
+		"@beyond-js/local": "~0.1.3",
+		"@types/react": "~18.3.11"
+	}
+}
