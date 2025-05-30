@@ -42,7 +42,36 @@ export /*bundle*/ class PromptsTemplate {
 			const value = Object.assign({}, promptData, { schema: data.schema, value: data.value });
 			return new BusinessResponse({ data: value });
 		} catch (exc) {
-			console.error(exc);
+			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+		}
+	}
+
+	static async items(tags: string[], language: string) {
+		try {
+			const dependencies = new Set<string>();
+			const items = new Set<IPromptTemplateData>();
+			const promises: any[] = [];
+			tags.forEach(tag => promises.push(PromptsTemplate.data(tag, language)));
+			const responses = await Promise.all(promises);
+			responses.forEach(response => {
+				if (response.error) throw new BusinessResponse({ error: response.error });
+				if (response.data.literals?.dependencies) {
+					response.data.literals.dependencies.forEach((dep: string) =>
+						dependencies.add(`ailearn.${dep.toLowerCase()}`)
+					);
+				}
+				items.add(response.data);
+			});
+
+			dependencies.forEach(dependency => promises.push(PromptsTemplate.data(dependency, language)));
+			const responsesDependencies = await Promise.all(promises);
+			responsesDependencies.forEach(response => {
+				if (response.error) throw new BusinessResponse({ error: response.error });
+				items.add(response.data);
+			});
+
+			return new BusinessResponse({ data: { items: Array.from(items) } });
+		} catch (exc) {
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
@@ -58,7 +87,6 @@ export /*bundle*/ class PromptsTemplate {
 			const id = prompt.docs[0].id;
 			return await PromptsTemplate.data(id, language);
 		} catch (exc) {
-			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
@@ -80,7 +108,6 @@ export /*bundle*/ class PromptsTemplate {
 			const entries = items.docs.map(item => item.data());
 			return new BusinessResponse({ data: { items: entries, entries } });
 		} catch (exc) {
-			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
@@ -100,7 +127,6 @@ export /*bundle*/ class PromptsTemplate {
 
 			return new BusinessResponse({ data: responseDelete.data });
 		} catch (exc) {
-			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
@@ -203,7 +229,6 @@ export /*bundle*/ class PromptsTemplate {
 
 			return await PromptsTemplate.data(id);
 		} catch (exc) {
-			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
@@ -219,7 +244,6 @@ export /*bundle*/ class PromptsTemplate {
 
 			return new BusinessResponse({ error, data });
 		} catch (exc) {
-			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}

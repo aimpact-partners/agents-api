@@ -4,9 +4,9 @@ import {
 	PromptTemplateProcessor
 } from '@aimpact/agents-api/business/prompts';
 import { ErrorGenerator } from '@beyond-js/firestore-collection/errors';
-import { Response as HttpResponse } from '@beyond-js/response/main';
+import { Response } from '@beyond-js/response/main';
 import * as dotenv from 'dotenv';
-import type { Application, Request, Response } from 'express';
+import type { Application, Response as IResponse, Request } from 'express';
 import { PromptsCategoriesRoutes } from './categories';
 
 dotenv.config();
@@ -19,6 +19,7 @@ export class PromptsRoutes {
 		app.get('/prompts/templates/:id', this.get);
 		app.get('/prompts/templates/identifier/:id', this.identifier);
 		app.get('/prompts/templates/:id/data', this.data);
+		app.get('/prompts/templates', this.items);
 		app.post('/prompts/templates', this.publish);
 		app.put('/prompts/templates/:id', this.update);
 		app.delete('/prompts/templates/:id', this.delete);
@@ -31,157 +32,177 @@ export class PromptsRoutes {
 		app.post('/prompts/templates/:id/process', this.process);
 	}
 
-	static async list(req: Request, res: Response) {
+	static async list(req: Request, res: IResponse) {
 		try {
 			const { projectId } = req.params;
 			const filter = req.query.is;
 			const response = await PromptsTemplate.list(projectId, filter);
-			if (response.error) return res.json(new HttpResponse({ error: response.error }));
+			if (response.error) return res.json(new Response({ error: response.error }));
 
-			res.json(new HttpResponse({ data: response.data }));
+			res.json(new Response({ data: response.data }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async get(req: Request, res: Response) {
+	static async get(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
 			const { language } = req.query;
 			const response = await PromptsTemplate.data(id, language);
-			if (response.error) return res.json(new HttpResponse(response));
+			if (response.error) return res.json(new Response(response));
 
-			res.json(new HttpResponse({ data: response.data }));
+			res.json(new Response({ data: response.data }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async identifier(req: Request, res: Response) {
+	static async identifier(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
 			const { language } = req.query;
 			const response = await PromptsTemplate.identifier(id, language);
-			if (response.error) return res.json(new HttpResponse(response));
+			if (response.error) return res.json(new Response(response));
 
-			res.json(new HttpResponse({ data: response.data }));
+			res.json(new Response({ data: response.data }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async data(req: Request, res: Response) {
+	static async data(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
 			const { language, option } = req.query;
 			const response = await PromptsTemplate.data(id, language, option);
-			if (response.error) return res.json(new HttpResponse(response));
-			if (!response.data.exists) return res.json(new HttpResponse({ error: response.data.error }));
+			if (response.error) return res.json(new Response(response));
+			if (!response.data.exists) return res.json(new Response({ error: response.data.error }));
 
-			res.json(new HttpResponse({ data: response.data.data }));
+			res.json(new Response({ data: response.data.data }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async update(req: Request, res: Response) {
+	static async update(req: Request, res: IResponse) {
 		try {
 			const specs = req.body;
 			const { data, error } = await PromptsTemplate.update(specs);
 
-			res.json(new HttpResponse({ data, error }));
+			res.json(new Response({ data, error }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async delete(req: Request, res: Response) {
+	static async delete(req: Request, res: IResponse) {
 		try {
 			// const { user } = req;
 			const { id } = req.params;
 
 			const response = await PromptsTemplate.delete(id);
 			if (response.error) {
-				return res.json(new HttpResponse({ error: response.error }));
+				return res.json(new Response({ error: response.error }));
 			}
 
-			res.json(new HttpResponse({ data: response.data }));
+			res.json(new Response({ data: response.data }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async publish(req: Request, res: Response) {
+	static async publish(req: Request, res: IResponse) {
 		try {
 			const specs = req.body;
 			const { data, error } = await PromptsTemplate.save(specs);
 
-			res.json(new HttpResponse({ data, error }));
+			res.json(new Response({ data, error }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async translate(req: Request, res: Response) {
+	static async translate(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
 			const { language, text } = req.body;
 
 			const response = await PromptTemplateLanguages.set(id, { language, text });
-			res.json(new HttpResponse(response));
+			res.json(new Response(response));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async updateLanguage(req: Request, res: Response) {
+	static async updateLanguage(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
 			const { language } = req.body;
 
 			const response = await PromptTemplateLanguages.update(id, language);
-			res.json(new HttpResponse(response));
+			res.json(new Response(response));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async processLiteral(req: Request, res: Response) {
+	static async processLiteral(req: Request, res: IResponse) {
 		try {
 			const { prompt, model, temperature } = req.body;
 			const response = await PromptsTemplate.process(prompt, model, temperature);
 			if (response.error) {
-				res.json(new HttpResponse(response));
+				res.json(new Response(response));
 				return;
 			}
 			if (response.data.error) {
-				res.json(new HttpResponse({ error: response.data.error }));
+				res.json(new Response({ error: response.data.error }));
 				return;
 			}
 
-			res.json(new HttpResponse({ data: response.data }));
+			res.json(new Response({ data: response.data }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 
-	static async process(req: Request, res: Response) {
+	static async process(req: Request, res: IResponse) {
 		try {
 			const params = req.body;
 			const promptTemplate = new PromptTemplateProcessor(params);
 			await promptTemplate.process();
 
 			if (promptTemplate.error) {
-				res.json(new HttpResponse({ error: promptTemplate.error }));
+				res.json(new Response({ error: promptTemplate.error }));
 				return;
 			}
 
 			const value = promptTemplate.processedValue;
 			const { format, schema } = promptTemplate;
 
-			res.json(new HttpResponse({ data: { value, format, schema } }));
+			res.json(new Response({ data: { value, format, schema } }));
 		} catch (exc) {
-			res.json(new HttpResponse({ error: ErrorGenerator.internalError(exc) }));
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
+		}
+	}
+
+	static async items(req: Request, res: IResponse) {
+		try {
+			const { language } = req.query;
+			if (!language)
+				return res.status(400).json(new Response({ error: ErrorGenerator.invalidParameters(['language']) }));
+
+			const ids = <string>req.query.ids;
+			if (!ids) return res.status(400).json(new Response({ error: ErrorGenerator.invalidParameters(['ids']) }));
+
+			const tags = ids.split(',');
+
+			const response = await PromptsTemplate.items(tags, language);
+			if (response.error) return res.status(500).json(new Response(response));
+
+			res.json(new Response({ data: response.data }));
+		} catch (exc) {
+			res.status(500).json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
 	}
 }
