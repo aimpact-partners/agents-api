@@ -189,16 +189,27 @@ export class PromptsRoutes {
 	static async items(req: Request, res: IResponse) {
 		try {
 			const { language } = req.query;
-			if (!language)
+			if (!language || typeof language !== 'string') {
 				return res.status(400).json(new Response({ error: ErrorGenerator.invalidParameters(['language']) }));
+			}
 
-			const ids = <string>req.query.ids;
-			if (!ids) return res.status(400).json(new Response({ error: ErrorGenerator.invalidParameters(['ids']) }));
+			const ids = req.query.ids;
+			if (!ids || typeof ids !== 'string') {
+				return res.status(400).json(new Response({ error: ErrorGenerator.invalidParameters(['ids']) }));
+			}
 
-			const tags = ids.split(',');
+			const tags = ids
+				.split(',')
+				.map(tag => tag.trim())
+				.filter(Boolean);
+			if (tags.length === 0) {
+				return res.status(400).json(new Response({ error: ErrorGenerator.invalidParameters(['ids']) }));
+			}
 
 			const response = await PromptsTemplate.items(tags, language);
-			if (response.error) return res.status(500).json(new Response(response));
+			if (response.error) {
+				return res.status(500).json(new Response(response));
+			}
 
 			res.json(new Response({ data: response.data }));
 		} catch (exc) {

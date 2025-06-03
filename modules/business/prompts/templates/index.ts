@@ -72,7 +72,8 @@ export /*bundle*/ class PromptsTemplate {
 
 			return new BusinessResponse({ data: { items: Array.from(items) } });
 		} catch (exc) {
-			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+			if (exc instanceof BusinessResponse) return exc;
+			return new BusinessResponse({ error: ErrorGenerator.internalErrorTrace({ code, exc }) });
 		}
 	}
 
