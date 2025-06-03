@@ -39,6 +39,10 @@ export class ChatMessagesRoutes {
 		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
 		let metadata: IMetadata;
 		try {
+			if (req.body.debug) {
+				return done({ status: false, error: ErrorGenerator.testing() });
+			}
+
 			const { iterator, error } = await Agent.processIncremental(id, specs, user);
 			if (error) return done({ status: false, error });
 
