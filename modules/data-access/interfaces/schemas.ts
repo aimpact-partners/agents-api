@@ -10,3 +10,10 @@ export /*bundle*/ interface ISchemaLanguageData {
 	id: string;
 	schema: string;
 }
+
+export /*bundle*/ enum Status {
+	pending = 'pending',
+	inProgress = 'in-progress',
+	completed = 'completed',
+	outstanding = 'outstanding'
+}

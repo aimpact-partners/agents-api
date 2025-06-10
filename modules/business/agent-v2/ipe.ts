@@ -143,6 +143,8 @@ export class IPE {
 			const { category, name } = entry.prompt;
 
 			if (error) {
+				console.error(998, error);
+				console.error(999, entry.prompt);
 				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(`${category}.${name}`) });
 				return;
 			}
