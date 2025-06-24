@@ -60,7 +60,7 @@ export class IPE {
 			});
 			literals.user && (literals.user = literals.user.replace(/^(\S+).*/, '$1'));
 
-			const reserved = item.literals.reserved.map(literal => reserved.push(literal));
+			const reserved = item.literals.reserved.map(literal => literal);
 			return { ...item, language: metadata.language, literals, reserved };
 		});
 
