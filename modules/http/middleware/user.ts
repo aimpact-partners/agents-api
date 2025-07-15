@@ -26,7 +26,7 @@ export /*bundle*/ class UserMiddlewareHandler {
 				name: decodedToken.name,
 				displayName: decodedToken.name,
 				email: decodedToken.email,
-				photoURL: decodedToken.photoURL ?? decodedToken.picture,
+				photoUrl: decodedToken.photoURL ?? decodedToken.picture,
 				phoneNumber: decodedToken.phoneNumber
 			};
 
@@ -36,6 +36,4 @@ export /*bundle*/ class UserMiddlewareHandler {
 			return res.status(500).json({ status: false, error: exc.message, code });
 		}
 	}
-
-	
 }

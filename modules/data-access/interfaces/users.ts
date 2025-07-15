@@ -4,7 +4,6 @@ export /*bundle*/ interface IUserBase {
 	name: string;
 	email: string;
 	photoUrl: string;
-	photoURL?: string;
 	phoneNumber: number;
 	displayName?: string;
 }

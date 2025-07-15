@@ -33,7 +33,7 @@ export class UsersRoutes {
 				email: req.body.email,
 				firebaseToken: req.body.firebaseToken,
 				token: req.body.token,
-				photoURL: req.body.photoURL,
+				photoUrl: req.body.photoURL,
 				phoneNumber: req.body.phoneNumber
 			};
 
@@ -61,7 +61,7 @@ export class UsersRoutes {
 				email: req.body.email,
 				firebaseToken: req.body.firebaseToken,
 				token: req.body.token,
-				photoURL: req.body.photoURL ?? '',
+				photoUrl: req.body.photoURL ?? '',
 				phoneNumber: req.body.phoneNumber ?? null
 			};
 
@@ -91,7 +91,7 @@ export class UsersRoutes {
 					name: response.data.displayName,
 					displayName: response.data.displayName,
 					email: response.data.email,
-					photoURL: response.data.photoURL,
+					photoUrl: response.data.photoUrl,
 					phoneNumber: response.data.phoneNumber
 				};
 
