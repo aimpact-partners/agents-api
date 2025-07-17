@@ -39,7 +39,14 @@ export class ChatMessagesRoutes {
 		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
 		let metadata: IMetadata;
 		try {
-			if (req.body.debug) {
+			const errorDebug = req.body.error;
+			if (errorDebug) {
+				if (errorDebug.metadata) {
+					res.write(`Lorem Ipsum is simply dummy text of the printing and typesetting industry.`);
+					res.write(
+						`Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.`
+					);
+				}
 				return done({ status: false, error: ErrorGenerator.testing() });
 			}
 
