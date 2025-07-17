@@ -42,10 +42,14 @@ export class ChatMessagesRoutes {
 			const errorDebug = req.body.error;
 			if (errorDebug) {
 				if (errorDebug.metadata) {
-					res.write(`Lorem Ipsum is simply dummy text of the printing and typesetting industry.`);
-					res.write(
-						`Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.`
-					);
+					const lorem = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.`;
+					return setTimeout(() => {
+						res.write(lorem);
+						setTimeout(() => {
+							res.write(lorem);
+							done({ status: false, error: ErrorGenerator.testing() });
+						}, 2000);
+					}, 3000);
 				}
 				return done({ status: false, error: ErrorGenerator.testing() });
 			}
