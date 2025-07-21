@@ -162,7 +162,13 @@ export class IPE {
 					}
 
 					if (!iteration.objectives) {
-						return { ...current, summary: iteration.summary, alert: iteration.alert };
+						return {
+							...current,
+							summary: iteration.summary,
+							alert: iteration.alert,
+							interaction: iteration.interaction,
+							knowledge: iteration.knowledge
+						};
 					}
 
 					const objectivesMap = new Map((current.objectives || []).map(obj => [toKebabCase(obj.name), obj]));
@@ -187,6 +193,7 @@ export class IPE {
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
 		});
+
 		return { ipe, error: responseError };
 	}
 }
