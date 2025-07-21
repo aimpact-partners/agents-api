@@ -60,6 +60,21 @@ export class AudioMessagesRoutes {
 			const action = { type: 'transcription', data: { transcription: content } };
 			res.write('😸' + JSON.stringify(action) + '🖋️');
 
+			const errorDebug = req.body.error;
+			if (errorDebug) {
+				if (errorDebug.metadata) {
+					const lorem = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.`;
+					return setTimeout(() => {
+						res.write(lorem);
+						setTimeout(() => {
+							res.write(lorem);
+							done({ status: false, error: ErrorGenerator.testing() });
+						}, 2000);
+					}, 3000);
+				}
+				return done({ status: false, error: ErrorGenerator.testing() });
+			}
+
 			const { iterator, error } = await Agent.processIncremental(chatId, { content }, user);
 			if (error) return done({ status: false, error });
 
