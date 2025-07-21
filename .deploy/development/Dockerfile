@@ -32,10 +32,11 @@ WORKDIR /app
 # Copy the build result
 COPY --from=build-stage /app/.beyond/builds/http/code/ ./
 
-# Install dependencies
-#RUN npm ci --omit=dev
-RUN npm install --omit=dev
+# Copy the package-lock.json for reproducible install
+COPY --from=build-stage /app/package-lock.json ./
 
+# Install only production dependencies
+RUN npm ci --omit=dev
 
-# Your start command here
+# Start the app
 CMD [ "node", "index.js" ]
