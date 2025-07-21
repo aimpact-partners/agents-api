@@ -33,7 +33,9 @@ WORKDIR /app
 COPY --from=build-stage /app/.beyond/builds/http/code/ ./
 
 # Install dependencies
-RUN npm ci --omit=dev
+#RUN npm ci --omit=dev
+RUN npm install --omit=dev
+
 
 # Your start command here
 CMD [ "node", "index.js" ]
