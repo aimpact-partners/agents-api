@@ -140,8 +140,6 @@ export class IPE {
 			const { category, name } = entry.prompt;
 
 			if (error) {
-				console.error(998, error);
-				console.error(999, entry.prompt);
 				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(`${category}.${name}`) });
 				return;
 			}
@@ -178,13 +176,14 @@ export class IPE {
 						reached: iteration.reached,
 						objectives: updatedObjectives ?? [],
 						summary: iteration.summary,
-						alert: iteration.alert
+						alert: iteration.alert,
+						interaction: iteration.interaction,
+						knowledge: iteration.knowledge
 					};
 				})();
 
 				ipe[index].response = progress;
 			} catch (exc) {
-				console.error(999, exc);
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
 		});
