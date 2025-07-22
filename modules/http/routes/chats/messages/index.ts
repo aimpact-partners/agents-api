@@ -39,6 +39,21 @@ export class ChatMessagesRoutes {
 		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
 		let metadata: IMetadata;
 		try {
+			const errorDebug = req.body.error;
+			if (errorDebug) {
+				if (errorDebug.metadata) {
+					const lorem = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.`;
+					return setTimeout(() => {
+						res.write(lorem);
+						setTimeout(() => {
+							res.write(lorem);
+							done({ status: false, error: ErrorGenerator.testing() });
+						}, 2000);
+					}, 3000);
+				}
+				return done({ status: false, error: ErrorGenerator.testing() });
+			}
+
 			const { iterator, error } = await Agent.processIncremental(id, specs, user);
 			if (error) return done({ status: false, error });
 

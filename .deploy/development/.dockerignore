@@ -1,0 +1,9 @@
+# Evita copiar carpetas pesadas o innecesarias
+node_modules
+dist
+.beyond
+.git
+.env
+*.log
+coverage
+.DS_Store
