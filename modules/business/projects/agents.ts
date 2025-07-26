@@ -37,4 +37,60 @@ export /*bundle*/ class ProjectsAgents {
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
+
+	static async activities() {
+		try {
+			const promptActivities = {
+				'character-talk': {
+					id: 'character-talk',
+					name: 'character talk',
+					prompts: {
+						system: 'ailearn.activity-character-talk-v2',
+						ipe: 'ailearn.character-talk-ipe-v2',
+						summary: 'ailearn.character-talk-summary'
+					}
+				},
+				'content-theory': {
+					id: 'content-theory',
+					name: 'content theory',
+					prompts: {
+						system: 'ailearn.activity-content-theory-v2',
+						ipe: 'ailearn.content-theory-ipe-v2',
+						summary: 'ailearn.content-theory-summary'
+					}
+				},
+				debate: {
+					id: 'debate',
+					name: 'debate',
+					prompts: {
+						system: 'ailearn.activity-debate-v2',
+						ipe: 'ailearn.debate-ipe-v2',
+						summary: 'ailearn.debate-summary'
+					}
+				},
+				exercise: {
+					id: 'exercise',
+					name: 'exercise',
+					prompts: {
+						system: 'ailearn.activity-exercise-v2',
+						ipe: 'ailearn.exercise-ipe-v2',
+						summary: 'ailearn.exercise-summary'
+					}
+				},
+				'free-conversation': {
+					id: 'free-conversation',
+					name: 'free-conversation',
+					prompts: {
+						system: 'ailearn.activity-free-conversation-v2',
+						ipe: 'ailearn.free-conversation-ipe-v2',
+						summary: 'ailearn.free-conversation-summary'
+					}
+				}
+			};
+
+			return new BusinessResponse({ data: promptActivities });
+		} catch (exc) {
+			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+		}
+	}
 }
