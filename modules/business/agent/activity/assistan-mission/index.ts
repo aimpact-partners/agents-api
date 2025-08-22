@@ -3,7 +3,7 @@ import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompt
 import type { User } from '@aimpact/agents-api/business/user';
 import { MessagesType } from '@aimpact/agents-api/business/models/open-ai/caller';
 import * as dotenv from 'dotenv';
-import { Chat } from '../chat';
+import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { v1 } from './v1';
 import { v2 } from './v2';
 

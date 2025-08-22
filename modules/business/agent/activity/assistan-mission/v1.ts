@@ -1,4 +1,4 @@
-import { Chat } from '../chat';
+import { Chat } from '@aimpact/agents-api/business/agent/chat';
 
 export const v1 = (chat: Chat) => {
 	const { module, activity } = chat.metadata;

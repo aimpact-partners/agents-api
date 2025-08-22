@@ -1,3 +1,4 @@
+import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
@@ -5,7 +6,6 @@ import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { User } from '@aimpact/agents-api/business/user';
 import * as dotenv from 'dotenv';
-import { Chat } from './chat';
 import { ILanguage, defaultTexts } from './common';
 
 dotenv.config();

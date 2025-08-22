@@ -1,4 +1,4 @@
-import { Agent } from '@aimpact/agents-api/business/agent-v2';
+import { Agent } from '@aimpact/agents-api/business/agent/base';
 import { Chat } from '@aimpact/agents-api/business/chats';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
@@ -75,7 +75,7 @@ export class AudioMessagesRoutes {
 				return done({ status: false, error: ErrorGenerator.testing() });
 			}
 
-			const { iterator, error } = await Agent.processIncremental(chatId, { content }, user);
+			const { iterator, error } = await Agent.process(chatId, { content }, user);
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {

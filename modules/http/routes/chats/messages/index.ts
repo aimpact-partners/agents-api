@@ -1,4 +1,4 @@
-import { Agent } from '@aimpact/agents-api/business/agent-v2';
+import { Agent } from '@aimpact/agents-api/business/agent/base';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
 import { UserMiddlewareHandler } from '@aimpact/agents-api/http/middleware';
@@ -37,6 +37,7 @@ export class ChatMessagesRoutes {
 		const { user } = req;
 		const { id } = req.params;
 		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
+
 		let metadata: IMetadata;
 		try {
 			const errorDebug = req.body.error;
@@ -54,7 +55,7 @@ export class ChatMessagesRoutes {
 				return done({ status: false, error: ErrorGenerator.testing() });
 			}
 
-			const { iterator, error } = await Agent.processIncremental(id, specs, user);
+			const { iterator, error } = await Agent.process(id, specs, user);
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {

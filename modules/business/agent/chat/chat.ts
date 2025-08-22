@@ -58,7 +58,7 @@ export /*bundle*/ class Chat {
 		return this.#data?.ipe;
 	}
 
-	#error;
+	#error: BusinessErrorManager;
 	get error() {
 		return this.#error;
 	}
@@ -89,15 +89,14 @@ export /*bundle*/ class Chat {
 		this.#data = chat;
 	}
 
-	async storeInteration(params) {
+	async storeInteration(params: { prompt: string; answer: string; ipe: any }) {
 		try {
 			const promises: Promise<any>[] = [];
-
 			const { prompt, answer, ipe } = params;
 
 			const metadata: Record<string, any> = {};
 			let summary = '';
-			ipe.forEach(item => {
+			ipe?.forEach(item => {
 				metadata[item.key] = item.response;
 				if (item.key === 'summary') {
 					summary = item.response.summary;
