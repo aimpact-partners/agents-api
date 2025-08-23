@@ -17,4 +17,18 @@ export /*bundle*/ class Chats {
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
 	}
+
+	static async byAgent(id: string, agent: string) {
+		try {
+			if (!id) return new BusinessResponse({ error: ErrorGenerator.invalidParameters(['id']) });
+
+			const docs = await chats.col().where('user.id', '==', id).where('project.agent', '==', agent).get();
+			const items: IChatData[] = [];
+			docs.forEach(item => items.push(item.data()));
+
+			return new BusinessResponse({ data: { items } });
+		} catch (exc) {
+			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+		}
+	}
 }

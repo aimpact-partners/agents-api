@@ -1,6 +1,9 @@
 import type { IUser } from '@aimpact/agents-api/business/user';
+import * as dotenv from 'dotenv';
 import type { NextFunction, Request, Response } from 'express';
 import * as admin from 'firebase-admin';
+
+dotenv.config();
 
 export interface /*bundle*/ IAuthenticatedRequest extends Request {
 	user?: IUser;
@@ -11,6 +14,11 @@ export /*bundle*/ class UserMiddlewareHandler {
 		const authHeader = req.headers['authorization'];
 		const accessToken = authHeader && authHeader.split(' ')[1];
 		if (!accessToken) return res.status(401).json({ error: 'Access token not provided' });
+
+		if (accessToken === process.env.AILEARN_API_TOKEN) {
+			next();
+			return;
+		}
 
 		try {
 			const decodedToken = await admin.auth().verifyIdToken(accessToken);
@@ -36,6 +44,4 @@ export /*bundle*/ class UserMiddlewareHandler {
 			return res.status(500).json({ status: false, error: exc.message, code });
 		}
 	}
-
-	
 }
