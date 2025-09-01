@@ -79,11 +79,20 @@ export /*bundle*/ class ProjectsAgents {
 				},
 				'free-conversation': {
 					id: 'free-conversation',
-					name: 'free-conversation',
+					name: 'free conversation',
 					prompts: {
 						system: 'ailearn.activity-free-conversation-v2',
 						ipe: 'ailearn.free-conversation-ipe-v2',
 						summary: 'ailearn.free-conversation-summary'
+					}
+				},
+				'self-service': {
+					id: 'self-service-agent',
+					name: 'self service agent',
+					prompts: {
+						system: 'itegrity.self-service-agent',
+						ipe: 'itegrity.self-service-ipe',
+						summary: 'itegrity.self-service-summary'
 					}
 				}
 			};
