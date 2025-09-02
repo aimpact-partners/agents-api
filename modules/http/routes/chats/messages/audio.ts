@@ -1,4 +1,4 @@
-import { Agent } from '@aimpact/agents-api/business/agent-v2';
+import { Agent } from '@aimpact/agents-api/business/agent/base';
 import { Chat } from '@aimpact/agents-api/business/chats';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
@@ -53,7 +53,22 @@ export class AudioMessagesRoutes {
 			const action = { type: 'transcription', data: { transcription: content } };
 			res.write('😸' + JSON.stringify(action) + '🖋️');
 
-			const { iterator, error } = await Agent.processIncremental(chatId, { content });
+			const errorDebug = req.body.error;
+			if (errorDebug) {
+				if (errorDebug.metadata) {
+					const lorem = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.`;
+					return setTimeout(() => {
+						res.write(lorem);
+						setTimeout(() => {
+							res.write(lorem);
+							done({ status: false, error: ErrorGenerator.testing() });
+						}, 2000);
+					}, 3000);
+				}
+				return done({ status: false, error: ErrorGenerator.testing() });
+			}
+
+			const { iterator, error } = await Agent.process(chatId, { content });
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {

@@ -1,7 +1,7 @@
+import { Chat } from '@aimpact/agents-api/business/agent/chat';
+import { hook } from '@aimpact/agents-api/business/agent/hook';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { AssistantMission } from './assistan-mission';
-import { Chat } from './chat';
-import { _hook } from './hook';
 import { IPE } from './ipe';
 
 interface IParams {
@@ -17,21 +17,18 @@ interface IMetadata {
 	error?: { code: number; text: string };
 }
 
-export /*bundle*/ class Agent {
+export /*bundle*/ class ActivityAgent {
 	// PreProcessor
-	static async pre(id: string, prompt: string) {
-		const chat = new Chat(id);
-		await chat.fetch();
-		if (chat.error) return { error: chat.error };
 
+	static async pre(chat: Chat, prompt: string) {
 		// Fetch the agent
-		const response = await _hook(chat);
+		const response = await hook(chat);
 		if (response.error) return { error: response.error };
 
 		const { specs, error } = await AssistantMission.get(chat, prompt);
 		if (error) return { error };
 
-		return { chat, specs };
+		return { specs };
 	}
 
 	// PostProcessor
@@ -41,7 +38,8 @@ export /*bundle*/ class Agent {
 
 		const { ipe } = response;
 		const hookSpecs = { ipe, prompt, answer, testing: chat.testing };
-		const hookResponse = await _hook(chat, hookSpecs);
+
+		const hookResponse = await hook(chat, hookSpecs);
 		if (hookResponse.error) return { error: hookResponse.error };
 
 		// Store messages
@@ -51,16 +49,11 @@ export /*bundle*/ class Agent {
 		return { ipe, credits: hookResponse.data.credits };
 	}
 
-	// Hook
-	static async hook(chat: Chat, params = {}) {
-		return _hook(chat, params);
-	}
-
-	static async processIncremental(chatId: string, params: IParams) {
+	static async processIncremental(chat: string, params: IParams) {
 		const prompt = params.content;
 
 		// Call preProcessor
-		const { chat, specs, error } = await Agent.pre(chatId, prompt);
+		const { specs, error } = await ActivityAgent.pre(chat, prompt);
 		if (error) return { status: false, error };
 
 		const promptTemplate = new PromptTemplateExecutor(specs);
@@ -83,7 +76,8 @@ export /*bundle*/ class Agent {
 			}
 
 			// Call postProcessor
-			const response = await Agent.post(chat, prompt, answer);
+
+			const response = await ActivityAgent.post(chat, prompt, answer);
 			if (response.error) metadata.error = response.error;
 
 			response.credits && (metadata.credits = response.credits);

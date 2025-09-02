@@ -1,4 +1,4 @@
-import { Agent } from '@aimpact/agents-api/business/agent-v2';
+import { Agent } from '@aimpact/agents-api/business/agent/base';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
 import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
@@ -35,9 +35,25 @@ export class ChatMessagesRoutes {
 
 		const { id } = req.params;
 		const specs = { content: req.body.content, id: req.body.id, systemId: req.body.systemId };
+
 		let metadata: IMetadata;
 		try {
-			const { iterator, error } = await Agent.processIncremental(id, specs);
+			const errorDebug = req.body.error;
+			if (errorDebug) {
+				if (errorDebug.metadata) {
+					const lorem = `Lorem Ipsum is simply dummy text of the printing and typesetting industry.`;
+					return setTimeout(() => {
+						res.write(lorem);
+						setTimeout(() => {
+							res.write(lorem);
+							done({ status: false, error: ErrorGenerator.testing() });
+						}, 2000);
+					}, 3000);
+				}
+				return done({ status: false, error: ErrorGenerator.testing() });
+			}
+
+			const { iterator, error } = await Agent.process(id, specs);
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {

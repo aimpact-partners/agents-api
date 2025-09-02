@@ -1,5 +1,5 @@
 import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
-import { Chat } from '../chat';
+import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { ILanguage, defaultTexts } from '../common';
 
 export const v2 = async (chat: Chat, lastMessage) => {
