@@ -1,4 +1,4 @@
-import { KBActivityAgent } from '@aimpact/agents-api/business/agent/activity';
+import { ActivityAgent } from '@aimpact/agents-api/business/agent/activity';
 import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { KBAgent } from '@aimpact/agents-api/business/agent/kb';
 import { User } from '@aimpact/agents-api/business/user';
@@ -20,6 +20,6 @@ export /*bundle*/ class Agent {
 			return await KBAgent.processIncremental(chat, params, user);
 		}
 
-		return await KBActivityAgent.processIncremental(chat, params, user);
+		return await ActivityAgent.processIncremental(chat, params, user);
 	}
 }

@@ -6,11 +6,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 const { AGENT_API_TOKEN } = process.env;
 
-<<<<<<< HEAD:modules/business/agent-v2/hook.ts
-export const _hook = async (chat: Chat, params = {}) => {
-=======
-export /*bundle*/ const hook = async (chat: Chat, user: User, params = {}) => {
->>>>>>> origin/dev:modules/business/agent/hook/hook.ts
+export /*bundle*/ const hook = async (chat: Chat, params = {}) => {
 	let response: any;
 	try {
 		const method = 'POST';
