@@ -19,7 +19,7 @@ export /*bundle*/ class KBAgent {
 	// PreProcessor
 	static async pre(chat: IAgentChat, prompt: string, user: User) {
 		// Fetch the agent
-		const response = await hook(chat, user, { prompt });
+		const response = await hook(chat, user, { prompt, language: chat.language });
 		if (response.error) return { error: response.error };
 
 		console.log('response AGENT', response.data);
@@ -44,7 +44,7 @@ export /*bundle*/ class KBAgent {
 		await chat.storeInteration({ prompt, answer, ipe: [] });
 		if (chat.error) return { error: chat.error };
 
-		return { credits: { total: 1, consumed: 1 } };
+		return { credits: { total: 100, consumed: 1 } };
 	}
 
 	static async processIncremental(chat: string, params: IParams, user: User) {
@@ -63,7 +63,7 @@ export /*bundle*/ class KBAgent {
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {
 			let answer = '';
-			const metadata: IMetadata = { objectives: [] };
+			const metadata: IMetadata = {};
 
 			// Dividir el texto en chunks de tamaño fijo
 			for (let i = 0; i < outputText.length; i += chunkSize) {
@@ -80,6 +80,8 @@ export /*bundle*/ class KBAgent {
 
 				answer += processedChunk;
 			}
+
+			yield { chunk: 'ÿ' };
 
 			// Call postProcessor
 			const response = await KBAgent.post(chat, prompt, outputText, user);

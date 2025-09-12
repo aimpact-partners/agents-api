@@ -33,6 +33,13 @@ export class ChatsRoutes {
 
 	static async list(req: IAuthenticatedRequest, res: IResponse) {
 		try {
+			const { userId, agent } = req.query;
+
+			if (userId && agent) {
+				const { data, error } = await Chats.byAgent(userId, agent);
+				return res.json(new Response({ data, error }));
+			}
+
 			const { uid } = req.user;
 			const { data, error } = await Chats.byUser(uid);
 			res.json(new Response({ data, error }));
@@ -46,6 +53,18 @@ export class ChatsRoutes {
 			const { id } = req.params;
 
 			const { data, error } = await Chat.get(id, true); // true for get messages
+			res.json(new Response({ data, error }));
+		} catch (exc) {
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
+		}
+	}
+
+	static async byAgent(req: IAuthenticatedRequest, res: IResponse) {
+		try {
+			const { uid } = req.user;
+			const { agent } = req.params;
+
+			const { data, error } = await Chats.byAgent(uid, agent);
 			res.json(new Response({ data, error }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));

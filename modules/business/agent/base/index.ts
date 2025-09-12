@@ -15,7 +15,6 @@ export /*bundle*/ class Agent {
 		await chat.fetch();
 		if (chat.error) return { error: chat.error };
 
-		console.log('response AGENT BASE', chat.project.agent);
 		if (chat.project.agent === 'kb-conversation') {
 			return await KBAgent.processIncremental(chat, params, user);
 		}
