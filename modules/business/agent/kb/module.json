@@ -1,5 +1,5 @@
 {
-	"name": "business/agent-v2",
+	"name": "business/agent/kb",
 	"platforms": ["node", "backend"],
 	"ts": {
 		"files": ["*"]

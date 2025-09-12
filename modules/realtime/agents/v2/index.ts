@@ -1,4 +1,4 @@
-import { Agent } from '@aimpact/agents-api/business/agent-v2';
+import { ActivityAgent } from '@aimpact/agents-api/business/agent/activity';
 import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
 import { User } from '@aimpact/agents-api/business/user';
@@ -66,7 +66,7 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 
 		// Call preProcessor
 		const { conversation } = params;
-		const { specs, error } = await Agent.pre(conversation.id, '', user);
+		const { specs, error } = await ActivityAgent.pre(conversation.id, '', user);
 		if (error) {
 			this.#error = error;
 			console.error(this.#error);

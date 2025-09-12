@@ -1,10 +1,10 @@
+import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import * as dotenv from 'dotenv';
-import { Chat } from './chat';
 import { ILanguage, defaultTexts } from './common';
 
 dotenv.config();
@@ -24,10 +24,6 @@ function toKebabCase(text: string) {
 export class IPE {
 	static async get(chat: Chat, prompt: string) {
 		const { project, metadata } = chat;
-		const agentName = typeof project.agent === 'string' ? project.agent : metadata.activity?.type;
-		const response = await ProjectsAgents.get(project.id, agentName);
-		if (response.error) return { error: response.error };
-		const agent = response.data;
 
 		const specs = metadata.activity.specs ?? metadata.activity.resources?.specs;
 		if (!specs.objectives) {
@@ -44,9 +40,13 @@ export class IPE {
 			return { ipe };
 		}
 
-		const ipe = [];
-		agent.ipe.forEach(item => {
-			const literals = {};
+		const agentName = typeof project.agent === 'string' ? project.agent : metadata.activity?.type;
+		const response = await ProjectsAgents.get(project.id, agentName);
+		if (response.error) return { error: response.error };
+		const agent = response.data;
+
+		const ipe = agent.ipe.map(item => {
+			const literals: Record<string, string> = {};
 			item.literals.pure.forEach(literal => {
 				literals[literal] =
 					typeof metadata[literal] === 'object'
@@ -57,14 +57,10 @@ export class IPE {
 								.join(`\n`)
 						: metadata[literal];
 			});
+			literals.user && (literals.user = literals.user.replace(/^(\S+).*/, '$1'));
 
-			if (literals.user) {
-				literals.user = literals.user.replace(/^(\S+).*/, '$1');
-			}
-
-			const reserved: string[] = [];
-			item.literals.reserved.forEach(literal => reserved.push(literal));
-			ipe.push({ ...item, language: metadata.language, literals, reserved });
+			const reserved = item.literals.reserved.map(literal => literal);
+			return { ...item, language: metadata.language, literals, reserved };
 		});
 
 		return { ipe };
@@ -74,14 +70,15 @@ export class IPE {
 		const response = await IPE.get(chat, message);
 		if (response.error) return { error: response.error };
 
-		const last = chat.messages?.last ?? [];
 		let lastMessage = {};
+		const last = chat.messages?.last ?? [];
 		for (let i = last.length - 1; i >= 0; i--) {
 			if (last[i].role === 'assistant') lastMessage = last[i];
 		}
 
 		const defaultText = defaultTexts[<ILanguage>chat.metadata.language];
 		const { ipe } = response;
+
 		const promises: Promise<any>[] = [];
 		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
 			const reservedValues: Record<string, string> = {};
@@ -164,7 +161,13 @@ export class IPE {
 					}
 
 					if (!iteration.objectives) {
-						return { ...current, summary: iteration.summary, alert: iteration.alert };
+						return {
+							...current,
+							summary: iteration.summary,
+							alert: iteration.alert,
+							interaction: iteration.interaction,
+							knowledge: iteration.knowledge
+						};
 					}
 
 					const objectivesMap = new Map((current.objectives || []).map(obj => [toKebabCase(obj.name), obj]));
@@ -178,16 +181,18 @@ export class IPE {
 						reached: iteration.reached,
 						objectives: updatedObjectives ?? [],
 						summary: iteration.summary,
-						alert: iteration.alert
+						alert: iteration.alert,
+						interaction: iteration.interaction,
+						knowledge: iteration.knowledge
 					};
 				})();
 
 				ipe[index].response = progress;
 			} catch (exc) {
-				console.error(999, exc);
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${category}.${name}`) });
 			}
 		});
+
 		return { ipe, error: responseError };
 	}
 }
