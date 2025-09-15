@@ -1,0 +1,6 @@
+{
+	"name": "comind",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": ["*"]
+}

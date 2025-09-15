@@ -48,9 +48,9 @@ export /*bundle*/ class User implements IUser {
 		return this.#phoneNumber;
 	}
 
-	#photoURL: string;
-	get photoURL() {
-		return this.#photoURL;
+	#photoUrl: string;
+	get photoUrl() {
+		return this.#photoUrl;
 	}
 
 	private collection;
@@ -78,7 +78,7 @@ export /*bundle*/ class User implements IUser {
 			this.#name = data.displayName;
 			this.#displayName = data.displayName;
 			this.#phoneNumber = data.phoneNumber;
-			this.#photoURL = data.photoURL;
+			this.#photoUrl = data.photoUrl;
 
 			return new BusinessResponse({ data });
 		} catch (exc) {
@@ -108,7 +108,7 @@ export /*bundle*/ class User implements IUser {
 					firebaseToken: user.firebaseToken,
 					token: customToken,
 					custom: customToken,
-					photoURL: user.photoURL,
+					photoUrl: user.photoUrl,
 					phoneNumber: user.phoneNumber,
 					createdOn: dayjs().unix(),
 					lastLogin: dayjs().unix()
@@ -156,7 +156,7 @@ export /*bundle*/ class User implements IUser {
 				firebaseToken: user.firebaseToken,
 				token: customToken,
 				custom: customToken,
-				photoURL: user.photoURL,
+				photoUrl: user.photoUrl,
 				phoneNumber: user.phoneNumber,
 				createdOn: date,
 				lastLogin: date
@@ -181,12 +181,12 @@ export /*bundle*/ class User implements IUser {
 			name: this.#name,
 			displayName: this.#displayName,
 			email: this.#email,
-			photoURL: this.#photoURL,
+			photoUrl: this.#photoUrl,
 			phoneNumber: this.#phoneNumber
 		};
 	}
 
-	static async verifyToken(token: string) {
+	static async verifyToken(token: string): Promise<BusinessResponse<IUser>> {
 		try {
 			const decodedToken = await admin.auth().verifyIdToken(token);
 			if (!decodedToken) return new BusinessResponse({ error: ErrorGenerator.invalidAccessToken() });
@@ -197,7 +197,7 @@ export /*bundle*/ class User implements IUser {
 				name: decodedToken.name,
 				displayName: decodedToken.name,
 				email: decodedToken.email,
-				photoURL: decodedToken.photoURL,
+				photoUrl: decodedToken.photoURL,
 				phoneNumber: decodedToken.phoneNumber
 			};
 			return new BusinessResponse({ data: user });

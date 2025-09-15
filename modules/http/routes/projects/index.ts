@@ -12,8 +12,7 @@ export class ProjectsRoutes {
 		app.delete('/projects/:id', this.delete);
 
 		app.post('/projects/:id/agents', this.agent);
-
-		
+		app.get('/projects/agents/activities', this.agentsActivities);
 	}
 
 	static async list(req: Request, res: IResponse) {
@@ -76,6 +75,16 @@ export class ProjectsRoutes {
 			const { id } = req.params;
 			const { name, literals, prompt, model, temperature, ipe } = req.body;
 			const { data, error } = await ProjectsAgents.set(id, { name, literals, prompt, model, temperature, ipe });
+
+			res.json(new Response({ data, error }));
+		} catch (exc) {
+			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
+		}
+	}
+
+	static async agentsActivities(req: Request, res: IResponse) {
+		try {
+			const { data, error } = await ProjectsAgents.activities();
 
 			res.json(new Response({ data, error }));
 		} catch (exc) {

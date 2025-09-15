@@ -1,13 +1,12 @@
 import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { Projects, ProjectsAgents } from '@aimpact/agents-api/business/projects';
-import type { User } from '@aimpact/agents-api/business/user';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 const { AGENT_API_TOKEN } = process.env;
 
-export /*bundle*/ const hook = async (chat: Chat, user: User, params = {}) => {
+export /*bundle*/ const hook = async (chat: Chat, params = {}) => {
 	let json: any;
 	try {
 		const method = 'POST';
@@ -27,7 +26,7 @@ export /*bundle*/ const hook = async (chat: Chat, user: User, params = {}) => {
 		// Prepare the parameters
 		const specs = {
 			...params,
-			user,
+			user: chat.user,
 			chatId: chat.id,
 			metadata: chat.metadata,
 			messages: chat.messages

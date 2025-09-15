@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"module": "es2020",
+		"target": "es2018",
+		"allowSyntheticDefaultImports": true,
+		"moduleResolution": "Node",
+		"skipLibCheck": true,
+		"types": []
+	}
+}

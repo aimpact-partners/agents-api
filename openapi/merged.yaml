@@ -1,52 +1,50 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "Agents",
-    "description": "Agents Specification",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://dev.agents.api.aimpact.partners"
-    }
-  ],
-  "paths": {
-    "/": {
-      "get": {
-        "tags": [
-          "Main"
-        ],
-        "responses": {
-          "200": {
-            "description": "Home endpoint",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "array"
-                    }
-                  }
+    'openapi': '3.0.0',
+    'info': { 'title': 'Agents', 'description': 'Agents Specification', 'version': '1.0.0' },
+    'servers': [{ 'url': 'https://agents-api-883367315651.europe-west10.run.app' }],
+    'paths':
+        {
+            '/':
+                {
+                    'get':
+                        {
+                            'tags': ['Main'],
+                            'responses':
+                                {
+                                    '200':
+                                        {
+                                            'description': 'Home endpoint',
+                                            'content':
+                                                {
+                                                    'application/json':
+                                                        {
+                                                            'schema':
+                                                                {
+                                                                    'type': 'object',
+                                                                    'properties':
+                                                                        {
+                                                                            'status': { 'type': 'boolean' },
+                                                                            'data': { 'type': 'array' }
+                                                                        }
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
                 }
-              }
-            }
-          }
+        },
+    'components':
+        {
+            'securitySchemes':
+                {
+                    'firebaseId':
+                        {
+                            'type': 'http',
+                            'scheme': 'bearer',
+                            'bearerFormat': 'JWT',
+                            'description': 'Firebase ID token for authentication'
+                        }
+                }
         }
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "firebaseId": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "Firebase ID token for authentication"
-      }
-    }
-  }
 }

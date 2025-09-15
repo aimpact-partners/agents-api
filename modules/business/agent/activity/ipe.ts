@@ -4,7 +4,6 @@ import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import { PromptTemplateExecutor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
-import { User } from '@aimpact/agents-api/business/user';
 import * as dotenv from 'dotenv';
 import { ILanguage, defaultTexts } from './common';
 
@@ -67,7 +66,7 @@ export class IPE {
 		return { ipe };
 	}
 
-	static async process(chat: Chat, message: string, answer: string, user: User) {
+	static async process(chat: Chat, message: string, answer: string) {
 		const response = await IPE.get(chat, message);
 		if (response.error) return { error: response.error };
 
@@ -122,7 +121,7 @@ export class IPE {
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
 			};
 
-			if (LOGS_PROMPTS === 'true' && USERS_LOGS.includes(user.email)) {
+			if (LOGS_PROMPTS === 'true' && USERS_LOGS.includes(chat.user.email)) {
 				specs.store = true;
 				specs.metadata = {
 					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
@@ -140,7 +139,7 @@ export class IPE {
 			const { category, name } = entry.prompt;
 
 			if (error) {
-				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(`${category}.${name}`) });
+				responseError = new BusinessResponse({ error: ErrorGenerator.processingIPE(name) });
 				return;
 			}
 

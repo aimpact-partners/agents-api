@@ -44,5 +44,8 @@ export /*bundle*/ enum ErrorCodes {
 	insufficientCredits,
 	ipeKeyNotDefined,
 	mailTemplatesNotDefined,
-	mailNotSend
+	mailNotSend,
+	invalidToDelete,
+	entityNotValid,
+	noAdministratorsToNotify
 }

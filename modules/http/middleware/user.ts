@@ -34,7 +34,7 @@ export /*bundle*/ class UserMiddlewareHandler {
 				name: decodedToken.name,
 				displayName: decodedToken.name,
 				email: decodedToken.email,
-				photoURL: decodedToken.photoURL ?? decodedToken.picture,
+				photoUrl: decodedToken.photoURL ?? decodedToken.picture,
 				phoneNumber: decodedToken.phoneNumber
 			};
 

@@ -1,11 +1,11 @@
 export /*bundle*/ interface IUserBase {
+	id?: string;
 	uid: string;
-	id: string;
 	name: string;
-	displayName: string;
 	email: string;
-	photoURL: string;
+	photoUrl: string;
 	phoneNumber: number;
+	displayName?: string;
 }
 
 export /*bundle*/ interface IUserData extends IUserBase {

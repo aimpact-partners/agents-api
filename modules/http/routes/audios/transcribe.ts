@@ -1,4 +1,4 @@
-import { OpenAIBackend } from '@aimpact/agents-api/backend-openai';
+import { OpenAIBackend } from '@aimpact/agents-api/openai-backend';
 import type { IChatData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { Request } from 'express';

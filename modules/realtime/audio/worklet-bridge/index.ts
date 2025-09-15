@@ -78,7 +78,6 @@ export /*bundle*/ abstract class WorkletBridge {
 		try {
 			// Load and register the AudioWorklet module
 			!this.#prepared && (await this.#context.audioWorklet.addModule(this.#src));
-			console.log('node registered', this.#name);
 			this.#prepared = true;
 		} catch (exc) {
 			console.log(`Error loading "${this.#name}" worklet:\n• ${exc.message}`);
@@ -91,9 +90,7 @@ export /*bundle*/ abstract class WorkletBridge {
 
 	create() {
 		if (this.#node) throw new Error('Worklet node already created');
-		console.log('creting node', this.#name);
 		this.#node = new WorkletNode(this, this.#context, this.#name, this.#timeout);
-		console.log('node created', this.#name);
 	}
 
 	connect(destination: AudioNode, output?: number, input?: number) {

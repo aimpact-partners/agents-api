@@ -37,5 +37,6 @@ export const v2 = async (chat: Chat, lastMessage) => {
 	literals.progress = objectiveProgress;
 
 	const { activity } = chat.metadata;
+
 	return { prompt: `ailearn.activity-${activity.type}-v2`, literals };
 };

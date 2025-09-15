@@ -39,4 +39,5 @@ export /*bundle*/ interface IChatDataSpecs {
 	parent?: string;
 	children?: string;
 	language: { default: string };
+	user: IUserBase;
 }

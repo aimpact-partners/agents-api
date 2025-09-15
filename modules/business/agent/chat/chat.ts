@@ -63,9 +63,8 @@ export /*bundle*/ class Chat {
 		return this.#error;
 	}
 
-	constructor(id: string, user: User) {
+	constructor(id: string) {
 		this.#id = id;
-		this.#user = user;
 	}
 
 	async fetch() {
@@ -77,8 +76,6 @@ export /*bundle*/ class Chat {
 		const chat = response.data;
 
 		if (!chat) return (this.#error = ErrorGenerator.chatNotValid(this.#id));
-		const id = chat.user.uid ?? chat.user.id;
-		if (id !== this.#user.uid) return (this.#error = ErrorGenerator.unauthorizedUserForChat());
 		if (!chat.language) return (this.#error = ErrorGenerator.chatWithoutLanguages(this.#id));
 
 		const language = chat.language.default;

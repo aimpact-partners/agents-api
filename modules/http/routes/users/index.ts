@@ -1,5 +1,5 @@
 import type { IUser } from '@aimpact/agents-api/business/user';
-import { User } from '@aimpact/agents-api/business/user';
+import { User, UserAccess } from '@aimpact/agents-api/business/user';
 import type { IUserData } from '@aimpact/agents-api/data/interfaces';
 import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
@@ -14,7 +14,10 @@ export class UsersRoutes {
 		app.post('/auth/login', UsersRoutes.login);
 		app.post('/auth/register', UsersRoutes.register);
 		app.post('/integrations/tokens/verify', UsersRoutes.verify);
-		app.post('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
+
+		app.post('/users/login', UsersRoutes.login);
+		app.get('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
+		app.get('/users/:id', UserMiddlewareHandler.validate, UsersRoutes.get);
 	}
 
 	static async login(req: Request, res: IResponse) {
@@ -31,7 +34,7 @@ export class UsersRoutes {
 				email: req.body.email,
 				firebaseToken: req.body.firebaseToken,
 				token: req.body.token,
-				photoURL: req.body.photoURL,
+				photoUrl: req.body.photoURL,
 				phoneNumber: req.body.phoneNumber
 			};
 
@@ -59,7 +62,7 @@ export class UsersRoutes {
 				email: req.body.email,
 				firebaseToken: req.body.firebaseToken,
 				token: req.body.token,
-				photoURL: req.body.photoURL ?? '',
+				photoUrl: req.body.photoURL ?? '',
 				phoneNumber: req.body.phoneNumber ?? null
 			};
 
@@ -89,7 +92,7 @@ export class UsersRoutes {
 					name: response.data.displayName,
 					displayName: response.data.displayName,
 					email: response.data.email,
-					photoURL: response.data.photoURL,
+					photoUrl: response.data.photoUrl,
 					phoneNumber: response.data.phoneNumber
 				};
 
@@ -103,11 +106,30 @@ export class UsersRoutes {
 	static async me(req: IAuthenticatedRequest, res: IResponse) {
 		try {
 			const { user } = req;
-			const users = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
 
-			if (!users.includes(user.email)) return res.json(new Response({ error: ErrorGenerator.userNotValid() }));
+			const response = await UserAccess.authorizations(user);
+			if (response.error) {
+				if (response.error.code === 404) return res.status(404).json(new Response({ error: response.error }));
+				if (response.error.code === 403) return res.status(403).json(new Response({ error: response.error }));
+				return res.json(new Response({ error: response.error }));
+			}
 
 			res.json(new Response({ data: user }));
+		} catch (exc) {
+			res.json(new Response({ error: ErrorGenerator.internalError('H210', exc) }));
+		}
+	}
+
+	static async get(req: IAuthenticatedRequest, res: IResponse) {
+		try {
+			const { id } = req.params;
+
+			const userModel = new User(id);
+			const response = await userModel.load();
+			if (response.error) return res.json(new Response({ error: response.error }));
+			if (!userModel.valid) return res.json(new Response({ error: ErrorGenerator.userNotValid() }));
+
+			res.json(new Response({ data: userModel.toJSON() }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError('H210', exc) }));
 		}

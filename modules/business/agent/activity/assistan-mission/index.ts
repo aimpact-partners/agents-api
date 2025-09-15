@@ -1,7 +1,6 @@
 import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
-import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
-import type { User } from '@aimpact/agents-api/business/user';
 import { MessagesType } from '@aimpact/agents-api/business/models/open-ai/caller';
+import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import * as dotenv from 'dotenv';
 import { Chat } from '@aimpact/agents-api/business/agent/chat';
 import { v1 } from './v1';
@@ -26,9 +25,7 @@ const defaultTexts = {
 };
 
 export class AssistantMission {
-	static async get(chat: Chat, prompt: string, user: User): Promise<IResponse> {
-		const { project, metadata } = chat;
-
+	static async get(chat: Chat, prompt: string): Promise<IResponse> {
 		const last = chat.messages?.last ?? [];
 		let lastMessage;
 		for (let i = last.length - 1; i >= 0; i--) {
@@ -37,13 +34,14 @@ export class AssistantMission {
 		const messages: Partial<MessagesType> = [...last].reverse().map(({ role, content }) => ({ role, content }));
 		messages.push({ role: 'user', content: prompt });
 
+		const { metadata } = chat;
 		const activitySpecs = metadata.activity.specs ?? metadata.activity.resources.specs;
 		const activityVersion = activitySpecs?.objectives ? v2 : v1;
 		const response = await activityVersion(chat, lastMessage);
 		if (response.error) return { error: response.error };
 
 		const { activity } = chat.metadata;
-		const store = LOGS_PROMPTS === 'true' && USERS_LOGS.includes(user.email);
+		const store = LOGS_PROMPTS === 'true' && USERS_LOGS.includes(chat.user.email);
 		const specs: IPromptExecutionParams = {
 			language: activity.language,
 			category: 'agents',
