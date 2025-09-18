@@ -8,8 +8,10 @@ servers:
 paths:
     /:
         $ref: 'home.yaml'
-    /chats:
-        $ref: 'chats/index.yaml'
+    /projects:
+        $ref: 'projects/index.yaml'
+    /projects/{id}:
+        $ref: 'projects/project.yaml'
     /prompts/templates/project/{id}:
         $ref: 'prompts/list.yaml'
     /prompts/templates:
