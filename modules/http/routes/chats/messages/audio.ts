@@ -68,7 +68,7 @@ export class AudioMessagesRoutes {
 				return done({ status: false, error: ErrorGenerator.testing() });
 			}
 
-			const { iterator, error } = await Agent.process(chatId, { content }, user);
+			const { iterator, error } = await Agent.process(chatId, { content });
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {

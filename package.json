@@ -89,6 +89,8 @@
 		"@beyond-js/events": "~0.0.7",
 		"@beyond-js/response": "~0.0.3",
 		"@google-cloud/storage": "^7.7.0",
+		"@openai/agents": "^0.1.0",
+		"@pinecone-database/pinecone": "~6.1.2",
 		"express": "~4.21.1",
 		"express-rate-limit": "~7.2.0",
 		"express-openapi-validator": "~5.5.8",
@@ -105,7 +107,8 @@
 		"openai": "~4.104.0",
 		"uuid": "^10.0.0",
 		"find-up": "~7.0.0",
-		"postmark": "4.0.5"
+		"postmark": "4.0.5",
+		"zod": "<=3.25.67"
 	},
 	"devDependencies": {
 		"socket.io-client": "^4.5.4",

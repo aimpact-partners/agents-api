@@ -16,12 +16,15 @@ export /*bundle*/ const hook = async (chat: Chat, params = {}) => {
 		if (typeof chat.project.agent === 'string') {
 			const agentResponse = await ProjectsAgents.get(chat.project.id, chat.project.agent);
 			if (agentResponse.error) return { error: agentResponse.error };
-			URL = agentResponse.data.hook;
+			agentResponse.data.hook && (URL = agentResponse.data.hook);
 		} else {
 			const response = await Projects.data(chat.project.id); // Support for old Chats
 			if (response.error) return { error: response.error };
 			URL = `${response.data.data.agent.url}/agent/hook`;
 		}
+
+		console.log('hook URL', URL);
+		if (!URL) return { data: {} }; // nothing to process
 
 		// Prepare the parameters
 		const specs = {

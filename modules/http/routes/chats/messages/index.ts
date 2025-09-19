@@ -53,7 +53,7 @@ export class ChatMessagesRoutes {
 				return done({ status: false, error: ErrorGenerator.testing() });
 			}
 
-			const { iterator, error } = await Agent.process(id, specs, user);
+			const { iterator, error } = await Agent.process(id, specs);
 			if (error) return done({ status: false, error });
 
 			for await (const part of iterator) {
