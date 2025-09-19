@@ -148,6 +148,7 @@ export /*bundle*/ class KBAgent {
 			// const response = await KBAgent.post(chat, prompt, answer);
 			// if (response.error) metadata.error = response.error;
 			// response.credits && (metadata.credits = response.credits);
+
 			yield { metadata };
 		}
 		return { status: true, iterator: iterator() };
