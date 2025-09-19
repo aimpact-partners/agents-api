@@ -15,10 +15,11 @@ export /*bundle*/ class Agent {
 		await chat.fetch();
 		if (chat.error) return { error: chat.error };
 
-		if (chat.project.agent === 'kb-conversation') {
+		if (chat.project.agent === 'kb-cgi') {
 			return await KBAgent.processIncremental(chat, params, user);
 		}
-		if (chat.project.agent === 'kb-cgi') {
+
+		if (chat.project.agent === 'kb-conversation') {
 			return await KBAgent.processIncremental(chat, params, user);
 		}
 
