@@ -17,6 +17,7 @@ export class UsersRoutes {
 
 		app.post('/users/login', UsersRoutes.login);
 		app.get('/users/me', UserMiddlewareHandler.validate, UsersRoutes.me);
+		app.get('/users/:id', UserMiddlewareHandler.validate, UsersRoutes.get);
 	}
 
 	static async login(req: Request, res: IResponse) {
@@ -114,6 +115,21 @@ export class UsersRoutes {
 			}
 
 			res.json(new Response({ data: user }));
+		} catch (exc) {
+			res.json(new Response({ error: ErrorGenerator.internalError('H210', exc) }));
+		}
+	}
+
+	static async get(req: IAuthenticatedRequest, res: IResponse) {
+		try {
+			const { id } = req.params;
+
+			const userModel = new User(id);
+			const response = await userModel.load();
+			if (response.error) return res.json(new Response({ error: response.error }));
+			if (!userModel.valid) return res.json(new Response({ error: ErrorGenerator.userNotValid() }));
+
+			res.json(new Response({ data: userModel.toJSON() }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError('H210', exc) }));
 		}

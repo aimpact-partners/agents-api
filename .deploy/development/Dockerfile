@@ -1,7 +1,7 @@
 # -------------------------
 # ------ Build Stage ------
 # -------------------------
-FROM node:18 AS build-stage
+FROM node:20-bullseye AS build-stage
 
 # Set the working directory in the container
 WORKDIR /app
@@ -24,7 +24,7 @@ RUN beyond build --pkg=@aimpact/agents-api --distribution=http --logs
 # ------------------------------
 # ------ Production Stage ------
 # ------------------------------
-FROM node:18-slim AS prod
+FROM node:20-slim AS prod
 
 # Set the working directory in the container
 WORKDIR /app

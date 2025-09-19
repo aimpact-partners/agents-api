@@ -1,0 +1,134 @@
+get:
+    summary: Get a specific audio file
+    tags:
+        - Audios
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the audio
+    responses:
+        '200':
+            description: Audio file details
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/components/schemas/IAudio'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+put:
+    summary: Update a specific audio file
+    tags:
+        - Audios
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the audio
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        metadata:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                    example: 'Updated Audio Name'
+                                description:
+                                    type: string
+                                    example: 'Updated audio description'
+    responses:
+        '200':
+            description: Audio updated successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/components/schemas/IAudio'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+delete:
+    summary: Delete a specific audio file
+    tags:
+        - Audios
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the audio
+    responses:
+        '200':
+            description: Audio deleted successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: object
+                                properties:
+                                    deleted:
+                                        type: boolean
+                                        example: true
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'

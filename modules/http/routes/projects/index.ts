@@ -1,18 +1,19 @@
 import { Projects, ProjectsAgents } from '@aimpact/agents-api/business/projects';
-import { ErrorGenerator } from '@beyond-js/firestore-collection/errors';
+import { UserMiddlewareHandler as userMiddleware } from '@aimpact/agents-api/http/middleware';
 import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
+import { ErrorGenerator } from '@beyond-js/firestore-collection/errors';
 import type { Application, Response as IResponse, Request } from 'express';
 
 export class ProjectsRoutes {
 	static setup(app: Application) {
-		app.get('/projects/', this.list);
-		app.get('/projects/:id', this.get);
-		app.post('/projects/', this.publish);
-		app.put('/projects/:id', this.update);
-		app.delete('/projects/:id', this.delete);
+		app.get('/projects/', userMiddleware.validate, this.list);
+		app.get('/projects/:id', userMiddleware.validate, this.get);
+		app.post('/projects/', userMiddleware.validate, this.publish);
+		app.put('/projects/:id', userMiddleware.validate, this.update);
+		// app.delete('/projects/:id', userMiddleware.validate, this.delete);
 
-		app.post('/projects/:id/agents', this.agent);
-		app.get('/projects/agents/activities', this.agentsActivities);
+		app.post('/projects/:id/agents', userMiddleware.validate, this.agent);
+		app.get('/projects/agents/activities', userMiddleware.validate, this.agentsActivities);
 	}
 
 	static async list(req: Request, res: IResponse) {
@@ -54,8 +55,13 @@ export class ProjectsRoutes {
 
 	static async update(req: Request, res: IResponse) {
 		try {
-			let response;
-			res.json(new Response(response));
+			const { id } = req.params;
+			const { name, description, agent } = req.body;
+			const response = await Projects.update({ id, name, description, agent });
+
+			if (response.error) return res.json(new Response({ error: response.error }));
+
+			res.json(new Response({ data: response.data.data }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
@@ -63,8 +69,12 @@ export class ProjectsRoutes {
 
 	static async delete(req: Request, res: IResponse) {
 		try {
-			let response;
-			res.json(new Response(response));
+			const { id } = req.params;
+
+			const response = await Projects.delete(id);
+			if (response.error) return res.json(new Response({ error: response.error }));
+
+			res.json(new Response({ data: response.data.data }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}

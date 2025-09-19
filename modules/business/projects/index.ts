@@ -44,15 +44,20 @@ export /*bundle*/ class Projects extends Group {
 
 	static async update(params) {
 		try {
-			const { id, name, description } = params;
+			const { id, name, description, agent } = params;
 
 			const dataResponse = await Projects.data(id);
+
 			if (dataResponse.error) return dataResponse;
 			if (!dataResponse.data.exists) return dataResponse;
 
-			const specs = { data: { id, name, description } };
-			const response = await projects.merge(specs);
-			if (response.error) return new FirestoreErrorManager(response.error.code, response.error.text);
+			const data: { name?: string; description?: string; agent?: Record<string, any> } = {};
+			name && (data.name = name);
+			description && (data.description = description);
+			agent && (data.agent = agent);
+
+			const response = await projects.merge({ id, data });
+			if (response.error) return new BusinessResponse({ error: response.error });
 
 			return Projects.data(id);
 		} catch (exc) {
@@ -67,7 +72,11 @@ export /*bundle*/ class Projects extends Group {
 			const snapshot = await projectsRef.get();
 
 			const items = [];
-			snapshot.forEach(doc => items.push(doc.data()));
+			snapshot.forEach(doc => {
+				const item = doc.data();
+				delete item.apiKey;
+				items.push(item);
+			});
 
 			return { data: { items } };
 		} catch (exc) {
@@ -75,4 +84,6 @@ export /*bundle*/ class Projects extends Group {
 			return new Response({ error });
 		}
 	}
+
+	static async delete(id) {}
 }
