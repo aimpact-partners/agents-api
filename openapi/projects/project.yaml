@@ -1,0 +1,186 @@
+get:
+    summary: Get a specific project
+    tags:
+        - Projects
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the project
+    responses:
+        '200':
+            description: Details of the specified project
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/schemas/IProject'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/schemas/IError'
+put:
+    summary: Update a specific project
+    tags:
+        - Projects
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the project
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        name:
+                            type: string
+                            example: 'Updated Project Name'
+                        description:
+                            type: string
+                            example: 'Updated project description'
+    responses:
+        '200':
+            description: Project updated successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/schemas/IProject'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/schemas/IError'
+# delete:
+#     summary: Delete a specific project
+#     tags:
+#         - Projects
+#     security:
+#         - firebaseId: []
+#     parameters:
+#         - in: path
+#           name: id
+#           required: true
+#           schema:
+#               type: string
+#           description: Unique identifier for the project
+#     responses:
+#         '200':
+#             description: Project deleted successfully
+#             content:
+#                 application/json:
+#                     schema:
+#                         type: object
+#                         properties:
+#                             status:
+#                                 type: boolean
+#                                 example: true
+#                             data:
+#                                 type: object
+#                                 properties:
+#                                     deleted:
+#                                         type: boolean
+#                                         example: true
+#         '404':
+#             description: Not Found
+#             content:
+#                 application/json:
+#                     schema:
+#                         type: object
+#                         properties:
+#                             status:
+#                                 type: boolean
+#                                 example: false
+#                             error:
+#                                 $ref: '#/schemas/IError'
+
+schemas:
+    IError:
+        type: object
+        properties:
+            status:
+                type: boolean
+            error:
+                type: object
+                properties:
+                    text:
+                        type: string
+                    code:
+                        type: integer
+    IResponse:
+        type: object
+        properties:
+            status:
+                type: boolean
+            data:
+                type: object
+                properties:
+                    items:
+                        type: array
+                        items:
+                            $ref: '#/schemas/IProject'
+
+    ProjectSpecification:
+        type: object
+        properties:
+            id:
+                type: string
+            name:
+                type: string
+            identifier:
+                type: string
+
+    ProjectBase:
+        allOf:
+            - $ref: '#/schemas/ProjectSpecification'
+            - type: object
+              properties:
+                  description:
+                      type: string
+
+    IProject:
+        allOf:
+            - $ref: '#/schemas/ProjectBase'
+            - type: object
+              properties:
+                  agent:
+                      type: object
+                      properties:
+                          url:
+                              type: string

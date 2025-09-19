@@ -6,6 +6,7 @@ export /*bundle*/ enum ErrorCodes {
 	userNotAuthorized = 403,
 	invalidParameters = 10500,
 	invalidToken,
+	tokenNotProvided,
 	testing,
 	transcribe
 }
@@ -20,7 +21,11 @@ export /*bundle*/ class ErrorGenerator {
 	}
 
 	static invalidToken() {
-		return new HTTPErrorManager(ErrorCodes.invalidToken, `Invalid token`);
+		return new HTTPErrorManager(ErrorCodes.invalidToken, `Invalid access token`);
+	}
+
+	static tokenNotProvided() {
+		return new HTTPErrorManager(ErrorCodes.tokenNotProvided, `Access token not provided`);
 	}
 
 	static userNotAuthorized() {

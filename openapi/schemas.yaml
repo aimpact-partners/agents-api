@@ -1,0 +1,252 @@
+components:
+    schemas:
+        Error:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    example: 404
+                text:
+                    type: string
+                    example: 'Not Found'
+                details:
+                    type: string
+                    example: 'The requested resource was not found'
+
+        # Chat schemas
+        IChatBase:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: '00000-dd1c-4e5d-8e40-208981d9bd7b'
+                name:
+                    type: string
+                    example: 'My chat'
+                projectId:
+                    type: string
+                    example: 'ffdfjhjh-er-b155-8e71334-82c19'
+                uid:
+                    type: string
+                    example: '123456789'
+                metadata:
+                    type: object
+                    properties:
+                        prompt:
+                            type: string
+                            example: 'topic-q&a'
+                language:
+                    type: object
+                    properties:
+                        default:
+                            type: string
+                            example: 'es'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            required:
+                - id
+                - name
+                - uid
+
+        IChatData:
+            allOf:
+                - $ref: '#/components/schemas/IChatBase'
+                - type: object
+                  properties:
+                      messages:
+                          type: array
+                          items:
+                              $ref: '#/components/schemas/IMessage'
+
+        IMessage:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: 'msg-123'
+                content:
+                    type: string
+                    example: 'Hello, this is a message'
+                role:
+                    type: string
+                    enum: [user, assistant, system]
+                    example: 'user'
+                systemId:
+                    type: string
+                    example: 'system123'
+                timestamp:
+                    type: string
+                    format: date-time
+            required:
+                - id
+                - content
+                - role
+
+        # Project schemas
+        IProject:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: 'proj-123'
+                name:
+                    type: string
+                    example: 'My Project'
+                description:
+                    type: string
+                    example: 'Project description'
+                uid:
+                    type: string
+                    example: '123456789'
+                metadata:
+                    type: object
+                    properties:
+                        category:
+                            type: string
+                            example: 'business'
+                language:
+                    type: object
+                    properties:
+                        default:
+                            type: string
+                            example: 'es'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            required:
+                - id
+                - name
+                - uid
+
+        # Audio schemas
+        IAudio:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: 'audio-123'
+                name:
+                    type: string
+                    example: 'My Audio'
+                description:
+                    type: string
+                    example: 'Audio description'
+                url:
+                    type: string
+                    example: 'https://storage.example.com/audio/file.mp3'
+                size:
+                    type: integer
+                    example: 1024000
+                duration:
+                    type: number
+                    example: 120.5
+                format:
+                    type: string
+                    example: 'mp3'
+                uid:
+                    type: string
+                    example: '123456789'
+                metadata:
+                    type: object
+                    properties:
+                        category:
+                            type: string
+                            example: 'voice-message'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            required:
+                - id
+                - name
+                - uid
+
+        # Category schemas
+        ICategory:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: 'cat-123'
+                name:
+                    type: string
+                    example: 'Business'
+                description:
+                    type: string
+                    example: 'Business related prompts'
+                icon:
+                    type: string
+                    example: 'business-icon'
+                color:
+                    type: string
+                    example: '#007bff'
+                uid:
+                    type: string
+                    example: '123456789'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            required:
+                - id
+                - name
+                - uid
+
+        # Prompt schemas
+        IPrompt:
+            type: object
+            properties:
+                id:
+                    type: string
+                    example: 'prompt-123'
+                title:
+                    type: string
+                    example: 'Business Analysis'
+                description:
+                    type: string
+                    example: 'Analyze business data and provide insights'
+                content:
+                    type: string
+                    example: 'You are a business analyst...'
+                categoryId:
+                    type: string
+                    example: 'cat-123'
+                projectId:
+                    type: string
+                    example: 'proj-123'
+                uid:
+                    type: string
+                    example: '123456789'
+                metadata:
+                    type: object
+                    properties:
+                        tags:
+                            type: array
+                            items:
+                                type: string
+                            example: ['analysis', 'business']
+                        version:
+                            type: string
+                            example: '1.0.0'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            required:
+                - id
+                - title
+                - content
+                - uid

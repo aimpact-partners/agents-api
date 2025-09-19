@@ -65,7 +65,8 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 		}
 
 		// Call preProcessor
-		const { chat, specs, error } = await ActivityAgent.pre(conversation.id, '', user);
+		const { conversation } = params;
+		const { specs, error } = await ActivityAgent.pre(conversation.id, '', user);
 		if (error) {
 			this.#error = error;
 			console.error(this.#error);

@@ -1,0 +1,121 @@
+get:
+    summary: Get all user audios
+    tags:
+        - Audios
+    security:
+        - firebaseId: []
+    responses:
+        '200':
+            description: A list of audios
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/IAudio'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+post:
+    summary: Upload a new audio file
+    tags:
+        - Audios
+    security:
+        - firebaseId: []
+    requestBody:
+        required: true
+        content:
+            multipart/form-data:
+                schema:
+                    type: object
+                    properties:
+                        file:
+                            type: string
+                            format: binary
+                            description: Audio file to upload
+                        metadata:
+                            type: string
+                            description: JSON string with metadata
+                            example: '{"name": "My Audio", "description": "Audio description"}'
+                        uid:
+                            type: string
+                            description: User ID
+                            example: '123456789'
+                    required:
+                        - file
+                        - uid
+    responses:
+        '200':
+            description: Audio uploaded successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/components/schemas/IAudio'
+        '400':
+            description: Bad Request
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+delete:
+    summary: Delete all user audios
+    tags:
+        - Audios
+    security:
+        - firebaseId: []
+    responses:
+        '200':
+            description: All audios deleted successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: object
+                                properties:
+                                    deleted:
+                                        type: boolean
+                                        example: true
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'

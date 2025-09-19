@@ -19,7 +19,6 @@ interface IMetadata {
 
 export /*bundle*/ class ActivityAgent {
 	// PreProcessor
-
 	static async pre(chat: Chat, prompt: string) {
 		// Fetch the agent
 		const response = await hook(chat);
@@ -38,7 +37,6 @@ export /*bundle*/ class ActivityAgent {
 
 		const { ipe } = response;
 		const hookSpecs = { ipe, prompt, answer, testing: chat.testing };
-
 		const hookResponse = await hook(chat, hookSpecs);
 		if (hookResponse.error) return { error: hookResponse.error };
 
@@ -49,7 +47,7 @@ export /*bundle*/ class ActivityAgent {
 		return { ipe, credits: hookResponse.data.credits };
 	}
 
-	static async processIncremental(chat: string, params: IParams) {
+	static async processIncremental(chat: Chat, params: IParams) {
 		const prompt = params.content;
 
 		// Call preProcessor
@@ -76,7 +74,6 @@ export /*bundle*/ class ActivityAgent {
 			}
 
 			// Call postProcessor
-
 			const response = await ActivityAgent.post(chat, prompt, answer);
 			if (response.error) metadata.error = response.error;
 

@@ -1,0 +1,137 @@
+get:
+    summary: Get a specific prompt category
+    tags:
+        - Categories
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the category
+    responses:
+        '200':
+            description: Details of the specified category
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/components/schemas/ICategory'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+put:
+    summary: Update a specific prompt category
+    tags:
+        - Categories
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the category
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        name:
+                            type: string
+                            example: 'Updated Business'
+                        description:
+                            type: string
+                            example: 'Updated business related prompts'
+                        icon:
+                            type: string
+                            example: 'updated-business-icon'
+                        color:
+                            type: string
+                            example: '#0056b3'
+    responses:
+        '200':
+            description: Category updated successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/components/schemas/ICategory'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+delete:
+    summary: Delete a specific prompt category
+    tags:
+        - Categories
+    security:
+        - firebaseId: []
+    parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+              type: string
+          description: Unique identifier for the category
+    responses:
+        '200':
+            description: Category deleted successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: object
+                                properties:
+                                    deleted:
+                                        type: boolean
+                                        example: true
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
