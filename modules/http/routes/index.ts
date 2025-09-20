@@ -1,11 +1,14 @@
 import type { Application, Response as IResponse, Request } from 'express';
 import { join } from 'path';
+import { ArticlesRoutes } from './articles';
 import { AudiosRoutes } from './audios';
 import { ChatsRoutes } from './chats';
 import { CompletionsRoutes } from './completions';
+import { DraftsRoutes } from './drafts';
 import { ProjectsRoutes } from './projects';
 import { PromptsRoutes } from './prompts';
 import { SchemasRoutes } from './schemas';
+import { SectionsRoutes } from './sections';
 import { UsersRoutes } from './users';
 
 export /*bundle*/ function setup(app: Application) {
@@ -14,6 +17,9 @@ export /*bundle*/ function setup(app: Application) {
 			res.send('AImpact Agents http server');
 		});
 
+		ArticlesRoutes.setup(app);
+		DraftsRoutes.setup(app);
+		SectionsRoutes.setup(app);
 		AudiosRoutes.setup(app);
 		ChatsRoutes.setup(app);
 		CompletionsRoutes.setup(app);

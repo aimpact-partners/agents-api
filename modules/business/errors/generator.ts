@@ -235,4 +235,7 @@ export /*bundle*/ class ErrorGenerator {
 	static requestNotExist(uid: string) {
 		return new BusinessErrorManager(ErrorCodes.requestNotExist, `User request "${uid}" does not exist`);
 	}
+	static typeNotValid(type: string, entity: string) {
+		return new BusinessErrorManager(ErrorCodes.typeNotValid, `Type "${type}" not supported for ${entity}`);
+	}
 }

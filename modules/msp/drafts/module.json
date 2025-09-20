@@ -1,0 +1,6 @@
+{
+	"name": "msp/business/drafts",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}

@@ -8,7 +8,8 @@ export /*bundle*/ enum ErrorCodes {
 	invalidToken,
 	tokenNotProvided,
 	testing,
-	transcribe
+	transcribe,
+	typeNotValid
 }
 
 export /*bundle*/ class ErrorGenerator {
@@ -42,5 +43,9 @@ export /*bundle*/ class ErrorGenerator {
 
 	static transcribe(text: string) {
 		return new HTTPErrorManager(ErrorCodes.transcribe, text);
+	}
+
+	static typeNotValid(type: string, entity: string) {
+		return new HTTPErrorManager(ErrorCodes.typeNotValid, `Type ${type} not supportd for ${entity}`);
 	}
 }

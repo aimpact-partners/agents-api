@@ -49,5 +49,6 @@ export /*bundle*/ enum ErrorCodes {
 	entityNotValid,
 	noAdministratorsToNotify,
 	userCantRemoveHimself,
-	requestNotExist
+	requestNotExist,
+	typeNotValid
 }
