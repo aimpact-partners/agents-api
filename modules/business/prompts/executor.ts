@@ -76,7 +76,6 @@ export /*bundle*/ class PromptTemplateExecutor {
 		this.#model = params.model;
 		this.#temperature = params.temperature;
 		// this.#tools = params.tools;
-		this.#format = params.format;
 		this.#store = params.store ?? null;
 		this.#metadata = params.metadata ?? undefined;
 		this.#messages = params.messages ? params.messages : [];

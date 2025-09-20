@@ -13,7 +13,7 @@ interface ICompletionsParams {
 }
 
 export /*bundle*/ class OpenAIBackend {
-	#openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
+	#openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 	async completions({ messages, model = models.GPT_3_5_TURBO, temperature = 0.2 }: ICompletionsParams) {
 		try {
@@ -74,7 +74,7 @@ export /*bundle*/ class OpenAIBackend {
 		form.append('model', models.WHISPER_1);
 
 		try {
-			const headers = { Authorization: `Bearer ${process.env.OPEN_AI_KEY}`, ...form.getHeaders() };
+			const headers = { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, ...form.getHeaders() };
 			const url = 'https://api.openai.com/v1/audio/transcriptions';
 			const response = await fetch(url, { method: 'POST', body: form, headers });
 			const json = await response.json();

@@ -5,9 +5,6 @@ import { Pinecone } from './pinecone';
 export /*bundle*/ class KB {
 	static async search(text: string, context) {
 		try {
-			// const { data, error } = await Organizations.get(organizationId, user);
-			// if (error) return new BusinessResponse({ error });
-
 			const response = await Pinecone.query(undefined, context, text, 10);
 			if (response.error) return new BusinessResponse({ error: response.error });
 
@@ -22,7 +19,7 @@ export /*bundle*/ class KB {
 		}
 	}
 
-	static async searchTool(text: string, context, topK = 10) {
+	static async searchTool(text: string, context = undefined, topK = 10) {
 		try {
 			const response = await Pinecone.query(undefined, context, text, topK);
 			if (response.error) return new BusinessResponse({ error: response.error });

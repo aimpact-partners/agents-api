@@ -23,7 +23,6 @@ export /*bundle*/ const hook = async (chat: Chat, params = {}) => {
 			URL = `${response.data.data.agent.url}/agent/hook`;
 		}
 
-		console.log('hook URL', URL);
 		if (!URL) return { data: {} }; // nothing to process
 
 		// Prepare the parameters

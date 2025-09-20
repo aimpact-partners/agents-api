@@ -12,11 +12,11 @@ export /*bundle*/ const searcher = tool({
 	parameters: z.object({
 		query: z.string().describe('The topic or question to look up in the knowledge base.')
 	}),
-	async execute({ query }: ISearcherParameters, runContext) {
+	async execute({ query }: ISearcherParameters, toolContext) {
 		try {
-			const organizationId = (runContext?.context as { organizationId: string }).organizationId;
+			const context = Object.keys(toolContext?.context).length !== 0 ? toolContext?.context : undefined;
+			const results = await KB.searchTool(query, context, 5);
 
-			const results = await KB.searchTool(query, organizationId, 5);
 			if (results.error) return results.error;
 
 			return results.data.items;

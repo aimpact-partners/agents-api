@@ -9,7 +9,7 @@ export /*bundle*/ const key = new (class OpenAIKey {
 		const dotenv = await bimport('dotenv');
 		dotenv.config();
 
-		this.#key = process.env.OPEN_AI_KEY;
+		this.#key = process.env.OPENAI_API_KEY;
 
 		return this.#key;
 	}

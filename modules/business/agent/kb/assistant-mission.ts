@@ -29,7 +29,6 @@ export /*bundle*/ class AssistantMission {
 			return new BusinessResponse({ error: ErrorGenerator.internalError('Processing agent prompt') });
 		}
 
-		console.log('executor.processedValue', executor.processedValue);
 		return new BusinessResponse({ data: { prompt: executor.processedValue, context: {} } }); // TODO context debe estar en los metadata del chat??
 	}
 }

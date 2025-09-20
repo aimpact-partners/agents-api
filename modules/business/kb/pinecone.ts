@@ -152,9 +152,10 @@ export /*bundle*/ class Pinecone {
 		// ): Promise<{ status: boolean; error?: string; matches?: ScoredVector[] }> {
 	): Promise<BusinessResponse<{ matches?: [] }>> {
 		// Check parameters
-		if (!filter || !query || typeof filter !== 'object' || typeof query !== 'string') {
-			throw new Error('Invalid parameters');
-		}
+		if (!query || typeof query !== 'string')
+			throw new BusinessResponse({ error: ErrorGenerator.invalidParameters(['query']) });
+		if (filter && typeof filter !== 'object')
+			throw new BusinessResponse({ error: ErrorGenerator.invalidParameters(['filter']) });
 
 		// Initialise OpenAI & Pinecone
 		const { error } = await this.#initialise();
@@ -177,7 +178,12 @@ export /*bundle*/ class Pinecone {
 		let matches;
 		try {
 			namespace = void 0; // Namespaces are not available in free tier
-			const request = { vector, topK, includeMetadata: true, filter };
+			const request = {
+				vector,
+				topK,
+				includeMetadata: true,
+				filter: filter ?? undefined
+			};
 
 			// Store the vectors in pinecone
 			// ({ matches } = await this.#index.namespace(namespace).query(request));

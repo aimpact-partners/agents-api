@@ -23,8 +23,8 @@ else console.error('Failed to obtain the API key.');
 
 1. Import and create an instance of the `OpenAIKey` class.
 2. Use the `get` method to obtain the OpenAI API key. If it's already stored, it returns it; otherwise, it uses `dotenv`
-   to load environment variables and obtains the key from `process.env.OPEN_AI_KEY` (if you are running the code on the
-   server side, for example, in a Node.js environment).
+   to load environment variables and obtains the key from `process.env.OPENAI_API_KEY ` (if you are running the code on
+   the server side, for example, in a Node.js environment).
 3. Check if the key was obtained successfully, and if so, display it in the console. Otherwise, display an error
    message.
 
@@ -42,6 +42,6 @@ console.log('New API key set:', openaiKeyInstance.get());
 
 ## NOTES
 
-It is recommended to configure a `.env` file with the `OPEN_AI_KEY` variable to securely store the API key. If you are
-running the code on the server side, the value of `OPEN_AI_KEY` will be automatically taken from the environment
+It is recommended to configure a `.env` file with the `OPENAI_API_KEY ` variable to securely store the API key. If you
+are running the code on the server side, the value of `OPENAI_API_KEY ` will be automatically taken from the environment
 variables.
