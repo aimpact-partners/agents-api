@@ -1,16 +1,17 @@
-import type { IUserData, IPeopleData } from '@aimpact/agents-api/data/interfaces';
-import { Collection, SubCollection } from '@beyond-js/firestore-collection/collection';
+import type { IPeopleData } from '@aimpact/agents-api/data/interfaces';
+import { SubCollection } from '@beyond-js/firestore-collection/collection';
+import { MSPUsers } from './msp/users';
 
-class Users extends Collection<IUserData> {
+class Users extends MSPUsers {
 	#projects: SubCollection<IPeopleData>;
 	get projects() {
 		return this.#projects;
 	}
 
 	constructor() {
-		super('Users');
+		super('Users'); // Call MSPUsers constructor with collection name
 		this.#projects = new SubCollection('People', this);
 	}
 }
 
-export /*bundle*/ const users: Collection<IUserData> = new Users();
+export /*bundle*/ const users: Users = new Users();

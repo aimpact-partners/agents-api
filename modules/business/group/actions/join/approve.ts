@@ -33,7 +33,7 @@ export const approve = async (
 		uid: user.uid,
 		email: user.email,
 		name: user.displayName,
-		photoUrl: user.photoURL,
+		photoUrl: user.photoUrl,
 		role,
 		authorized: true
 	};
@@ -45,7 +45,7 @@ export const approve = async (
 
 	// Update people on Organization document
 	const people = group.people;
-	people.push({ id: user.uid, uid: user.uid, name: user.displayName, photoUrl: user.photoURL, role });
+	people.push({ id: user.uid, uid: user.uid, name: user.displayName, photoUrl: user.photoUrl, role });
 
 	const responseMerge = await collection.merge({ id: group.id, data: { people }, transaction });
 	if (responseMerge.error) throw new BusinessResponse({ error: responseMerge.error });
@@ -87,7 +87,7 @@ export const approve = async (
 	// }
 
 	// Update the users organizations/classrooms subcollection
-	const specs = { group, uid: user.uid, transaction };
+	const specs = { group, user: user, transaction };
 	const responseUsers = await Users.projects(specs);
 	if (responseUsers.error) throw new BusinessResponse({ error: responseUsers.error });
 

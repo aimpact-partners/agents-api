@@ -1,24 +1,13 @@
-import type {
-	IClassroomData,
-	IOrganizationData,
-	IProjectData,
-	ITeacherOrg,
-	IUserMetadata
-} from '@aimpact/agents-api/data/interfaces';
+import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
+import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import type { User } from '@aimpact/agents-api/business/user';
+import type { IProjectData } from '@aimpact/agents-api/data/interfaces';
+import { db } from '@beyond-js/firestore-collection/db';
+import * as dotenv from 'dotenv';
 import type { Transaction } from 'firebase-admin/firestore';
 import type { IApproveResponse, IGroupApprove } from '../interfaces';
-import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { Mailer } from '@aimpact/agents-api/business/mailer';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
-import config from '@aimpact/agents-api/config';
-import { UserRole } from '@aimpact/agents-api/data/interfaces';
-import { ailearnUsers as users } from '@aimpact/agents-api/data/model';
-import { db } from '@beyond-js/firestore-collection/db';
 import { STATUS } from '../status';
 import { Users } from './users';
-import { UsersHome } from './users/home';
-import * as dotenv from 'dotenv';
 
 dotenv.config();
 const { MAIL_TEMPLATES_APPROVE } = process.env;
@@ -89,7 +78,7 @@ export class Approve {
 
 				// 5. Update Users data
 				// 5.3 Update users organizations/classrooms subcollection
-				const usersSpecs = { group, uid: params.uid, transaction };
+				const usersSpecs = { group, user: people, transaction };
 				let userResponse;
 				if (params.entity.name === 'project') userResponse = await Users.projects(usersSpecs);
 				if (userResponse.error) throw new BusinessResponse({ error: userResponse.error });

@@ -28,7 +28,7 @@ export const request = async (
 		uid: user.uid,
 		email: user.email,
 		name: user.displayName,
-		photoUrl: user.photoURL,
+		photoUrl: user.photoUrl,
 		authorized: false
 	};
 	const response = await collection.people.set({ id: user.uid, data, parents, transaction });

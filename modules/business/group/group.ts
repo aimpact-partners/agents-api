@@ -3,7 +3,13 @@ import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 // import { ailearnUsers } from '@aimpact/agents-api/data/model';
 import { users } from '@aimpact/agents-api/data/model';
-import type { IProjectData, IPeopleBase, IPeopleData } from '@aimpact/agents-api/data/interfaces';
+import type {
+	IProjectData,
+	ISectionData,
+	IPeopleBase,
+	IPeopleData,
+	IOrganizationData
+} from '@aimpact/agents-api/data/interfaces';
 // import type { IAILearnUserData, ITeacherOrg } from '@aimpact/agents-api/data/interfaces';
 import { db } from '@beyond-js/firestore-collection/db';
 import * as dotenv from 'dotenv';
@@ -31,7 +37,7 @@ export /*bundle*/ abstract class Group {
 
 	static async getPeople(
 		params: IGroupBase,
-		group: IProjectData,
+		group: IProjectData | IOrganizationData | ISectionData,
 		user: User
 	): Promise<BusinessResponse<IPeopleData[] | IPeopleBase[]>> {
 		const { entity, collection } = params;
@@ -146,7 +152,7 @@ export /*bundle*/ abstract class Group {
 				// 	if (response.error) throw new BusinessResponse({ error: response.error });
 				// }
 
-				const subcollection = 'projects';
+				const subcollection = entity.collectionName === 'Project' ? 'projects' : 'sections';
 				const subcollectionResponse = await users[subcollection].delete({
 					id: groupData.id,
 					transaction,

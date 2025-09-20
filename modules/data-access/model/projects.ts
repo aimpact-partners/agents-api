@@ -1,4 +1,10 @@
-import type { IAgentData, IApiKeyData, IPeopleData, IProjectData } from '@aimpact/agents-api/data/interfaces';
+import type {
+	IAgentData,
+	IApiKeyData,
+	IPeopleData,
+	IProjectData,
+	ISectionItemBase
+} from '@aimpact/agents-api/data/interfaces';
 import { Collection, SubCollection } from '@beyond-js/firestore-collection/collection';
 
 export /*bundle*/ class Projects extends Collection<IProjectData> {
@@ -10,6 +16,11 @@ export /*bundle*/ class Projects extends Collection<IProjectData> {
 	#agents: SubCollection<IAgentData>;
 	get agents() {
 		return this.#agents;
+	}
+
+	#sections: SubCollection<ISectionItemBase>;
+	get sections() {
+		return this.#sections;
 	}
 
 	#apiKeys: SubCollection<IApiKeyData>;

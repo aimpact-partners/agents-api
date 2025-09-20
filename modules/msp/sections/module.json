@@ -1,0 +1,6 @@
+{
+	"name": "msp/business/sections",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}

@@ -47,5 +47,7 @@ export /*bundle*/ enum ErrorCodes {
 	mailNotSend,
 	invalidToDelete,
 	entityNotValid,
-	noAdministratorsToNotify
+	noAdministratorsToNotify,
+	userCantRemoveHimself,
+	requestNotExist
 }
