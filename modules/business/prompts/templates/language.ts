@@ -6,8 +6,8 @@ import { PromptTemplateExecutor } from '../executor';
 import { PromptsTemplate } from './index';
 
 export /*bundle*/ class PromptTemplateLanguages {
-	static async set(id: string, params: { language: string; text: string }) {
-		const { language, text } = params;
+	static async set(id: string, params: { language: string; text: string; literals?: Record<string, string[]> }) {
+		const { language, text, literals } = params;
 
 		const errors = [];
 		!id && errors.push('id');
@@ -27,7 +27,7 @@ export /*bundle*/ class PromptTemplateLanguages {
 				id: `${prompt.identifier}.${language}`,
 				language,
 				value: text,
-				literals: prompt.literals ?? { pure: [], dependencies: [] },
+				literals: literals ?? { pure: [], dependencies: [] },
 				project: prompt.project
 			};
 			// SET value on language subcollection
@@ -42,6 +42,8 @@ export /*bundle*/ class PromptTemplateLanguages {
 				updatedLanguages.updated.push(language);
 				await prompts.merge({ id, data: { language: updatedLanguages } });
 			}
+
+			if (literals) await prompts.merge({ id, data: { literals } });
 
 			return new BusinessResponse({ data });
 		} catch (exc) {

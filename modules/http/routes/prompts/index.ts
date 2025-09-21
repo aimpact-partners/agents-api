@@ -126,9 +126,9 @@ export class PromptsRoutes {
 	static async translate(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
-			const { language, text } = req.body;
+			const { language, text, literals } = req.body;
 
-			const response = await PromptTemplateLanguages.set(id, { language, text });
+			const response = await PromptTemplateLanguages.set(id, { language, text, literals });
 			res.json(new Response(response));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));

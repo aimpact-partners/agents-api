@@ -41,7 +41,6 @@ export /*bundle*/ class PromptsTemplate {
 			const { data } = languageDoc.data;
 			const value = Object.assign({}, promptData, {
 				value: data.value,
-				schema: data.schema,
 				language: data.language
 			});
 			return new BusinessResponse({ data: value });
