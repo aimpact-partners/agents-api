@@ -205,17 +205,16 @@ export /*bundle*/ class PromptsTemplate {
 				is: params.is
 			};
 			params.value && (toSave.value = params.value);
-
 			params.description && (toSave.description = params.description);
-			params.literals && (toSave.literals = params.literals);
+
+			if (params.literals) toSave.literals = params.literals;
+			else toSave.literals = { pure: [], dependencies: [] };
 
 			const specs = { data: toSave };
 			const response = await prompts.set(specs);
 			if (response.error) return new BusinessResponse({ error: response.error });
 
-			if (!params.value) {
-				return new BusinessResponse({ data: toSave });
-			}
+			if (!params.value) return new BusinessResponse({ data: toSave });
 
 			const data: IPromptTemplateLanguageData = {
 				id: `${project.identifier}.${name}.${params.language.default}`,
