@@ -7,8 +7,7 @@ import * as dotenv from 'dotenv';
 import { ILanguage, defaultTexts } from './common';
 
 dotenv.config();
-const { GPT_MODEL } = process.env;
-const LOGS_PROMPTS = false;
+const { GPT_MODEL, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
 
 function toKebabCase(text: string) {
@@ -101,8 +100,9 @@ export class IPE {
 			if (LOGS_PROMPTS && USERS_LOGS.includes(chat.user.email)) {
 				specs.store = true;
 				specs.metadata = {
-					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
-					prompt: prompt.name
+					key: `agent/${chat.project.agent}/${prompt.name}`,
+					prompt: prompt.name,
+					user: { id: chat.user.id, name: chat.user.name }
 				};
 			}
 			const promptExecutor = new PromptTemplateExecutor(specs);

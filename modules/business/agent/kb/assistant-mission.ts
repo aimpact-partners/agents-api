@@ -3,16 +3,6 @@ import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { PromptTemplateProcessor } from '@aimpact/agents-api/business/prompts';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 
-/**
- * TODO add logic
- * 
-// // const last = params.messages.last.map(m => ({ content: m.content, role: m.role }));
-// const messages = [{ content: params.prompt, role: 'user' }]
-// // .concat(last)
-// .map(item => (item.role === 'user' ? userAgent(item.content) : assistant(item.content)));
- *
- */
-
 export /*bundle*/ class AssistantMission {
 	static async get(chat: Chat, agent) {
 		const literals: Record<string, string> = {};
