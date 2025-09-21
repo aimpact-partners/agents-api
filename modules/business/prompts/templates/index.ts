@@ -39,7 +39,11 @@ export /*bundle*/ class PromptsTemplate {
 			if (!languageDoc.data.exists) return new BusinessResponse({ data: promptData });
 
 			const { data } = languageDoc.data;
-			const value = Object.assign({}, promptData, { schema: data.schema, value: data.value });
+			const value = Object.assign({}, promptData, {
+				value: data.value,
+				schema: data.schema,
+				language: data.language
+			});
 			return new BusinessResponse({ data: value });
 		} catch (exc) {
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
