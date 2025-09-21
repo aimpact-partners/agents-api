@@ -26,9 +26,13 @@ export /*bundle*/ class AssistantMission {
 		});
 		await executor.process();
 		if (executor.error) {
-			return new BusinessResponse({ error: ErrorGenerator.internalError('Processing agent prompt') });
+			return new BusinessResponse({
+				error: ErrorGenerator.internalError('PromptTemplateProcessor', 'Processing Agent prompt')
+			});
 		}
 
-		return new BusinessResponse({ data: { prompt: executor.processedValue, context: {} } }); // TODO context debe estar en los metadata del chat??
+		// TODO Que se debe tomar en cuenta para el contexto de cada agente en la tool
+		const context = { projectId: chat.metadata.project.id };
+		return new BusinessResponse({ data: { prompt: executor.processedValue, context } });
 	}
 }

@@ -10,6 +10,7 @@ import { Pinecone as PineconeClient } from '@pinecone-database/pinecone';
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { splitter } from './splitter';
+
 dotenv.config();
 
 const { PINECONE_API_KEY, PINECONE_INDEX_NAME, EMBEDDINGS_MODEL, OPENAI_API_KEY } = process.env;
@@ -74,7 +75,8 @@ export /*bundle*/ class Pinecone {
 		metadata: object,
 		id: string,
 		text: string,
-		language: string
+		language: string,
+		split: string
 	): Promise<BusinessResponse<{ stored: boolean }>> {
 		// Check parameters
 		if (
@@ -97,9 +99,21 @@ export /*bundle*/ class Pinecone {
 		if (error) return new BusinessResponse({ error: ErrorGenerator.internalError(error) });
 
 		// Split the text in paragraphs
-		// const paragraphs = this.#splitter(text);
-		const { splits, prompt } = await splitter(language, text);
-		if (splits.error) return new BusinessResponse({ error: ErrorGenerator.internalError(splits.error) });
+		let prompt, splits;
+		if (split) {
+			if (split === 'split-text') {
+				splits = this.#splitter(text);
+			} else if (split === 'split-paragraphs') {
+				const response = await splitter(language, text);
+				if (response.error)
+					return new BusinessResponse({ error: ErrorGenerator.internalError(response.error.text) });
+				if (response.splits.error)
+					return new BusinessResponse({ error: ErrorGenerator.internalError(response.splits.error) });
+
+				splits = response.splits;
+				prompt = response.prompt;
+			}
+		} else splits = [{ vector: text, context: '' }];
 
 		// metadata.content = splits.map
 		const vector = splits.map(p => p.vector);
