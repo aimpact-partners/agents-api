@@ -27,7 +27,7 @@ export /*bundle*/ class PromptTemplateLanguages {
 				id: `${prompt.identifier}.${language}`,
 				language,
 				value: text,
-				literals: prompt.literals ?? {},
+				literals: prompt.literals ?? { pure: [], dependencies: [] },
 				project: prompt.project
 			};
 			// SET value on language subcollection
