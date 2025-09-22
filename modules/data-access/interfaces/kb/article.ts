@@ -1,5 +1,5 @@
-import { IOwnerData } from './common/owner';
-import { ITimeStamp } from './common/timeStamp';
+import { IOwnerData } from '../common/owner';
+import { ITimeStamp } from '../common/timeStamp';
 import { IDraftBase, IDraftData, IDraftsTypes } from './draft';
 import { IUserBase } from './user';
 

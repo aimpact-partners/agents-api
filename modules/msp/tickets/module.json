@@ -1,0 +1,6 @@
+{
+	"name": "msp/business/tickets",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}

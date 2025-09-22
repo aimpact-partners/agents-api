@@ -4,7 +4,7 @@ import { ProjectsAgents } from '@aimpact/agents-api/business/projects';
 import { Agent, assistant, run, user as userAgent } from '@openai/agents';
 import { AssistantMission } from './assistant-mission';
 import { IPE } from './ipe';
-import { tools } from './tools';
+import { createAppointmentTool } from './tools/appointment';
 
 interface IParams {
 	content: string;
@@ -73,7 +73,8 @@ export /*bundle*/ class KBAgent {
 		const agent = new Agent({
 			name: 'Knowledge Base Agent',
 			instructions: specs.prompt,
-			model: 'gpt-4o-mini'
+			model: 'gpt-4o-mini',
+			tools: [createAppointmentTool]
 		});
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {

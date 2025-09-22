@@ -3,18 +3,8 @@ import { ErrorGenerator } from '@aimpact/agents-api/http/errors';
 import type { IAuthenticatedRequest } from '@aimpact/agents-api/http/middleware';
 import { HTTPResponse as Response } from '@aimpact/agents-api/http/response';
 import type { Application, Response as IResponse } from 'express';
+import type { IError, IMetadata } from '../interfaces';
 import { AudioMessagesRoutes } from './audio';
-
-export interface IMetadata {
-	summary?: string;
-	objectives?: [];
-	credits?: { total: number; consumed: number };
-	error?: IError;
-}
-export interface IError {
-	code: number;
-	text: string;
-}
 
 export class ChatMessagesRoutes {
 	static setup(app: Application) {

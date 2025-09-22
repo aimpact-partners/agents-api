@@ -26,4 +26,3 @@ export /*bundle*/ const searcher = tool({
 	}
 });
 
-export const tools = [searcher];

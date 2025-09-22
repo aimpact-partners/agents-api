@@ -1,5 +1,5 @@
 import { IKBObjectArticleData } from './article';
-import { IKBObjectSectionBase } from './section';
+import { IKBObjectSectionBase } from '../group/section';
 
 export /*bundle*/ enum KBObjectTypes {
 	Article = 'article',

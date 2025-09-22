@@ -1,7 +1,7 @@
+import type { IOwnerData } from '../common/owner';
 import { IPeopleBase } from '../common/people';
-import { IArticleListItem, IKBObjectArticleData } from './article';
-import type { IOwnerData } from './common/owner';
-import { ITimeStamp } from './common/timeStamp';
+import { ITimeStamp } from '../common/timeStamp';
+import { IArticleListItem, IKBObjectArticleData } from '../kb/article';
 
 export interface IKBObjectSectionBase {
 	id: string;

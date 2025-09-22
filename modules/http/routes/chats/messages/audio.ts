@@ -7,7 +7,7 @@ import { Response } from '@beyond-js/response/main';
 import type { Application, Response as IResponse } from 'express';
 import * as multer from 'multer';
 import { transcribe } from '../../audios/transcribe';
-import type { IError, IMetadata } from './index';
+import type { IError, IMetadata } from '../interfaces';
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });

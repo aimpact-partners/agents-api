@@ -1,6 +1,6 @@
 import type { IPeopleData } from '@aimpact/agents-api/data/interfaces';
 import { SubCollection } from '@beyond-js/firestore-collection/collection';
-import { MSPUsers } from './msp/users';
+import { MSPUsers } from './kb/users';
 
 class Users extends MSPUsers {
 	#projects: SubCollection<IPeopleData>;

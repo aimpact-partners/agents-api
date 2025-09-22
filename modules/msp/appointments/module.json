@@ -1,0 +1,6 @@
+{
+	"name": "msp/business/appointments",
+	"platforms": ["node", "backend"],
+	"bundle": "ts",
+	"files": "*"
+}

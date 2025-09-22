@@ -1,5 +1,6 @@
 import type { Application, Response as IResponse, Request } from 'express';
 import { join } from 'path';
+import { AppointmentsRoutes } from './appointments';
 import { ArticlesRoutes } from './articles';
 import { AudiosRoutes } from './audios';
 import { ChatsRoutes } from './chats';
@@ -18,16 +19,17 @@ export /*bundle*/ function setup(app: Application) {
 			res.send('AImpact Agents http server');
 		});
 
+		AppointmentsRoutes.setup(app);
 		ArticlesRoutes.setup(app);
-		DraftsRoutes.setup(app);
-		SectionsRoutes.setup(app);
 		AudiosRoutes.setup(app);
 		ChatsRoutes.setup(app);
-		KBRoutes.setup(app);
 		CompletionsRoutes.setup(app);
+		DraftsRoutes.setup(app);
+		KBRoutes.setup(app);
 		ProjectsRoutes.setup(app);
 		PromptsRoutes.setup(app);
 		SchemasRoutes.setup(app);
+		SectionsRoutes.setup(app);
 		UsersRoutes.setup(app);
 	} catch (exc) {
 		console.error('setup', exc);

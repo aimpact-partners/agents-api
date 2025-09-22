@@ -1,5 +1,5 @@
-import { IContributors } from './common/contributors';
-import type { IOwnerData } from './common/owner';
+import { IContributors } from '../common/contributors';
+import type { IOwnerData } from '../common/owner';
 import { IUserBase } from './user';
 
 export /*bundle*/ type DraftType = 'article' | 'draft' | 'module' | 'community';
