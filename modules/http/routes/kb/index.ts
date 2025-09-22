@@ -80,7 +80,7 @@ export class KBRoutes {
 			if (projectResponse.error) return res.json(new Response({ error: projectResponse.error }));
 			const project = projectResponse.data.data;
 
-			const agentName = type ?? `kb-cgi`;
+			const agentName = type ?? `kb-appointment`;
 			const { data, error } = await Chats.byAgent(user.uid, agentName);
 			if (error) return res.json(new Response({ error }));
 
