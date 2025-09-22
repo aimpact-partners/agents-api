@@ -34,7 +34,7 @@ export class IPE {
 									return `  ${entry[0]}: ${entry[1]}`;
 								})
 								.join(`\n`)
-						: metadata[literal];
+						: metadata[literal.toLowerCase()];
 			});
 			literals.user && (literals.user = literals.user.replace(/^(\S+).*/, '$1'));
 
@@ -59,10 +59,10 @@ export class IPE {
 		const { ipe } = response;
 
 		const promises: Promise<any>[] = [];
-		ipe.forEach(({ prompt, literals, key, reserved, format }) => {
+		ipe.forEach(({ prompt, literals, reserved }) => {
 			const reservedValues: Record<string, string> = {};
 
-			const objectives = chat.metadata?.objectives ?? chat.metadata['activity-objectives'];
+			const objectives = chat.metadata?.objectives;
 			reservedValues.objectives = JSON.stringify(objectives); // property backward support
 
 			reserved?.forEach((literal: string) => {
@@ -77,13 +77,16 @@ export class IPE {
 				if (literal.toUpperCase() === 'PROGRESS') {
 					const progress = chat.ipe?.progress ?? {};
 
+					console.log(11, '=====================', progress.objectives, progress.objectives?.length);
 					let objectiveProgress;
-					if (progress.objectives) {
+					if (progress.objectives?.length) {
 						objectiveProgress = progress.objectives?.map(obj => {
 							return { name: obj.name, progress: obj.progress, status: obj.status };
 						});
 						objectiveProgress = JSON.stringify(objectiveProgress);
 					} else objectiveProgress = defaultText;
+
+					console.log(12, defaultText, literal, objectiveProgress);
 					reservedValues[literal] = objectiveProgress;
 					return;
 				}
@@ -102,9 +105,10 @@ export class IPE {
 				specs.metadata = {
 					key: `agent/${chat.project.agent}/${prompt.name}`,
 					prompt: prompt.name,
-					user: { id: chat.user.id, name: chat.user.name }
+					user: chat.user.name
 				};
 			}
+
 			const promptExecutor = new PromptTemplateExecutor(specs);
 			promises.push(promptExecutor.execute());
 		});
@@ -122,6 +126,10 @@ export class IPE {
 
 			try {
 				const iteration = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
+
+				console.log('________________________________________________');
+				console.log(name, iteration);
+				console.log('________________________________________________');
 				if (ipe[index].key === 'summary') {
 					ipe[index].response = iteration;
 					return;
@@ -130,42 +138,59 @@ export class IPE {
 				const progress = (() => {
 					let current = chat.ipe?.progress;
 					if (!current) {
-						const objectives = chat.metadata?.objectives ?? chat.metadata['activity-objectives'];
+						const objectives = chat.metadata?.objectives ?? [];
 						const items = objectives?.map(item => {
 							return { id: toKebabCase(item.name), name: item.name, status: 'pending' };
 						});
+						console.log('objectives', objectives);
 						current = { objectives: items ?? [], reached: [] };
 					}
 
-					if (!iteration.objectives) {
+					if (!iteration.steps) {
 						return {
 							...current,
-							summary: iteration.summary,
-							alert: iteration.alert,
-							interaction: iteration.interaction,
-							knowledge: iteration.knowledge
+							summary: iteration.summary ?? '',
+							alert: iteration.alert ?? '',
+							interaction: iteration.interaction ?? '',
+							knowledge: iteration.knowledge ?? ''
 						};
 					}
 
-					const objectivesMap = new Map((current.objectives || []).map(obj => [toKebabCase(obj.name), obj]));
-					iteration.objectives.forEach(obj => {
-						obj = { ...obj, analysis: obj.progress, impact: obj.integration }; // property backward support
-						objectivesMap.set(toKebabCase(obj.name), obj);
+					const objectivesMap = new Map((current.objectives || []).map(obj => [toKebabCase(obj.id), obj]));
+					iteration.steps.forEach(obj => {
+						obj = {
+							...obj,
+							analysis: obj.progress ?? '',
+							name: obj.id,
+							progress: obj.info,
+							impact: obj.integration ?? ''
+						}; // property backward support
+						console.log(5, '________________________________________', obj);
+						objectivesMap.set(toKebabCase(obj.id), obj);
 					});
 					const updatedObjectives = Array.from(objectivesMap.values());
 
+					console.log(2, {
+						reached: iteration.reached,
+						objectives: updatedObjectives ?? [],
+						summary: iteration.summary,
+						alert: iteration.alert ?? '',
+						interaction: iteration.interaction,
+						knowledge: iteration.knowledge ?? ''
+					});
 					return {
 						reached: iteration.reached,
 						objectives: updatedObjectives ?? [],
 						summary: iteration.summary,
-						alert: iteration.alert,
+						alert: iteration.alert ?? '',
 						interaction: iteration.interaction,
-						knowledge: iteration.knowledge
+						knowledge: iteration.knowledge ?? ''
 					};
 				})();
 
 				ipe[index].response = progress;
 			} catch (exc) {
+				console.log(exc);
 				responseError = new BusinessResponse({ error: ErrorGenerator.parsingIPE(`${name}`) });
 			}
 		});

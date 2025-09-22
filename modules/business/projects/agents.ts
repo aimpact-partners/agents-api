@@ -8,6 +8,7 @@ export /*bundle*/ class ProjectsAgents {
 			const parents = { Projects: projectId };
 			const response = await projects.agents.data({ id, parents });
 			if (response.error) return new BusinessResponse({ error: response.error });
+			if (!response.data.exists) return new BusinessResponse({ error: response.data.error });
 
 			return new BusinessResponse({ data: response.data.data });
 		} catch (exc) {
@@ -30,6 +31,7 @@ export /*bundle*/ class ProjectsAgents {
 
 			const parents = { Projects: id };
 			const response = await projects.agents.set({ id: name, data, parents });
+			console.log(1, response, data);
 			if (response.error) return new BusinessResponse({ error: response.error });
 
 			return new BusinessResponse({ data });

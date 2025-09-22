@@ -83,8 +83,8 @@ export class ProjectsRoutes {
 	static async agent(req: Request, res: IResponse) {
 		try {
 			const { id } = req.params;
-			const { name, literals, prompt, model, temperature, ipe } = req.body;
-			const { data, error } = await ProjectsAgents.set(id, { name, literals, prompt, model, temperature, ipe });
+			const { name, literals, prompt, temperature, ipe } = req.body;
+			const { data, error } = await ProjectsAgents.set(id, { name, literals, prompt, temperature, ipe });
 
 			res.json(new Response({ data, error }));
 		} catch (exc) {

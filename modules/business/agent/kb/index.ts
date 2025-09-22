@@ -73,8 +73,7 @@ export /*bundle*/ class KBAgent {
 		const agent = new Agent({
 			name: 'Knowledge Base Agent',
 			instructions: specs.prompt,
-			model: 'gpt-4o-mini',
-			tools
+			model: 'gpt-4o-mini'
 		});
 
 		async function* iterator(): AsyncIterable<{ chunk?: string; metadata?: IMetadata }> {
