@@ -76,8 +76,6 @@ export class IPE {
 				}
 				if (literal.toUpperCase() === 'PROGRESS') {
 					const progress = chat.ipe?.progress ?? {};
-
-					console.log(11, '=====================', progress.objectives, progress.objectives?.length);
 					let objectiveProgress;
 					if (progress.objectives?.length) {
 						objectiveProgress = progress.objectives?.map(obj => {
@@ -86,7 +84,6 @@ export class IPE {
 						objectiveProgress = JSON.stringify(objectiveProgress);
 					} else objectiveProgress = defaultText;
 
-					console.log(12, defaultText, literal, objectiveProgress);
 					reservedValues[literal] = objectiveProgress;
 					return;
 				}
@@ -126,10 +123,6 @@ export class IPE {
 
 			try {
 				const iteration = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
-
-				console.log('________________________________________________');
-				console.log(name, iteration);
-				console.log('________________________________________________');
 				if (ipe[index].key === 'summary') {
 					ipe[index].response = iteration;
 					return;
@@ -142,7 +135,6 @@ export class IPE {
 						const items = objectives?.map(item => {
 							return { id: toKebabCase(item.name), name: item.name, status: 'pending' };
 						});
-						console.log('objectives', objectives);
 						current = { objectives: items ?? [], reached: [] };
 					}
 
@@ -165,19 +157,10 @@ export class IPE {
 							progress: obj.info,
 							impact: obj.integration ?? ''
 						}; // property backward support
-						console.log(5, '________________________________________', obj);
 						objectivesMap.set(toKebabCase(obj.id), obj);
 					});
 					const updatedObjectives = Array.from(objectivesMap.values());
 
-					console.log(2, {
-						reached: iteration.reached,
-						objectives: updatedObjectives ?? [],
-						summary: iteration.summary,
-						alert: iteration.alert ?? '',
-						interaction: iteration.interaction,
-						knowledge: iteration.knowledge ?? ''
-					});
 					return {
 						reached: iteration.reached,
 						objectives: updatedObjectives ?? [],

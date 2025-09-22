@@ -66,15 +66,18 @@ export class KBRoutes {
 		}
 	}
 
+	/**
+	 * @deprecar
+	 * migrar a /projects/:projectId/agents/:agentId/chats
+	 *
+	 */
 	static async chat(req: IAuthenticatedRequest, res: IResponse) {
 		try {
 			const { user } = req;
 			const { ownerId, language, title } = req.body;
 			const { type } = req.query;
 
-			if (!ownerId) {
-				return res.json(new Response({ error: ErrorGenerator.invalidParameters(['ownerId']) }));
-			}
+			if (!ownerId) return res.json(new Response({ error: ErrorGenerator.invalidParameters(['ownerId']) }));
 
 			const projectResponse = await Projects.data(ownerId, user);
 			if (projectResponse.error) return res.json(new Response({ error: projectResponse.error }));
@@ -84,8 +87,8 @@ export class KBRoutes {
 			const { data, error } = await Chats.byAgent(user.uid, agentName);
 			if (error) return res.json(new Response({ error }));
 
-			const found = data.items.find(item => item.metadata.project.id === ownerId);
-			if (found) return res.json(new Response({ data: found }));
+			// const found = data.items.find(item => item.metadata.project.id === ownerId);
+			// if (found) return res.json(new Response({ data: found }));
 
 			const params = {
 				projectId: project.id,

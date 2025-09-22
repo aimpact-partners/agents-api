@@ -1,6 +1,7 @@
 import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { projects } from '@aimpact/agents-api/data/model';
+import { db } from '@beyond-js/firestore-collection/db';
 
 export /*bundle*/ class ProjectsAgents {
 	static async get(projectId: string, id: string) {
@@ -31,7 +32,6 @@ export /*bundle*/ class ProjectsAgents {
 
 			const parents = { Projects: id };
 			const response = await projects.agents.set({ id: name, data, parents });
-			console.log(1, response, data);
 			if (response.error) return new BusinessResponse({ error: response.error });
 
 			return new BusinessResponse({ data });
@@ -40,6 +40,34 @@ export /*bundle*/ class ProjectsAgents {
 		}
 	}
 
+	static async all(projectId: string) {
+		try {
+			const project = db.collection('Projects').doc(projectId);
+			const agents = await project.listCollections();
+
+			const items = [];
+			for (const agentDoc of agents) {
+				const docs = await agentDoc.get();
+				docs.forEach(doc => {
+					const entry = doc.data();
+					const prompts = [{ type: 'agent', prompt: entry.prompt.name, name: 'Assistant Mission' }].concat(
+						entry.ipe.map(ipe => ({ type: 'agent', prompt: ipe.prompt.name, name: ipe.name }))
+					);
+
+					items.push({ id: entry.id, name: entry.name, prompts });
+				});
+			}
+
+			return new BusinessResponse({ data: { items } });
+		} catch (exc) {
+			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
+		}
+	}
+
+	/**
+	 *
+	 * @returns @deprecated
+	 */
 	static async activities() {
 		try {
 			const promptActivities = {

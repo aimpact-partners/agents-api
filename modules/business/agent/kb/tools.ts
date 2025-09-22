@@ -16,7 +16,6 @@ export /*bundle*/ const searcher = tool({
 		try {
 			const context = Object.keys(toolContext?.context).length !== 0 ? toolContext?.context : undefined;
 			const results = await KB.searchTool(query, context, 5);
-
 			if (results.error) return results.error;
 
 			return results.data.items;
