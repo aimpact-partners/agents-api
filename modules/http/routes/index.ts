@@ -11,6 +11,7 @@ import { ProjectsRoutes } from './projects';
 import { PromptsRoutes } from './prompts';
 import { SchemasRoutes } from './schemas';
 import { SectionsRoutes } from './sections';
+import { TicketsRoutes } from './tickets';
 import { UsersRoutes } from './users';
 
 export /*bundle*/ function setup(app: Application) {
@@ -30,6 +31,7 @@ export /*bundle*/ function setup(app: Application) {
 		PromptsRoutes.setup(app);
 		SchemasRoutes.setup(app);
 		SectionsRoutes.setup(app);
+		TicketsRoutes.setup(app);
 		UsersRoutes.setup(app);
 	} catch (exc) {
 		console.error('setup', exc);

@@ -45,7 +45,7 @@ export /*bundle*/ class AssistantMission {
 		}
 
 		// TODO Que se debe tomar en cuenta para el contexto de cada agente en la tool
-		const context = { projectId: chat.metadata.project.id };
+		const context = { user: chat.user, projectId: chat.metadata.project.id };
 		return new BusinessResponse({ data: { prompt: executor.processedValue, context } });
 	}
 }

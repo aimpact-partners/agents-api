@@ -2,7 +2,7 @@ import { tool } from '@openai/agents';
 import { z } from 'zod';
 import { Appointments } from '@aimpact/agents-api/msp/business/appointments';
 
-export /*bundle*/ const createAppointmentTool = tool({
+export /*bundle*/ const createAppointment = tool({
 	name: 'create_appointment',
 	description:
 		'Creates an appointment in LernLog on behalf of the requesting teacher/tutor. Requires explicit user consent and all required fields.',
@@ -67,16 +67,19 @@ export /*bundle*/ const createAppointmentTool = tool({
 			}
 
 			// 4) Call your App API (replace with real SDK/HTTP)
-			const result = await Appointments.create({
-				title,
-				description,
-				participants,
-				startTime,
-				endTime,
-				idempotencyKey,
-				actor: toolContext?.actor?.id ?? null,
-				metadata: { source: 'createAppointmentTool', ...ctx }
-			});
+			const result = await Appointments.create(
+				{
+					title,
+					description,
+					participants,
+					startTime,
+					endTime,
+					idempotencyKey,
+					actor: toolContext?.actor?.id ?? null,
+					metadata: { source: 'createAppointment', ...ctx }
+				},
+				ctx.user
+			);
 			if (result.error) {
 				return {
 					status: 'error',

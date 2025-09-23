@@ -1,5 +1,5 @@
-import { createAppointmentTool } from './appointment';
-import { searcher } from './kb';
-// // import { createSupportTicketTool } from './ticket';
+// import { searcher } from './kb';
+import { createAppointment } from './appointment';
+import { createSupportTicket } from './ticket';
 
-export const tools = [searcher, createAppointmentTool];
+export const tools = [createAppointment, createSupportTicket];
