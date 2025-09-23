@@ -127,7 +127,8 @@ export const publish = async (draft: IArticleDraftData, user: User): ModulesResp
 				specs.metadata,
 				specs.id,
 				specs.text,
-				specs.language
+				specs.language,
+				'prompt'
 			);
 			if (resUpsert.error) throw new BusinessResponse({ error });
 			resUpsert.data.vectors.forEach(v => (v.tags = v.tags ?? []));

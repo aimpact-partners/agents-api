@@ -10,7 +10,7 @@ class Users extends MSPUsers {
 
 	constructor() {
 		super('Users'); // Call MSPUsers constructor with collection name
-		this.#projects = new SubCollection('People', this);
+		this.#projects = new SubCollection('Projects', this);
 	}
 }
 

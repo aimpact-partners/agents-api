@@ -76,7 +76,7 @@ export /*bundle*/ class Pinecone {
 		id: string,
 		text: string,
 		language: string,
-		split: string
+		split: 'text' | 'prompt'
 	): Promise<BusinessResponse<{ stored: boolean }>> {
 		// Check parameters
 		if (
@@ -94,6 +94,10 @@ export /*bundle*/ class Pinecone {
 			throw new Error('Invalid parameters');
 		}
 
+		if (split && !['text', 'prompt'].includes(split)) {
+			throw new Error('Invalid parameter type, must be "text" or "prompt"');
+		}
+
 		// Initialise OpenAI & Pinecone
 		const { error } = await this.#initialise();
 		if (error) return new BusinessResponse({ error: ErrorGenerator.internalError(error) });
@@ -101,9 +105,9 @@ export /*bundle*/ class Pinecone {
 		// Split the text in paragraphs
 		let prompt, splits;
 		if (split) {
-			if (split === 'split-text') {
+			if (split === 'text') {
 				splits = this.#splitter(text);
-			} else if (split === 'split-paragraphs') {
+			} else if (split === 'prompt') {
 				const response = await splitter(language, text);
 				if (response.error)
 					return new BusinessResponse({ error: ErrorGenerator.internalError(response.error.text) });
