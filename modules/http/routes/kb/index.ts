@@ -93,7 +93,7 @@ export class KBRoutes {
 			const params = {
 				projectId: project.id,
 				name: title ?? `${user.name} chat with ${agentName}`,
-				language: { default: language },
+				language: { default: 'en' },
 				metadata: { user: user.name, project: { id: project.id, name: project.name } },
 				agent: agentName,
 				user: {
