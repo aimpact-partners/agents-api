@@ -18,10 +18,11 @@ export class KBRoutes {
 	static async upsert(req: IAuthenticatedRequest, res: IResponse) {
 		try {
 			const { user } = req;
-			const { text, projectId, language } = req.body;
+			const { text, type, projectId, language } = req.body;
 
 			if (!text) return res.json(new Response({ error: ErrorGenerator.invalidParameters(['text']) }));
 			if (!language) return res.json(new Response({ error: ErrorGenerator.invalidParameters(['language']) }));
+			if (!type) return res.json(new Response({ error: ErrorGenerator.invalidParameters(['type']) }));
 
 			// Store on KB
 			const specs = {
@@ -36,7 +37,8 @@ export class KBRoutes {
 				specs.metadata,
 				specs.id,
 				specs.text,
-				specs.language
+				specs.language,
+				type
 			);
 			if (resUpsert.error) throw new Response({ error: resUpsert.error });
 

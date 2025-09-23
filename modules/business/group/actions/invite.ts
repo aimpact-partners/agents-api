@@ -20,9 +20,9 @@ export class Invite {
 		// 4. Send the invited an email
 		try {
 			return await db.runTransaction(async (transaction: Transaction) => {
-				if (!MAIL_TEMPLATES_INVITE) {
-					throw new BusinessResponse({ error: ErrorGenerator.mailTemplatesNotDefined('invite') });
-				}
+				// if (!MAIL_TEMPLATES_INVITE) {
+				// 	throw new BusinessResponse({ error: ErrorGenerator.mailTemplatesNotDefined('invite') });
+				// }
 
 				const { id, entity, collection, name, role } = params;
 				const email = params.email.toLocaleLowerCase();
