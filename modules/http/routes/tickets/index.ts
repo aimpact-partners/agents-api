@@ -8,7 +8,7 @@ import type { Application, Response as IResponse } from 'express';
 export class TicketsRoutes {
 	static setup(app: Application) {
 		app.post('/tickets', userMiddleware.validate, this.create);
-		app.get('/tickets', userMiddleware.validate, this.list);
+		app.get('/tickets', this.list);
 		app.get('/tickets/:id', userMiddleware.validate, this.get);
 	}
 
