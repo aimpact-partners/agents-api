@@ -71,11 +71,6 @@ export /*bundle*/ class Chat {
 
 			specs.metadata = data.metadata ? data.metadata : {};
 
-			if (!response.data.exists) {
-				// if the parent is not received, we set it to root by default
-				!data.parent && (specs.parent = '0');
-			}
-
 			if (data.projectId) {
 				const response = await projects.data({ id: data.projectId });
 				if (response.error) return new BusinessResponse({ error: response.error });
@@ -104,11 +99,14 @@ export /*bundle*/ class Chat {
 				specs.user = model.toJSON();
 			}
 
-			await chats.merge({ id, data: specs });
-			const chatResponse = await chats.data({ id });
-			if (chatResponse.error) return new BusinessResponse({ error: response.error });
+			let chatResponse;
+			if (!response.data.exists) {
+				!data.parent && (specs.parent = '0'); // if the parent is not received, we set it to root by default
+			} else chatResponse = await chats.merge({ id, data: specs });
+			if (chatResponse.error) return new BusinessResponse({ error: chatResponse.error });
 
-			return new BusinessResponse({ data: chatResponse.data.data });
+			const thisChat = await Chat.get(id);
+			return new BusinessResponse(thisChat);
 		} catch (exc) {
 			console.error(exc);
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });

@@ -78,7 +78,7 @@ export /*bundle*/ class User implements IUser {
 			this.#name = data.displayName;
 			this.#displayName = data.displayName;
 			this.#phoneNumber = data.phoneNumber;
-			this.#photoUrl = data.photoUrl;
+			this.#photoUrl = data.photoUrl ?? data.photoURL;
 
 			return new BusinessResponse({ data });
 		} catch (exc) {
