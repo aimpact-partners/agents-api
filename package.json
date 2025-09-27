@@ -108,7 +108,8 @@
 		"uuid": "^10.0.0",
 		"find-up": "~7.0.0",
 		"postmark": "4.0.5",
-		"zod": "<=3.25.67"
+		"zod": "<=3.25.67",
+		"axios": ">=1.12.0"
 	},
 	"devDependencies": {
 		"socket.io-client": "^4.5.4",
