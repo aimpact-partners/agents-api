@@ -7,7 +7,7 @@ FROM node:20-bullseye AS build-stage
 WORKDIR /app
 
 # Install beyond first to enable Docker caching, as the layer will not change with the installation of beyond unless the lines above are changed.
-RUN npm i -g beyond@1.3.2
+RUN npm i -g beyond@1.4.1
 
 # Copy the package files first to leverage Docker cache
 COPY package*.json ./
@@ -19,7 +19,7 @@ RUN npm ci
 COPY . .
 
 # Build the project
-RUN beyond build --pkg=@aimpact/agents-api --distribution=http --logs
+RUN beyond build --pkg=@aimpact/agents-api --distribution=http-development --logs
 
 # ------------------------------
 # ------ Production Stage ------
@@ -30,7 +30,7 @@ FROM node:20-slim AS prod
 WORKDIR /app
 
 # Copy the build result
-COPY --from=build-stage /app/.beyond/builds/http/code/ ./
+COPY --from=build-stage /app/.beyond/builds/http-development/code/ ./
 
 # Copy the package-lock.json for reproducible install
 COPY --from=build-stage /app/package-lock.json ./
