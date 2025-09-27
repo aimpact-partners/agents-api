@@ -99,10 +99,10 @@ export /*bundle*/ class Chat {
 				specs.user = model.toJSON();
 			}
 
-			let chatResponse;
-			if (!response.data.exists) {
-				!data.parent && (specs.parent = '0'); // if the parent is not received, we set it to root by default
-			} else chatResponse = await chats.merge({ id, data: specs });
+			!response.data.exists && !data.parent && (specs.parent = '0'); // if the parent is not received, we set it to root by default
+
+			const method = !response.data.exists ? 'set' : 'merge';
+			const chatResponse = await chats[method]({ id, data: specs });
 			if (chatResponse.error) return new BusinessResponse({ error: chatResponse.error });
 
 			const thisChat = await Chat.get(id);
