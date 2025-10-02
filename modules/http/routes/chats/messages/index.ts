@@ -45,7 +45,7 @@ export class ChatMessagesRoutes {
 					return setTimeout(() => {
 						res.write(lorem);
 						setTimeout(() => {
-							res.write(lorem);
+							res.write('ÿ');
 							done({ status: false, error: ErrorGenerator.testing() });
 						}, 2000);
 					}, 3000);
