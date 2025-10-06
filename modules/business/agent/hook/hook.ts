@@ -36,6 +36,12 @@ export /*bundle*/ const hook = async (chat: Chat, params = {}) => {
 
 		const body = JSON.stringify(specs);
 		const response = await fetch(URL, { method, headers, body });
+		if (!response.ok) {
+			const json = await response.json();
+			const error = `Error generating speech: ${JSON.stringify(json)}`;
+			return { status: false, error };
+		}
+
 		json = await response.json();
 	} catch (exc) {
 		return { error: ErrorGenerator.internalError('BA100', `Failed to post`, exc.message) };
