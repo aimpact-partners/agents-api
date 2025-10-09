@@ -113,4 +113,4 @@ Estructura completa de un chat con toda su información asociada.
 
 ---
 
-**Referencia OpenAPI:** [Ver especificación completa](../openapi/chats/chat.yaml)
+**Referencia OpenAPI:** [Ver especificación completa](../../../openapi/chats/chat.yaml)

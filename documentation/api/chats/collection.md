@@ -139,4 +139,4 @@ Elimina todos los chats del usuario.
 
 ---
 
-**Referencia OpenAPI:** [Ver especificación completa](../openapi/chats/index.yaml)
+**Referencia OpenAPI:** [Ver especificación completa](../../../openapi/chats/index.yaml)

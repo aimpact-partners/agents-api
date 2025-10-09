@@ -144,4 +144,4 @@ Prompt que es utilizado como dependencia por otros prompts.
 
 ---
 
-**Referencia OpenAPI:** [Ver especificación completa](../openapi/prompts/create.yaml)
+**Referencia OpenAPI:** [Ver especificación completa](../../../openapi/prompts/create.yaml)

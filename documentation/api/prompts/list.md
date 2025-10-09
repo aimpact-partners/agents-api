@@ -206,4 +206,4 @@ const response = await fetch('/prompts?is=function', {
 
 ---
 
-**Referencia OpenAPI:** [Ver especificación completa](../openapi/prompts/list.yaml)
+**Referencia OpenAPI:** [Ver especificación completa](../../../openapi/prompts/list.yaml)

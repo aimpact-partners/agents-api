@@ -131,4 +131,4 @@ Authorization: Bearer YOUR_FIREBASE_ID_TOKEN
 
 ---
 
-**Referencia OpenAPI:** [Ver especificación completa](../openapi/chats/messages/messages.yaml)
+**Referencia OpenAPI:** [Ver especificación completa](../../../openapi/chats/messages/messages.yaml)

@@ -173,4 +173,4 @@ Esto permite:
 
 ---
 
-**Referencia OpenAPI:** [Ver especificación completa](../openapi/prompts/index.yaml)
+**Referencia OpenAPI:** [Ver especificación completa](../../../openapi/prompts/index.yaml)
