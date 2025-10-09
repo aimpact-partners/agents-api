@@ -1,6 +1,6 @@
 # Summary
 
--   [Introduction](documentation/README.md)
+-   [Introduction](README.md)
 -   [Key Functional Benefits](documentation/key-functional-benefits.md)
     -   [Model-Specific Control and Optimization](documentation/model-specific-control.md)
     -   [Scalability and Localization](documentation/scalability-localization.md)
