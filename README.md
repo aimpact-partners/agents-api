@@ -1,4 +1,4 @@
-# Introduction
+# AGENTS API Introduction
 
 Integrating generative AI into applications often faces the challenge of rigidity when prompts and instructions are
 hardcoded into the source code. Any business-driven or optimization-related change requires modifying, rebuilding, and
