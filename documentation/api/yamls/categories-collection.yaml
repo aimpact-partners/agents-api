@@ -1,0 +1,89 @@
+get:
+    summary: Get all prompt categories
+    tags:
+        - Categories
+    security:
+        - firebaseId: []
+    responses:
+        '200':
+            description: A list of prompt categories
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/ICategory'
+        '404':
+            description: Not Found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
+post:
+    summary: Create a new prompt category
+    tags:
+        - Categories
+    security:
+        - firebaseId: []
+    requestBody:
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: object
+                    properties:
+                        name:
+                            type: string
+                            example: 'Business'
+                        description:
+                            type: string
+                            example: 'Business related prompts'
+                        icon:
+                            type: string
+                            example: 'business-icon'
+                        color:
+                            type: string
+                            example: '#007bff'
+                        uid:
+                            type: string
+                            example: '123456789'
+                    required:
+                        - name
+                        - uid
+    responses:
+        '200':
+            description: Category created successfully
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: true
+                            data:
+                                $ref: '#/components/schemas/ICategory'
+        '400':
+            description: Bad Request
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            status:
+                                type: boolean
+                                example: false
+                            error:
+                                $ref: '#/components/schemas/Error'
