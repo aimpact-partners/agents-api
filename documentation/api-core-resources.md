@@ -1,0 +1,1 @@
+# Management of Core Resources

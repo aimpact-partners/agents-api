@@ -1,6 +1,6 @@
 # Summary
 
--   [Introduction](README.md)
+-   [Introduction](documentation/README.md)
 -   [Key Functional Benefits](documentation/key-functional-benefits.md)
     -   [Model-Specific Control and Optimization](documentation/model-specific-control.md)
     -   [Scalability and Localization](documentation/scalability-localization.md)
@@ -31,9 +31,11 @@
         -   [Iterative Execution (Agents/Chats)](documentation/api-iterative-execution.md)
     -   [Multimedia and Utilities](documentation/api-multimedia.md)
     -   [OpenAPI Endpoints](documentation/api-openapi-endpoints.md)
-        -   [Chats API](openapi/chats/index.yaml)
-            -   [Chat Operations](openapi/chats/chat.yaml)
-            -   [Chat Messages](openapi/chats/messages/messages.yaml)
-        -   [Prompts API](openapi/prompts/list.yaml)
-            -   [Create Prompt](openapi/prompts/create.yaml)
-            -   [Prompt Operations](openapi/prompts/index.yaml)
+        -   Chats API
+            -   [Chats Collection](documentation/api-chats-collection.md)
+            -   [Single Chat](documentation/api-chat-single.md)
+            -   [Chat Messages](documentation/api-chat-messages.md)
+        -   Prompts API
+            -   [Create Prompt](documentation/api-prompts-create.md)
+            -   [Prompt Operations](documentation/api-prompts-operations.md)
+            -   [List Prompts](documentation/api-prompts-list.md)
