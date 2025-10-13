@@ -4,6 +4,7 @@
 		"target": "es2018",
 		"noImplicitAny": true,
 		"moduleResolution": "node",
-		"types": []
+		"types": [],
+		"skipLibCheck": true
 	}
 }
