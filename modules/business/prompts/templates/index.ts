@@ -109,9 +109,9 @@ export /*bundle*/ class PromptsTemplate {
 				);
 			}
 
-			const items = await query.get();
-			const entries = items.docs.map(item => item.data());
-			return new BusinessResponse({ data: { items: entries, entries } });
+			const entries = await query.get();
+			const items = entries.docs.map(entry => entry.data());
+			return new BusinessResponse({ data: { items } });
 		} catch (exc) {
 			return new BusinessResponse({ error: ErrorGenerator.internalError(exc) });
 		}
@@ -140,9 +140,12 @@ export /*bundle*/ class PromptsTemplate {
 		if (!params.id) return new Response({ error: ErrorGenerator.invalidParameters(['id']) });
 
 		try {
-			const dataResponse = await PromptsTemplate.data(params.id);
-			if (dataResponse.error) return dataResponse;
-
+			const response = await prompts.data({ id: params.id });
+			if (response.error) return new BusinessResponse({ error: response.error });
+			if (!response.data.exists) {
+				return new BusinessResponse({ error: ErrorGenerator.documentNotFound('Prompts', params.id) });
+			}
+			const dataResponse = response.data.data;
 			const { id, name, description, language, format, is, literals } = params;
 
 			const specs: {
@@ -161,9 +164,15 @@ export /*bundle*/ class PromptsTemplate {
 			format && (specs.format = format);
 			is && (specs.is = is);
 			literals && (specs.literals = literals);
+			const responseMerge = await prompts.merge({ id, data: specs });
+			if (responseMerge.error) return new BusinessResponse({ error: responseMerge.error });
 
-			const response = await prompts.merge({ data: specs });
-			if (response.error) return new BusinessResponse({ error: response.error });
+			if (literals) {
+				const promises = dataResponse.language.languages.map(l =>
+					prompts.languages.merge({ id: l, parents: { Prompts: id }, data: { literals } })
+				);
+				await Promise.all(promises);
+			}
 
 			return PromptsTemplate.data(id);
 		} catch (exc) {

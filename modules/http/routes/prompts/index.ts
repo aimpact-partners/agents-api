@@ -15,21 +15,23 @@ export class PromptsRoutes {
 	static setup(app: Application) {
 		PromptsCategoriesRoutes.setup(app);
 
-		app.get('/prompts/templates/project/:projectId', this.list);
-		app.get('/prompts/templates/:id', this.get);
 		app.get('/prompts/templates/identifier/:id', this.identifier);
 		app.get('/prompts/templates/:id/data', this.data);
-		app.get('/prompts/templates', this.items);
-		app.post('/prompts/templates', this.publish);
-		app.put('/prompts/templates/:id', this.update);
+		app.get('/prompts/templates/projects/:projectId', this.list);
+		app.get('/prompts/templates/project/:projectId', this.list);
+
+		app.get('/prompts/templates/:id', this.get);
 		app.delete('/prompts/templates/:id', this.delete);
+		app.put('/prompts/templates/:id', this.update);
 
 		app.post('/prompts/templates/:id/translate', this.translate);
-
 		app.post('/prompts/templates/:id/languages/update', this.updateLanguage);
+		app.post('/prompts/templates/:id/process', this.process);
 
 		app.post('/prompts/templates/process/completion', this.processLiteral);
-		app.post('/prompts/templates/:id/process', this.process);
+		app.post('/prompts/templates', this.publish);
+
+		app.get('/prompts/templates', this.items);
 	}
 
 	static async list(req: Request, res: IResponse) {
@@ -88,7 +90,11 @@ export class PromptsRoutes {
 	static async update(req: Request, res: IResponse) {
 		try {
 			const specs = req.body;
-			const { data, error } = await PromptsTemplate.update(specs);
+			const { id } = req.params;
+			const { data, error } = await PromptsTemplate.update({ ...specs, id });
+			if (error) {
+				return res.status(error.code === 404 ? 404 : 500).json(new Response({ error }));
+			}
 
 			res.json(new Response({ data, error }));
 		} catch (exc) {
@@ -103,7 +109,9 @@ export class PromptsRoutes {
 
 			const response = await PromptsTemplate.delete(id);
 			if (response.error) {
-				return res.json(new Response({ error: response.error }));
+				return res
+					.status(response.error.code === 404 ? 404 : 500)
+					.json(new Response({ error: response.error }));
 			}
 
 			res.json(new Response({ data: response.data }));
@@ -116,7 +124,9 @@ export class PromptsRoutes {
 		try {
 			const specs = req.body;
 			const { data, error } = await PromptsTemplate.save(specs);
-
+			if (error) {
+				return res.status(error.code === 404 ? 404 : 500).json(new Response({ error }));
+			}
 			res.json(new Response({ data, error }));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
@@ -128,8 +138,12 @@ export class PromptsRoutes {
 			const { id } = req.params;
 			const { language, text } = req.body;
 
-			const response = await PromptTemplateLanguages.set(id, { language, text });
-			res.json(new Response(response));
+			const { data, error } = await PromptTemplateLanguages.set(id, { language, text });
+			if (error) {
+				return res.status(error.code === 404 ? 404 : 500).json(new Response({ error }));
+			}
+
+			res.json(new Response(data));
 		} catch (exc) {
 			res.json(new Response({ error: ErrorGenerator.internalError(exc) }));
 		}
@@ -173,8 +187,9 @@ export class PromptsRoutes {
 			await promptTemplate.process();
 
 			if (promptTemplate.error) {
-				res.json(new Response({ error: promptTemplate.error }));
-				return;
+				return res
+					.status(promptTemplate.error.code === 404 ? 404 : 500)
+					.json(new Response({ error: promptTemplate.error }));
 			}
 
 			const value = promptTemplate.processedValue;
@@ -208,7 +223,9 @@ export class PromptsRoutes {
 
 			const response = await PromptsTemplate.items(tags, language);
 			if (response.error) {
-				return res.status(500).json(new Response(response));
+				return res
+					.status(response.error.code === 404 ? 404 : 500)
+					.json(new Response({ error: response.error }));
 			}
 
 			res.json(new Response({ data: response.data }));
