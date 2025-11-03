@@ -89,9 +89,8 @@ export /*bundle*/ class AgentV2 extends BaseRealtimeAgent {
 			return false;
 		}
 
-		const voice = ['alloy', 'shimmer', 'echo'];
-		const numero = Math.floor(Math.random() * 3);
-		this.session.update({ voice: voice[numero], instructions: prompt.processedValue });
+		// const voice = ['alloy', 'shimmer', 'echo'];
+		this.session.update({ voice: 'alloy', instructions: prompt.processedValue });
 
 		return true;
 	}

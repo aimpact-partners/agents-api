@@ -18,9 +18,6 @@ export class AudioMessagesRoutes {
 	}
 
 	static async process(req: IAuthenticatedRequest, res: IResponse) {
-		const { test } = req.query;
-		if (!!test) return res.json(new Response({ error: ErrorGenerator.testing() }));
-
 		const chatId = req.params.id;
 		if (!chatId) return res.status(400).json({ status: false, error: 'Parameter chatId is required' });
 
