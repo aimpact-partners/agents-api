@@ -96,7 +96,7 @@ export /*bundle*/ class Chat {
 			if (data.user) specs.user = data.user;
 
 			// only for RVD.users
-			if (data.uid) {
+			if (data.uid && !data.user) {
 				const model = new User(data.uid);
 				await model.load();
 				specs.user = model.toJSON();
