@@ -60,6 +60,9 @@ export /*bundle*/ class Chat {
 	static async save(data: IChatDataSpecs) {
 		try {
 			const id = data.id ?? uuid();
+
+			console.log('chat-save', id, data);
+
 			const response = await chats.data({ id });
 			if (response.error) return new BusinessResponse({ error: response.error });
 
@@ -102,6 +105,7 @@ export /*bundle*/ class Chat {
 			!response.data.exists && !data.parent && (specs.parent = '0'); // if the parent is not received, we set it to root by default
 
 			const method = !response.data.exists ? 'set' : 'merge';
+			console.log('chat--', method, specs);
 			const chatResponse = await chats[method]({ id, data: specs });
 			if (chatResponse.error) return new BusinessResponse({ error: chatResponse.error });
 
