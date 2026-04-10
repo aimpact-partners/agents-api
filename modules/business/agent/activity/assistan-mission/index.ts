@@ -49,9 +49,15 @@ export class AssistantMission {
 			literals: response.literals,
 			messages: messages ?? [],
 			model: GPT_MODEL,
-			temperature: 1,
+			temperature: 0.5,
 			store: store ? true : undefined,
-			metadata: store ? { key: `agent/${activity.type}/${response.prompt}`, prompt: response.prompt } : undefined
+			metadata: store
+				? {
+						key: `agent/${activity.type}/${response.prompt}`,
+						prompt: response.prompt,
+						user: chat.user.email
+					}
+				: undefined
 		};
 
 		return { specs };
