@@ -5,7 +5,6 @@ import type {
 	IQueryExecutionParams,
 	IResolvedTool,
 	IncrementalResponseType,
-	MessagesType,
 	ResponseType
 } from '@aimpact/agents-api/business/models/types';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
@@ -13,43 +12,98 @@ import OpenAI from 'openai';
 
 type FormatResponse = OpenAI.ResponseFormatText | OpenAI.ResponseFormatJSONObject;
 
-const JSON_INSTRUCTION = 'Respond with a valid JSON object.';
+const JSON_MODE_DIRECTIVE =
+	'STRICT_JSON_OUTPUT: Respond with a single valid json value only. ' +
+	'Do not include markdown, code fences, natural language, prefixes, or trailing commentary. ' +
+	'Start the response with `{` or `[` and end with the matching closing bracket. ' +
+	'Example shape (actual keys/structure depend on the task): {"key":"value"}.';
 
-/**
- * DeepSeek requires the word "json" to appear somewhere in the prompt
- * when using response_format: json_object. This helper ensures that
- * constraint is met without modifying the original messages array.
- */
-function ensureJsonInstruction(messages: MessagesType): MessagesType {
-	const hasJsonHint = messages.some(m => {
-		const content = typeof m.content === 'string' ? m.content : '';
-		return content.toLowerCase().includes('json');
-	});
+const JSON_SCHEMA_DIRECTIVE_HEADER =
+	'STRICT_JSON_SCHEMA: Your response MUST be a single JSON value that exactly matches the schema below. ' +
+	'Return every required field using the exact field names, respecting types, enums, and array/object shapes. ' +
+	'When the schema declares `type: "array"`, return a JSON array (not an object keyed by name). ' +
+	'Do not include markdown, code fences, natural language, prefixes, or trailing commentary.';
 
-	if (hasJsonHint) return messages;
+function extractJson(raw: string): string {
+	if (!raw) return raw;
+	let cleaned = raw.trim();
+	// Strip surrounding markdown fences if present
+	cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+	// Slice from the first opening bracket to the last matching closing bracket
+	const firstObj = cleaned.indexOf('{');
+	const firstArr = cleaned.indexOf('[');
+	const candidates = [firstObj, firstArr].filter(i => i !== -1);
+	if (!candidates.length) return cleaned;
+	const start = Math.min(...candidates);
+	const end = Math.max(cleaned.lastIndexOf('}'), cleaned.lastIndexOf(']'));
+	if (end <= start) return cleaned;
+	return cleaned.slice(start, end + 1);
+}
 
-	// Insert a new system message to avoid mutating existing instructions.
-	return [{ role: 'system', content: JSON_INSTRUCTION }, ...messages] as MessagesType;
+function ensureJsonDirective(messages: IQueryExecutionParams['messages']) {
+	// DeepSeek rejects `response_format: json_object` unless the prompt mentions "json".
+	const alreadyRequested = messages.some(m => typeof (m as any)?.content === 'string' && (m as any).content.toLowerCase().includes('json'));
+	if (alreadyRequested) return;
+
+	const first = messages[0] as any;
+	if (first?.role === 'system' && typeof first.content === 'string') {
+		first.content = `${first.content}\n\n${JSON_MODE_DIRECTIVE}`;
+		return;
+	}
+
+	messages.unshift({ role: 'system', content: JSON_MODE_DIRECTIVE } as any);
+}
+
+function ensureSchemaDirective(messages: IQueryExecutionParams['messages'], schema: Record<string, any>) {
+	// DeepSeek does not support `response_format: json_schema` natively.
+	// We inject the schema as a system-level instruction so the model sees the same contract OpenAI sees.
+	if (!schema) return;
+	const directive = `${JSON_SCHEMA_DIRECTIVE_HEADER}\n\nJSON Schema:\n${JSON.stringify(schema, null, 2)}`;
+
+	const first = messages[0] as any;
+	if (first?.role === 'system' && typeof first.content === 'string') {
+		first.content = `${first.content}\n\n${directive}`;
+		return;
+	}
+
+	messages.unshift({ role: 'system', content: directive } as any);
+}
+
+function applyJsonDirective(messages: IQueryExecutionParams['messages'], params: IQueryExecutionParams) {
+	const schemaRequested =
+		params.responseFormat === 'json_schema' ||
+		params.response?.format === 'json_schema' ||
+		params.format === 'json_schema';
+	if (schemaRequested && params.schema) {
+		ensureSchemaDirective(messages, params.schema);
+		return;
+	}
+	ensureJsonDirective(messages);
 }
 
 export /*bundle*/ class DeepSeekCaller {
 	static async *incremental(params: IQueryExecutionParams): IncrementalResponseType {
-		const { model, temperature, tools, browser } = params;
+		const { messages, model, temperature, tools, browser } = params;
 
 		let tool: IResolvedTool | undefined = void 0;
 
-		const isJson = (() => {
-			const { format, responseFormat } = params;
-			return (
-				format === 'json' ||
-				format === 'json_schema' ||
+		const format = (() => {
+			const { format, responseFormat, response: responseOpts } = params;
+			let formatValue: FormatResponse = { type: 'text' };
+			if (
 				responseFormat === 'json' ||
-				responseFormat === 'json_schema'
-			);
+				format === 'json' ||
+				responseFormat === 'json_schema' ||
+				format === 'json_schema' ||
+				responseOpts?.format === 'json' ||
+				responseOpts?.format === 'json_schema'
+			) {
+				formatValue = { type: 'json_object' };
+			}
+			return formatValue;
 		})();
 
-		const format: FormatResponse = isJson ? { type: 'json_object' } : { type: 'text' };
-		const messages = isJson ? ensureJsonInstruction(params.messages) : params.messages;
+		if (format.type === 'json_object') applyJsonDirective(messages, params);
 
 		try {
 			const apiKey = await key.get();
@@ -119,7 +173,7 @@ export /*bundle*/ class DeepSeekCaller {
 	}
 
 	static async generate(params: IQueryExecutionParams): ResponseType {
-		const { model, temperature } = params;
+		const { messages, model, temperature } = params;
 
 		const MAX_RETRIES = 5;
 		const RETRY_INTERVAL = 5000;
@@ -129,30 +183,52 @@ export /*bundle*/ class DeepSeekCaller {
 		const apiKey = await key.get();
 		const openai = new OpenAI({ apiKey, baseURL: 'https://api.deepseek.com' });
 
-		const isJson = (() => {
+		const format = (() => {
 			const { response, responseFormat } = params;
-			return (
+
+			let responseFormatValue: FormatResponse = { type: 'text' };
+			if (
 				responseFormat === 'json' ||
 				response?.format === 'json' ||
 				responseFormat === 'json_schema' ||
 				response?.format === 'json_schema'
-			);
+			) {
+				responseFormatValue = { type: 'json_object' };
+			}
+			return responseFormatValue;
 		})();
 
-		const format: FormatResponse = isJson ? { type: 'json_object' } : { type: 'text' };
-		const messages = isJson ? ensureJsonInstruction(params.messages) : params.messages;
+		if (format.type === 'json_object') applyJsonDirective(messages, params);
 
 		while (retries < MAX_RETRIES) {
 			try {
-				const response = await openai.chat.completions.create({
+				const request = {
 					model,
 					temperature,
 					messages,
 					response_format: format
-				});
+				};
+				console.log('[LLM:deepseek][request] ->', JSON.stringify(request, null, 2));
+
+				const response = await openai.chat.completions.create(request);
+				console.log('[LLM:deepseek][response] <-', JSON.stringify(response, null, 2));
 
 				let { content } = response.choices[0].message;
 				content = content ?? '';
+
+				if (format.type === 'json_object') {
+					const candidate = extractJson(content);
+					try {
+						JSON.parse(candidate);
+						content = candidate;
+					} catch (parseExc) {
+						console.error('DeepSeek returned invalid JSON, retrying', { attempt: retries + 1, content });
+						retries++;
+						await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
+						continue;
+					}
+				}
+
 				return new BusinessResponse({ data: { content } });
 			} catch (exc) {
 				console.error(exc);

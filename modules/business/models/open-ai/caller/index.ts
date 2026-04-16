@@ -170,14 +170,18 @@ export /*bundle*/ class OpenAICaller {
 		// Retry logic for API call
 		while (retries < MAX_RETRIES) {
 			try {
-				const response = await openai.chat.completions.create({
+				const request = {
 					model,
 					temperature,
 					messages,
 					response_format: format,
 					store,
 					metadata
-				});
+				};
+				console.log('[LLM:openai][request] ->', JSON.stringify(request, null, 2));
+
+				const response = await openai.chat.completions.create(request);
+				console.log('[LLM:openai][response] <-', JSON.stringify(response, null, 2));
 
 				let { content } = response.choices[0].message;
 				content = content ?? '';

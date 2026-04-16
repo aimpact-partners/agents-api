@@ -91,6 +91,8 @@ export /*bundle*/ class Chat {
 			const promises: Promise<any>[] = [];
 			const { prompt, answer, ipe } = params;
 
+			// console.log('[storeInteration] incoming ipe ->', JSON.stringify(ipe, null, 2));
+
 			const metadata: Record<string, any> = {};
 			let summary = '';
 			ipe?.forEach(item => {
@@ -111,13 +113,30 @@ export /*bundle*/ class Chat {
 				synthesis: summary
 			};
 
+			const provider = process.env.LLM_PROVIDER ?? 'openai';
+			console.log(`[storeInteration:${provider}][userData] ->`, userData);
+			console.log(`[storeInteration:${provider}][answer] ->`, answer);
+			console.log(`[storeInteration:${provider}][ipe] ->`, JSON.stringify(ipe, null, 2));
+			console.log(`[storeInteration:${provider}][metadata] ->`, JSON.stringify(metadata, null, 2));
+			console.log(`[storeInteration:${provider}][assistantData] ->`, JSON.stringify(assistantData, null, 2));
+
+			const logSaveResult = (stage: string, res: any) => {
+				if (res?.error) {
+					console.log(`[storeInteration:${provider}][${stage}] ERROR ->`, res.error);
+				} else {
+					console.log(`[storeInteration:${provider}][${stage}] OK`);
+				}
+			};
+
 			let response;
 			response = await ChatData.saveMessage(this.id, userData, this.user);
+			logSaveResult('saveMessage:user', response);
 			if (response.error) {
 				this.#error = response.error;
 				return;
 			}
 			response = await ChatData.saveMessage(this.id, assistantData, this.user);
+			logSaveResult('saveMessage:assistant', response);
 			if (response.error) {
 				this.#error = response.error;
 				return;
@@ -126,7 +145,9 @@ export /*bundle*/ class Chat {
 			promises.push(ChatData.setLastInteractions(this.id, 4));
 			promises.push(ChatData.saveIPE(this.id, metadata));
 			responses = await Promise.all(promises);
-			responses.forEach(response => {
+			responses.forEach((response, index) => {
+				const tag = index === 0 ? 'setLastInteractions' : 'saveIPE';
+				logSaveResult(tag, response);
 				if (!response.error) return;
 				this.#error = response.error;
 			});

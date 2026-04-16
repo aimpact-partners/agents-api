@@ -8,9 +8,10 @@ import * as dotenv from 'dotenv';
 import { ILanguage, defaultTexts } from './common';
 
 dotenv.config();
-const { GPT_MODEL, LLM_MODEL, LOGS_PROMPTS } = process.env;
+const { GPT_MODEL, LLM_MODEL, LLM_PROVIDER, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
 const model = LLM_MODEL ?? GPT_MODEL;
+const temperature = (LLM_PROVIDER ?? 'openai').toLowerCase() === 'deepseek' ? 0.3 : 1;
 
 function toKebabCase(text: string) {
 	return text
@@ -116,7 +117,7 @@ export class IPE {
 				category: prompt.category,
 				name: prompt.name,
 				model,
-				temperature: 1,
+				temperature,
 				language: chat.language,
 				format,
 				literals: { ...literals, ...reservedValues, prompt: message, answer }
@@ -145,10 +146,27 @@ export class IPE {
 			}
 
 			try {
+				const provider = process.env.LLM_PROVIDER ?? 'openai';
+				console.log(`[IPE:${provider}][raw] key=${ipe[index].key} prompt=${name} ->`, data?.content);
 				const iteration = entry.format === 'text' ? data?.content : JSON.parse(data?.content);
+				console.log(`[IPE:${provider}][parsed] key=${ipe[index].key} prompt=${name} ->`, JSON.stringify(iteration, null, 2));
 				if (ipe[index].key === 'summary') {
 					ipe[index].response = iteration;
 					return;
+				}
+
+				// Defensive normalization: some providers (e.g. DeepSeek without native json_schema support)
+				// may return `objectives` as an object keyed by name instead of the expected array.
+				// Convert to array so the downstream `.forEach` does not throw.
+				if (
+					iteration?.objectives &&
+					!Array.isArray(iteration.objectives) &&
+					typeof iteration.objectives === 'object'
+				) {
+					iteration.objectives = Object.entries(iteration.objectives).map(([name, value]) => ({
+						name,
+						...(value as object)
+					}));
 				}
 
 				const progress = (() => {
