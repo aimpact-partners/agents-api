@@ -28,17 +28,8 @@ function ensureJsonInstruction(messages: MessagesType): MessagesType {
 
 	if (hasJsonHint) return messages;
 
-	const normalized = [...messages] as MessagesType;
-	const systemIndex = normalized.findIndex(m => m.role === 'system');
-
-	if (systemIndex !== -1) {
-		const sys = normalized[systemIndex] as { role: 'system'; content: string };
-		normalized[systemIndex] = { ...sys, content: `${sys.content}\n${JSON_INSTRUCTION}` };
-	} else {
-		(normalized as any[]).unshift({ role: 'system', content: JSON_INSTRUCTION });
-	}
-
-	return normalized;
+	// Insert a new system message to avoid mutating existing instructions.
+	return [{ role: 'system', content: JSON_INSTRUCTION }, ...messages] as MessagesType;
 }
 
 export /*bundle*/ class DeepSeekCaller {
