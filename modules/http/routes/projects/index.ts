@@ -6,14 +6,14 @@ import type { Application, Response as IResponse, Request } from 'express';
 
 export class ProjectsRoutes {
 	static setup(app: Application) {
-		app.get('/projects/', userMiddleware.validate, this.list);
-		app.get('/projects/:id', userMiddleware.validate, this.get);
-		app.post('/projects/', userMiddleware.validate, this.publish);
-		app.put('/projects/:id', userMiddleware.validate, this.update);
-		// app.delete('/projects/:id', userMiddleware.validate, this.delete);
+		app.get('/projects/',  this.list);
+		app.get('/projects/:id',  this.get);
+		app.post('/projects/',  this.publish);
+		app.put('/projects/:id',  this.update);
+		// app.delete('/projects/:id',  this.delete);
 
-		app.post('/projects/:id/agents', userMiddleware.validate, this.agent);
-		app.get('/projects/agents/activities', userMiddleware.validate, this.agentsActivities);
+		app.post('/projects/:id/agents',  this.agent);
+		app.get('/projects/agents/activities',  this.agentsActivities);
 	}
 
 	static async list(req: Request, res: IResponse) {
