@@ -54,10 +54,11 @@ export class AssistantMission {
 			model,
 			temperature: 1,
 			store: store ? true : undefined,
-			metadata: store ? { key: `agent/${activity.type}/${response.prompt}`, prompt: response.prompt } : undefined
+			metadata: store ? { 
+				key: `agent/${activity.type}/${response.prompt}`,
+				 prompt: response.prompt } : undefined,
+				 user: chat.user.email
 		};
-
-		console.log('specs-------', specs);
 
 		return { specs };
 	}
