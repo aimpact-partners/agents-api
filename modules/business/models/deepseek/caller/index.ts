@@ -5,6 +5,7 @@ import type {
 	IQueryExecutionParams,
 	IResolvedTool,
 	IncrementalResponseType,
+	MessagesType,
 	ResponseType
 } from '@aimpact/agents-api/business/models/types';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
@@ -12,25 +13,52 @@ import OpenAI from 'openai';
 
 type FormatResponse = OpenAI.ResponseFormatText | OpenAI.ResponseFormatJSONObject;
 
+const JSON_INSTRUCTION = 'Respond with a valid JSON object.';
+
+/**
+ * DeepSeek requires the word "json" to appear somewhere in the prompt
+ * when using response_format: json_object. This helper ensures that
+ * constraint is met without modifying the original messages array.
+ */
+function ensureJsonInstruction(messages: MessagesType): MessagesType {
+	const hasJsonHint = messages.some(m => {
+		const content = typeof m.content === 'string' ? m.content : '';
+		return content.toLowerCase().includes('json');
+	});
+
+	if (hasJsonHint) return messages;
+
+	const normalized = [...messages] as MessagesType;
+	const systemIndex = normalized.findIndex(m => m.role === 'system');
+
+	if (systemIndex !== -1) {
+		const sys = normalized[systemIndex] as { role: 'system'; content: string };
+		normalized[systemIndex] = { ...sys, content: `${sys.content}\n${JSON_INSTRUCTION}` };
+	} else {
+		(normalized as any[]).unshift({ role: 'system', content: JSON_INSTRUCTION });
+	}
+
+	return normalized;
+}
+
 export /*bundle*/ class DeepSeekCaller {
 	static async *incremental(params: IQueryExecutionParams): IncrementalResponseType {
-		const { messages, model, temperature, tools, browser } = params;
+		const { model, temperature, tools, browser } = params;
 
 		let tool: IResolvedTool | undefined = void 0;
 
-		const format = (() => {
+		const isJson = (() => {
 			const { format, responseFormat } = params;
-			let response: FormatResponse = { type: 'text' };
-			if (
-				responseFormat === 'json' ||
+			return (
 				format === 'json' ||
-				responseFormat === 'json_schema' ||
-				format === 'json_schema'
-			) {
-				response = { type: 'json_object' };
-			}
-			return response;
+				format === 'json_schema' ||
+				responseFormat === 'json' ||
+				responseFormat === 'json_schema'
+			);
 		})();
+
+		const format: FormatResponse = isJson ? { type: 'json_object' } : { type: 'text' };
+		const messages = isJson ? ensureJsonInstruction(params.messages) : params.messages;
 
 		try {
 			const apiKey = await key.get();
@@ -100,7 +128,7 @@ export /*bundle*/ class DeepSeekCaller {
 	}
 
 	static async generate(params: IQueryExecutionParams): ResponseType {
-		const { messages, model, temperature } = params;
+		const { model, temperature } = params;
 
 		const MAX_RETRIES = 5;
 		const RETRY_INTERVAL = 5000;
@@ -110,20 +138,18 @@ export /*bundle*/ class DeepSeekCaller {
 		const apiKey = await key.get();
 		const openai = new OpenAI({ apiKey, baseURL: 'https://api.deepseek.com' });
 
-		const format = (() => {
+		const isJson = (() => {
 			const { response, responseFormat } = params;
-
-			let responseFormatValue: FormatResponse = { type: 'text' };
-			if (
+			return (
 				responseFormat === 'json' ||
 				response?.format === 'json' ||
 				responseFormat === 'json_schema' ||
 				response?.format === 'json_schema'
-			) {
-				responseFormatValue = { type: 'json_object' };
-			}
-			return responseFormatValue;
+			);
 		})();
+
+		const format: FormatResponse = isJson ? { type: 'json_object' } : { type: 'text' };
+		const messages = isJson ? ensureJsonInstruction(params.messages) : params.messages;
 
 		while (retries < MAX_RETRIES) {
 			try {
