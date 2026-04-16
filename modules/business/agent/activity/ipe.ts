@@ -8,8 +8,9 @@ import * as dotenv from 'dotenv';
 import { ILanguage, defaultTexts } from './common';
 
 dotenv.config();
-const { GPT_MODEL, LOGS_PROMPTS } = process.env;
+const { GPT_MODEL, LLM_MODEL, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
+const model = LLM_MODEL ?? GPT_MODEL;
 
 function toKebabCase(text: string) {
 	return text
@@ -114,7 +115,7 @@ export class IPE {
 			const specs: IPromptExecutionParams = {
 				category: prompt.category,
 				name: prompt.name,
-				model: GPT_MODEL,
+				model,
 				temperature: 1,
 				language: chat.language,
 				format,
