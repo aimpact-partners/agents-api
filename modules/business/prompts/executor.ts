@@ -2,9 +2,10 @@ import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
 import type {
 	IncrementalResponseType,
 	IResolvedTool,
+	MessagesType,
 	ResponseType
-} from '@aimpact/agents-api/business/models/open-ai/caller';
-import { MessagesType, OpenAICaller } from '@aimpact/agents-api/business/models/open-ai/caller';
+} from '@aimpact/agents-api/business/models/types';
+import { ModelResolver } from '@aimpact/agents-api/business/models/resolver';
 import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { PromptTemplateProcessor } from './templates/processor';
 // import type { IToolSpecs } from './tools';
@@ -124,12 +125,13 @@ export /*bundle*/ class PromptTemplateExecutor {
 	async execute(): ResponseType {
 		const { error, prompt, messages, model, temperature, format, schema, store, metadata } = await this.#prepare();
 		if (error) return new BusinessResponse({ error });
+		const caller = ModelResolver.get();
 
 		// Call Open AI to generate the response of the prompt
 		// @todo Add code to support tools in cases of non-incremental executions
 		let content: string;
 		while (true) {
-			const response = await OpenAICaller.generate({
+			const response = await caller.generate({
 				model,
 				temperature,
 				messages,
@@ -148,6 +150,7 @@ export /*bundle*/ class PromptTemplateExecutor {
 
 	async *incremental(): IncrementalResponseType {
 		const { error, prompt, messages, model, temperature, format, schema, store, metadata } = await this.#prepare();
+		const caller = ModelResolver.get();
 
 		if (error) {
 			yield { error };
@@ -158,7 +161,7 @@ export /*bundle*/ class PromptTemplateExecutor {
 		// The iterator can return a tool call of a chunk
 		// Keep iterating while the query returns a tool call
 		while (true) {
-			const iterator = OpenAICaller.incremental({
+			const iterator = caller.incremental({
 				model,
 				temperature,
 				messages,

@@ -1,0 +1,6 @@
+{
+	"name": "business/models/deepseek/key",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}
