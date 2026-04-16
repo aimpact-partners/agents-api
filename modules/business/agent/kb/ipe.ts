@@ -102,7 +102,8 @@ export class IPE {
 				specs.store = true;
 				specs.metadata = {
 					key: `agent/${chat.metadata.activity.type}/${prompt.name}`,
-					prompt: prompt.name
+					prompt: prompt.name,
+					user: chat.user.email
 				};
 			}
 			const promptExecutor = new PromptTemplateExecutor(specs);
