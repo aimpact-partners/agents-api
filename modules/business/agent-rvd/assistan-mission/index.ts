@@ -1,14 +1,14 @@
 import { BusinessErrorManager } from '@aimpact/agents-api/business/errors';
 import type { IPromptExecutionParams } from '@aimpact/agents-api/business/prompts';
 import type { User } from '@aimpact/agents-api/business/user';
-import { MessagesType } from '@aimpact/agents-api/business/models/open-ai/caller';
+import type { MessagesType } from '@aimpact/agents-api/business/models/types';
 import * as dotenv from 'dotenv';
 import { Chat } from '../chat';
 import { v1 } from './v1';
 import { v2 } from './v2';
 
 dotenv.config();
-const { GPT_MODEL, LOGS_PROMPTS } = process.env;
+const { GPT_MODEL, LLM_MODEL, LOGS_PROMPTS } = process.env;
 const USERS_LOGS = ['felix@beyondjs.com', 'julio@beyondjs.com', 'boxenrique@gmail.com'];
 
 interface IResponse {
@@ -44,17 +44,20 @@ export class AssistantMission {
 
 		const { activity } = chat.metadata;
 		const store = LOGS_PROMPTS === 'true' && USERS_LOGS.includes(user.email);
+		const model = LLM_MODEL ?? GPT_MODEL;
 		const specs: IPromptExecutionParams = {
 			language: activity.language,
 			category: 'agents',
 			name: response.prompt,
 			literals: response.literals,
 			messages: messages ?? [],
-			model: GPT_MODEL,
+			model,
 			temperature: 1,
 			store: store ? true : undefined,
 			metadata: store ? { key: `agent/${activity.type}/${response.prompt}`, prompt: response.prompt } : undefined
 		};
+
+		console.log('specs-------', specs);
 
 		return { specs };
 	}

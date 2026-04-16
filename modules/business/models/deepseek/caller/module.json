@@ -1,0 +1,6 @@
+{
+	"name": "business/models/deepseek/caller",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}

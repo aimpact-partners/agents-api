@@ -1,0 +1,6 @@
+{
+	"name": "business/models/types",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}

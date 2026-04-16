@@ -1,0 +1,6 @@
+{
+	"name": "business/models/resolver",
+	"platforms": ["*"],
+	"bundle": "ts",
+	"files": "*"
+}

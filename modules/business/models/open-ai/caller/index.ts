@@ -1,69 +1,24 @@
-import { BusinessErrorManager, ErrorGenerator } from '@aimpact/agents-api/business/errors';
-import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import { key } from '@aimpact/agents-api/business/models/open-ai/key';
+import type {
+	IQueryExecutionParams,
+	IResolvedTool,
+	IncrementalResponseType,
+	ResponseType
+} from '@aimpact/agents-api/business/models/types';
+import { ErrorGenerator } from '@aimpact/agents-api/business/errors';
+import { BusinessResponse } from '@aimpact/agents-api/business/response';
 import OpenAI from 'openai';
 
-// Define the type for messages used in chat completions
-export /*bundle*/ type MessagesType = Omit<OpenAI.Chat.ChatCompletionMessageParam[], 'name'>;
-
-// Define the interface for an AgentTool with its properties and parameters
-export /*bundle*/ interface AgentTool {
-	name: string;
-	description: string;
-	parameters: {
-		type: string;
-		properties: Record<string, { type: string }>;
-		required?: string[];
-	};
-}
-
-// Define the interface for query execution parameters
-export /*bundle*/ interface IQueryExecutionParams {
-	model: string;
-	temperature?: number;
-	messages: MessagesType;
-	tools?: AgentTool[];
-	response?: { format: string };
-	browser?: boolean;
-	format?: 'text' | 'json' | 'json_schema';
-	store?: boolean | null;
-	metadata?: Record<string, string>;
-	schema?: Record<string, any>;
-
-	/**
-	 * @deprecated Use `response.format` instead.
-	 */
-	responseFormat?: 'text' | 'json' | 'json_schema'; // @deprecated
-}
-
-// Define the interface for a resolved tool with parameters and response content
-export /*bundle*/ interface IResolvedTool {
-	name: string;
-	params: string;
-	response?: { content: string };
-}
-
-// Define the interface for incremental responses
-export /*bundle*/ interface IIncrementalResponse {
-	chunk?: string;
-	tool?: IResolvedTool;
-	function?: { content: string } | null;
-	error?: BusinessErrorManager;
-	metadata?: IIncrementalResponseMetadata;
-}
-
-// Define the type for an incremental response as an async generator
-export /*bundle*/ type IncrementalResponseType = AsyncGenerator<IIncrementalResponse>;
-
-// Define the type for a standard response as a promise
-export /*bundle*/ type ResponseType = Promise<BusinessResponse<{ content: string }>>;
-
-// Define the interface for incremental response metadata
-export /*bundle*/ interface IIncrementalResponseMetadata {
-	content?: string;
-	finish: string;
-	messages: MessagesType;
-}
+export type {
+	AgentTool,
+	IIncrementalResponse,
+	IIncrementalResponseMetadata,
+	IQueryExecutionParams,
+	IResolvedTool,
+	IncrementalResponseType,
+	MessagesType,
+	ResponseType
+} from '@aimpact/agents-api/business/models/types';
 
 type FormatResponse = OpenAI.ResponseFormatText | OpenAI.ResponseFormatJSONObject | OpenAI.ResponseFormatJSONSchema;
 
